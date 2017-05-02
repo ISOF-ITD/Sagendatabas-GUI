@@ -20,63 +20,82 @@ export default class TopicsGraph extends React.Component {
 			bottom: 30
 		};
 
-		this.topicsCount = 20;
+		this.topicsCount = this.props.count || 20;
 
-		this.toggleViewModeButtonClickHandler = this.toggleViewModeButtonClickHandler.bind(this);
+		this.orderSelectChangeHandler = this.orderSelectChangeHandler.bind(this);
+		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 
 		this.state = {
 			paramString: '',
+			params: null,
 			data: [],
 			total: null,
 
-			viewMode: 'absolute',
+			order: 'parent_doc_count',
 
 			graphContainerWidth: 800,
-			graphContainerHeight: 400,
+			graphContainerHeight: this.props.graphHeight || 400,
 
 			graphId: 'Graph'+Math.round((new Date()).valueOf()*Math.random())
 		};
 	}
 
 	componentDidMount() {
-		this.renderGraphBase();
+		this.setState({
+			graphContainerWidth: this.refs.container.clientWidth
+		}, function() {
+			this.renderGraphBase();
+		}.bind(this));
 
 		if (window.eventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
 		}
+
+		window.addEventListener('resize', this.windowResizeHandler);
 	}
 
-	toggleViewModeButtonClickHandler() {
-		this.setViewMode(this.state.viewMode == 'absolute' ? 'relative' : 'absolute');
+	windowResizeHandler() {
+		this.setState({
+			graphContainerWidth: this.refs.container.clientWidth
+		}, function() {
+			this.renderGraph();
+		}.bind(this));
 	}
 
-	setViewMode(viewMode) {
-		var currentViewMode = this.state.viewMode;
+	orderSelectChangeHandler(event) {
+		this.setOrder(event.target.value);
+	}
+
+	setOrder(order) {
+		var currentOrder = this.state.order;
 
 		this.setState({
-			viewMode: viewMode
+			order: order
 		}, function() {
-			if (this.state.viewMode != currentViewMode) {
-				this.updateGraph();
+			if (this.state.order != currentOrder) {
+				this.fetchData();
 			}
 		}.bind(this));
 
 	}
 
 	searchHandler(event, data) {
-		this.fetchData(data.params);
-	}
-
-	fetchData(params) {
-		var paramString = paramsHelper.buildParamString(params);
-
-		if (paramString == this.state.paramString) {
+		if (JSON.stringify(data.params) == JSON.stringify(this.state.params)) {
 			return;
 		}
 
 		this.setState({
-			paramString: paramString
-		});
+			params: data.params
+		}, function() {
+			this.fetchData();
+		}.bind(this));
+	}
+
+	fetchData() {
+		var params = this.state.params;
+		params.order = this.state.order;
+
+		var paramString = paramsHelper.buildParamString(this.state.params);
 
 		fetch(config.apiUrl+(this.props.type == 'titles' ? config.endpoints.title_topics : config.endpoints.topics)+'?'+paramString+'&count='+this.topicsCount)
 			.then(function(response) {
@@ -111,12 +130,7 @@ export default class TopicsGraph extends React.Component {
 			.call(d3.axisLeft(y)
 				.ticks(5)
 				.tickFormat(function(d) {
-					if (this.state.viewMode == 'absolute') {
-						return d;
-					}
-					else if (this.state.viewMode == 'relative') {
-						return d*100 < 1 ? d*100 : Math.round(d*100);
-					}
+					return d;
 				}.bind(this))
 				.tickSizeInner([-this.graphWidth])
 			);
@@ -129,27 +143,57 @@ export default class TopicsGraph extends React.Component {
 			.transition()
 			.duration(1000)
 			.attr('y', function(d) {
-				if (this.state.viewMode == 'absolute') {
+				if (this.state.order == 'parent_doc_count') {
+					return y(d.parent_doc_count.doc_count);
+				}
+				else if (this.state.order == '_count') {
 					return y(d.doc_count);
 				}
-				else if (this.state.viewMode == 'relative') {
+				else if (this.state.order == 'probability_avg') {
+					return y(d.probability_avg.value);
+				}
+				else if (this.state.order == 'probability_max') {
+					return y(d.probability_max.value);
+				}
+				else if (this.state.order == 'probability_median.50') {
+					return y(d.probability_median.values['50.0']);
 				}
 			}.bind(this))
 			.attr('height', function(d) {
-				if (this.state.viewMode == 'absolute') {
+				if (this.state.order == 'parent_doc_count') {
+					return this.graphHeight-y(d.parent_doc_count.doc_count);
+				}
+				else if (this.state.order == '_count') {
 					return this.graphHeight-y(d.doc_count);
 				}
-				else if (this.state.viewMode == 'relative') {
+				else if (this.state.order == 'probability_avg') {
+					return this.graphHeight-y(d.probability_avg.value);
+				}
+				else if (this.state.order == 'probability_max') {
+					return this.graphHeight-y(d.probability_max.value);
+				}
+				else if (this.state.order == 'probability_median.50') {
+					return this.graphHeight-y(d.probability_median.values['50.0']);
 				}
 			}.bind(this));
 	}
 
 	createYRange() {
 		var yRangeValues = this.state.data.map(function(item) {
-			if (this.state.viewMode == 'absolute') {
+			if (this.state.order == 'parent_doc_count') {
+				return item.parent_doc_count.doc_count;
+			}
+			else if (this.state.order == '_count') {
 				return item.doc_count;
 			}
-			else if (this.state.viewMode == 'relative') {
+			else if (this.state.order == 'probability_avg') {
+				return item.probability_avg.value;
+			}
+			else if (this.state.order == 'probability_max') {
+				return item.probability_max.value;
+			}
+			else if (this.state.order == 'probability_median.50') {
+				return item.probability_median.values['50.0'];
 			}
 		}.bind(this));
 
@@ -197,12 +241,7 @@ export default class TopicsGraph extends React.Component {
 			.call(d3.axisLeft(y)
 				.ticks(5)
 				.tickFormat(function(d) {
-					if (this.state.viewMode == 'absolute') {
-						return d;
-					}
-					else if (this.state.viewMode == 'relative') {
-						return d*100 < 1 ? d*100 : Math.round(d*100);
-					}
+					return d;
 				}.bind(this))
 				.tickSizeInner([-this.graphWidth])
 			);
@@ -223,12 +262,20 @@ export default class TopicsGraph extends React.Component {
 			}.bind(this))
 			.attr('fill', function(d, i) {
 				return colorScale(d.doc_count);
-			}).on('mousemove', function(d) {
+			})
+			.on('mousemove', function(d) {
+				var html = '<strong>'+d.key+'</strong><br/>'+
+					'Terms: '+d.doc_count+'<br/>'+
+					'Documents: '+d.parent_doc_count.doc_count+'<br/>'+
+					'Avg probability: '+d.probability_avg.value+'<br/>'+
+					'Max probability: '+d.probability_max.value+'<br/>'+
+					'Median probability: '+d.probability_median.values['50.0'];
+
 				this.tooltip
-					.style('left', d3.event.pageX - 50 + 'px')
-					.style('top', d3.event.pageY - 70 + 'px')
+					.style('left', d3.event.pageX + 20 + 'px')
+					.style('top', d3.event.pageY + 'px')
 					.style('display', 'inline-block')
-					.html('<strong>'+d.key+'</strong>: '+d.doc_count);
+					.html(html);
 				}.bind(this))
 				.on('mouseout', function(d) {
 					this.tooltip.style('display', 'none');
@@ -238,35 +285,63 @@ export default class TopicsGraph extends React.Component {
 			.transition()
 			.duration(1000)
 			.attr('y', function(d) {
-				if (this.state.viewMode == 'absolute') {
+				if (this.state.order == 'parent_doc_count') {
+					return y(d.parent_doc_count.doc_count);
+				}
+				else if (this.state.order == '_count') {
 					return y(d.doc_count);
 				}
-				else if (this.state.viewMode == 'relative') {
+				else if (this.state.order == 'probability_avg') {
+					return y(d.probability_avg.value);
+				}
+				else if (this.state.order == 'probability_max') {
+					return y(d.probability_max.value);
+				}
+				else if (this.state.order == 'probability_median.50') {
+					return y(d.probability_median.values['50.0']);
 				}
 			}.bind(this))
 			.attr('height', function(d) {
-				if (this.state.viewMode == 'absolute') {
+				if (this.state.order == 'parent_doc_count') {
+					return this.graphHeight-y(d.parent_doc_count.doc_count);
+				}
+				else if (this.state.order == '_count') {
 					return this.graphHeight-y(d.doc_count);
 				}
-				else if (this.state.viewMode == 'relative') {
+				else if (this.state.order == 'probability_avg') {
+					return this.graphHeight-y(d.probability_avg.value);
+				}
+				else if (this.state.order == 'probability_max') {
+					return this.graphHeight-y(d.probability_max.value);
+				}
+				else if (this.state.order == 'probability_median.50') {
+					return this.graphHeight-y(d.probability_median.values['50.0']);
 				}
 			}.bind(this));
 	}
 
 	render() {
 		return (
-			<div className="graph-wrapper">
+			<div className="graph-wrapper" ref="container">
 
 				{
 					this.state.total &&
-					<p>Total: {this.state.total}</p>
+					<div className="total-number">Total: {this.state.total}</div>
 				}
 
 				<div className='graph-container'>
 					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
 				</div>
 
-				<button onClick={this.toggleViewModeButtonClickHandler}>viewMode: {this.state.viewMode}</button>
+				<div className="graph-controls">
+					<select value={this.state.order} onChange={this.orderSelectChangeHandler}>
+						<option value="parent_doc_count">document</option>
+						<option value="_count">term</option>
+						<option value="probability_avg">avg probability</option>
+						<option value="probability_median.50">median probability</option>
+						<option value="probability_max">max probability</option>
+					</select>
+				</div>
 
 			</div>
 		);

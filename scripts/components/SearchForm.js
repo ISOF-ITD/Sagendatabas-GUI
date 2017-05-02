@@ -13,7 +13,7 @@ export default class SearchForm extends React.Component {
 		this.searchInputKeypressHandler = this.searchInputKeypressHandler.bind(this);
 
 		this.state = {
-			searchInputValue: '',
+			searchInputValue: 'häst',
 			topicsInputValue: ''
 		};
 	}

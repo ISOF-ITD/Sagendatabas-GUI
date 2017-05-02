@@ -8,9 +8,8 @@ import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import paramsHelper from './../utils/paramsHelper';
 
 import config from './../config';
-import categories from './../../ISOF-React-modules/utils/sagenkartaCategories.js';
 
-export default class CategoriesGraph extends React.Component {
+export default class CollectionYearsGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -37,7 +36,7 @@ export default class CategoriesGraph extends React.Component {
 			graphId: 'Graph'+Math.round((new Date()).valueOf()*Math.random())
 		};
 
-		this.fetchTotalCategories();
+		this.fetchTotalByYear();
 	}
 
 	componentDidMount() {
@@ -55,6 +54,7 @@ export default class CategoriesGraph extends React.Component {
 	}
 
 	windowResizeHandler() {
+		console.log('windowResizeHandler');
 		this.setState({
 			graphContainerWidth: this.refs.container.clientWidth
 		}, function() {
@@ -83,16 +83,16 @@ export default class CategoriesGraph extends React.Component {
 		this.fetchData(data.params);
 	}
 
-	getTotalByCategory(category) {
-		return _.findWhere(this.totalByCategoryArray, {key: category}).doc_count;
+	getTotalByYear(year) {
+		return _.findWhere(this.totalByYearArray, {key_as_string: year}).doc_count;
 	}
 
-	fetchTotalCategories() {
-		fetch(config.apiUrl+config.endpoints.categories)
+	fetchTotalByYear() {
+		fetch(config.apiUrl+config.endpoints.collection_years)
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
-				this.totalByCategoryArray = json.aggregations.data.buckets;
+				this.totalByYearArray = json.aggregations.data.data.buckets;
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -110,13 +110,13 @@ export default class CategoriesGraph extends React.Component {
 			paramString: paramString
 		});
 
-		fetch(config.apiUrl+config.endpoints.categories+'?'+paramString)
+		fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramString)
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
 					total: json.hits.total,
-					data: json.aggregations.data.buckets
+					data: json.aggregations.data.data.buckets
 				}, function() {
 					this.renderGraph();
 				}.bind(this));
@@ -134,7 +134,7 @@ export default class CategoriesGraph extends React.Component {
 
 	updateGraph() {
 		this.updateYAxis();
-		this.updateBars();
+		this.updateLines();
 	}
 
 	updateYAxis() {
@@ -154,32 +154,39 @@ export default class CategoriesGraph extends React.Component {
 			);
 	}
 
-	updateBars() {
+	updateLines() {
+		var x = this.createXRange();
 		var y = this.createYRange();
 
-		this.vis.selectAll('.bar')
-			.transition()
-			.duration(1000)
-			.attr('y', function(d) {
+		var lineValue = d3.line()
+			.x(function(d) {
+				return x(Number(d.key_as_string));
+			})
+			.y(function(d) {
 				if (this.state.viewMode == 'absolute') {
 					return y(d.doc_count);
 				}
 				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByCategory(d.key);
+					var total = this.getTotalByYear(d.key_as_string);
 
-					return y(d.doc_count/total);
-				}
-			}.bind(this))
-			.attr('height', function(d) {
-				if (this.state.viewMode == 'absolute') {
-					return this.graphHeight-y(d.doc_count);
-				}
-				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByCategory(d.key);
-
-					return this.graphHeight-y(d.doc_count/total);
+					return y(total == 0 ? 0 : d.doc_count/total);
 				}
 			}.bind(this));
+
+		this.vis.selectAll('path.line')
+			.transition()
+			.duration(1000)
+			.attr('d', lineValue);
+	}
+
+	createXRange() {
+		var x = d3.scaleTime().range([0,this.graphWidth]);
+
+		x.domain(d3.extent(this.state.data, function(d) {
+			return d.key_as_string;
+		}));
+
+		return x;
 	}
 
 	createYRange() {
@@ -188,7 +195,7 @@ export default class CategoriesGraph extends React.Component {
 				return item.doc_count;
 			}
 			else if (this.state.viewMode == 'relative') {
-				var total = this.getTotalByCategory(item.key);
+				var total = this.getTotalByYear(item.key_as_string);
 
 				return item.doc_count/total;
 			}
@@ -197,7 +204,6 @@ export default class CategoriesGraph extends React.Component {
 		var y = d3.scaleLinear()
 			.range([this.graphHeight, 0]);
 
-		
 		y.domain([0, d3.max(yRangeValues)]);
 
 		return y;
@@ -213,17 +219,11 @@ export default class CategoriesGraph extends React.Component {
 		this.graphWidth = this.state.graphContainerWidth-this.graphMargins.left-this.graphMargins.right;
 		this.graphHeight = this.state.graphContainerHeight-this.graphMargins.top-this.graphMargins.bottom;
 
-		var x = d3.scaleBand()
-			.rangeRound([0, this.graphWidth])
-			.padding(0.1);
-
-		x.domain(this.state.data.map(function(d) {
-			return d.key;
-		}));
+		var x = this.createXRange();
 
 		var y = this.createYRange();
 
-		var colorScale = d3.scaleOrdinal(d3.schemeCategory20)
+		var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');
@@ -231,7 +231,9 @@ export default class CategoriesGraph extends React.Component {
 		this.vis.append('g')
 			.attr('class', 'x axis')
 			.attr('transform', 'translate(0, '+this.graphHeight+')')
-			.call(d3.axisBottom(x));
+			.call(d3.axisBottom(x)
+				.tickFormat(d3.format(5, '+%'))
+			);
 
 		this.vis.append('g')
 			.attr('class', 'y axis')
@@ -248,58 +250,90 @@ export default class CategoriesGraph extends React.Component {
 				.tickSizeInner([-this.graphWidth])
 			);
 
-		this.vis.selectAll('.bar')
-			.data(this.state.data)
-			.enter().append('rect')
-			.attr('class', 'bar')
-			.attr('x', function(d) {
-				return x(d.key);
+		this.axisMarker = this.vis.append('line')
+			.attr('class', 'x axis-marker')
+			.attr('x1', 0)
+			.attr('y1', 0)
+			.attr('x2', 0)
+			.attr('y2', this.graphHeight)
+			.style('display', 'none');
+
+		var flatLineValue = d3.line()
+			.x(function(d) {
+				return x(Number(d.key_as_string));
 			})
-			.attr('width', x.bandwidth())
-			.attr('y', function(d) {
-				return y(0);
-			}.bind(this))
-			.attr('height', function(d) {
-				return this.graphHeight-y(0);
-			}.bind(this))
-			.attr('fill', function(d, i) {
-				return colorScale(d.doc_count);
-			}).on('mousemove', function(d) {
-				var total = this.getTotalByCategory(d.key);
+			.y(this.graphHeight);
 
-				this.tooltip
-					.style('left', d3.event.pageX + 20 + 'px')
-					.style('top', d3.event.pageY + 'px')
-					.style('display', 'inline-block')
-					.html((d.key != ' ' ? '<strong>'+d.key+'</strong>: ' : '')+categories.getCategoryName(d.key)+'<br/>'+d.doc_count+' (total '+total+')');
-			}.bind(this))
-			.on('mouseout', function(d) {
-				this.tooltip.style('display', 'none');
-			}.bind(this));
-
-		this.vis.selectAll('.bar')
-			.transition()
-			.duration(1000)
-			.attr('y', function(d) {
+		var lineValue = d3.line()
+			.x(function(d) {
+				return x(Number(d.key_as_string));
+			})
+			.y(function(d) {
 				if (this.state.viewMode == 'absolute') {
 					return y(d.doc_count);
 				}
 				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByCategory(d.key);
+					var total = this.getTotalByYear(d.key_as_string);
 
 					return y(d.doc_count/total);
 				}
-			}.bind(this))
-			.attr('height', function(d) {
-				if (this.state.viewMode == 'absolute') {
-					return this.graphHeight-y(d.doc_count);
-				}
-				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByCategory(d.key);
-
-					return this.graphHeight-y(d.doc_count/total);
-				}
 			}.bind(this));
+
+		this.vis.append('path')
+			.data([this.state.data])
+			.attr('class', 'line')
+			.attr('d', flatLineValue)
+			.attr('stroke', 'black');
+
+		this.vis.selectAll('path.line')
+			.transition()
+			.duration(1000)
+			.attr('d', lineValue);
+
+		this.vis.append('rect')
+			.attr('class', 'overlay')
+			.attr('width', this.graphWidth)
+			.attr('height', this.graphHeight)
+			.on('mouseover', function() {
+				this.tooltip.style('display', null);
+				this.axisMarker.style('display', null);
+			}.bind(this))
+			.on('mouseout', function() {
+				this.tooltip.style('display', 'none');
+				this.axisMarker.style('display', 'none');
+			}.bind(this))
+			.on('mousemove', mousemove);
+
+		var bisectDate = d3.bisector(function(d) {
+			return d.key_as_string;
+		}).left;
+
+		var view = this;
+
+		function mousemove() {
+			function getTotalYearData(mousePos, dataArray) {
+				var x0 = x.invert(Math.round(mousePos));
+				var i = bisectDate(view.state.data, x0, 1);
+				var d0 = view.state.data[i - 1];
+				var d1 = view.state.data[i];
+				var d = x0 - d0.key_as_string > d1.key_as_string - x0 ? d1 : d0 || null;
+
+				return d;
+			}
+
+			var yearData = getTotalYearData(d3.mouse(this)[0]);
+
+			view.tooltip
+				.style('left', d3.event.pageX + 20 + 'px')
+				.style('top', d3.event.pageY + 'px')
+				.style('display', 'inline-block')
+				.html('<strong>'+yearData.key_as_string+'</strong><br/>'+
+					'Antal: '+yearData.doc_count+'<br/>'+
+					'Total: '+view.getTotalByYear(yearData.key_as_string)
+				);
+
+			view.axisMarker.attr('transform', 'translate('+d3.mouse(this)[0]+', 0)');
+		}
 	}
 
 	render() {
