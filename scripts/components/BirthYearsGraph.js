@@ -20,6 +20,12 @@ export default class BirthYearsGraph extends React.Component {
 			bottom: 30
 		};
 
+		this.lineColors = [
+			'#9ecae1',
+			'#ff7f0e',
+			'#2ca02c'
+		];
+
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 
@@ -27,6 +33,8 @@ export default class BirthYearsGraph extends React.Component {
 			paramString: '',
 			data: [],
 			total: null,
+
+			loading: false,
 
 			viewMode: 'absolute',
 
@@ -106,7 +114,8 @@ export default class BirthYearsGraph extends React.Component {
 		}
 
 		this.setState({
-			paramString: paramString
+			paramString: paramString,
+			loading: true
 		});
 
 		fetch(config.apiUrl+config.endpoints.birth_years+'?'+paramString)
@@ -117,7 +126,8 @@ export default class BirthYearsGraph extends React.Component {
 					total: json.hits.total,
 					data: json.aggregations.data.data.buckets,
 					informantsData: json.aggregations.informants.data.data.buckets,
-					collectorsData: json.aggregations.collectors.data.data.buckets
+					collectorsData: json.aggregations.collectors.data.data.buckets,
+					loading: false
 				}, function() {
 					this.renderGraph();
 				}.bind(this));
@@ -258,8 +268,6 @@ export default class BirthYearsGraph extends React.Component {
 
 		var y = this.createYRange();
 
-		var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
-
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');
 
@@ -312,8 +320,8 @@ export default class BirthYearsGraph extends React.Component {
 				.attr('class', 'line line-'+lineIndex)
 				.attr('d', flatLineValue)
 				.attr('stroke', function() {
-					return colorScale(lineIndex);
-				})
+					return this.lineColors[lineIndex];
+				}.bind(this))
 
 			this.vis.select('path.line-'+lineIndex)
 				.transition()
@@ -389,23 +397,25 @@ export default class BirthYearsGraph extends React.Component {
 
 	render() {
 		return (
-			<div className='graph-wrapper' ref='container'>
+			<div className={'graph-wrapper'+(this.state.loading ? ' loading' : '')} ref="container">
 
 				{
 					this.state.total &&
-					<div className='total-number'>Total: {this.state.total}</div>
+					<div className="total-number">Total: {this.state.total}</div>
 				}
 
-				<div className='graph-container'>
-					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
+				<div className="graph-container">
+					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref="graphContainer"/>
 				</div>
 
-				<div className='graph-controls'>
+				<div className="graph-controls">
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
-						<option value='absolute'>absolute</option>
-						<option value='relative'>relative</option>
+						<option value="absolute">absolute</option>
+						<option value="relative">relative</option>
 					</select>
 				</div>
+
+				<div className="loading-overlay"></div>
 
 			</div>
 		);

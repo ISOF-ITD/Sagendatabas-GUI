@@ -4,6 +4,8 @@ import _ from 'underscore';
 
 import paramsHelper from './../utils/paramsHelper';
 
+import DocumentsListItem from './DocumentsListItem';
+
 import config from './../config';
 
 export default class DocumentsList extends React.Component {
@@ -12,7 +14,8 @@ export default class DocumentsList extends React.Component {
 
 		this.state = {
 			total: null,
-			data: []
+			data: [],
+			loading: false
 		};
 	}
 
@@ -34,7 +37,8 @@ export default class DocumentsList extends React.Component {
 		}
 
 		this.setState({
-			paramString: paramString
+			paramString: paramString,
+			loading: true
 		});
 
 		fetch(config.apiUrl+config.endpoints.documents+'?'+paramString)
@@ -43,7 +47,8 @@ export default class DocumentsList extends React.Component {
 			}).then(function(json) {
 				this.setState({
 					total: json.hits.total,
-					data: json.hits.hits
+					data: json.hits.hits,
+					loading: false
 				});
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
@@ -52,14 +57,18 @@ export default class DocumentsList extends React.Component {
 	}
 
 	render() {
-		var documents = this.state.data.map(function(item) {
-			return <div key={item._id}>{item._source.title}</div>
+		var documentItems = this.state.data.map(function(item) {
+			return <DocumentsListItem key={item._id} doc={item} />
 		});
 
 		return (
-			<div>
+			<div className={'documents-list'+(this.state.loading ? ' loading' : '')}>
 
-				{documents}>
+				<div className="items">
+					{documentItems}
+				</div>
+
+				<div className="loading-overlay"></div>
 
 			</div>
 		);

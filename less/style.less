@@ -7,101 +7,32 @@
 @import "../ISOF-React-modules/less/minimal-scrollbar.less";
 @import "../ISOF-React-modules/less/tables.less";
 
+@import "../ISOF-React-modules/less/advanced/graph.less";
+@import "../ISOF-React-modules/less/advanced/documents-list.less";
+
 @color-red: #a6192e;
 @color-red-lighter: #d4454c;
 @color-red-divider: #b62837;
 @color-gray: #edeff1;
 
-
 body {
 	padding: 0;
 	margin: 0;
-
-	background: #f8f8f8;
 
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 1rem;
 }
 
-hr {
-	margin: 10px 0 30px 0;
-}
-
-.graph-tooltip {
-	display: none;
-	
-	position: absolute;
-	
-	min-width: 80px;
-	height: auto;
-
-	padding: 14px;
-	
-	background: none repeat scroll 0 0 #f2f2f2;
-	
-	border: 1px solid #cccccc;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.graph-wrapper {
-	position: relative;
-
-	padding: 50px 10px 0 0;
+.component-frame {
 	margin-bottom: 20px;
 
 	box-sizing: border-box;
 	border-radius: 1px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 
-	background: #fff;
+	background: #f8f8f8;
+}
 
-	.total-number {
-		position: absolute;
-
-		top: 20px;
-		left: 20px;
-
-		font-size: 0.9rem;
-		color: #737373;
-	}
-
-	.graph-container {
-		.axis {
-			font: 1.4rem;
-
-			path, line {
-				fill: none;
-				stroke: #D4D8DA;
-				stroke-width: 1px;
-				shape-rendering: crispEdges;
-			}
-		}
-
-		path.line {
-			fill: none;
-		}
-
-		.overlay {
-			fill: none;
-			pointer-events: all;
-		}
-
-		.focus circle {
-			fill: #F1F3F3;
-			stroke: #6F257F;
-			stroke-width: 5px;
-		}
-
-		.axis-marker {
-			stroke: #999;
-			stroke-width: 1px;
-			stroke-dasharray: 3,3;
-		}
-	}
-
-	.graph-controls {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-	}
+hr {
+	margin: 10px 0 30px 0;
 }

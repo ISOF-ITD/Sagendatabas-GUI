@@ -29,6 +29,8 @@ export default class CategoriesGraph extends React.Component {
 			data: [],
 			total: null,
 
+			loading: false,
+
 			viewMode: 'absolute',
 
 			graphContainerWidth: 800,
@@ -107,7 +109,8 @@ export default class CategoriesGraph extends React.Component {
 		}
 
 		this.setState({
-			paramString: paramString
+			paramString: paramString,
+			loading: true
 		});
 
 		fetch(config.apiUrl+config.endpoints.categories+'?'+paramString)
@@ -116,7 +119,8 @@ export default class CategoriesGraph extends React.Component {
 			}).then(function(json) {
 				this.setState({
 					total: json.hits.total,
-					data: json.aggregations.data.buckets
+					data: json.aggregations.data.buckets,
+					loading: false
 				}, function() {
 					this.renderGraph();
 				}.bind(this));
@@ -304,14 +308,14 @@ export default class CategoriesGraph extends React.Component {
 
 	render() {
 		return (
-			<div className="graph-wrapper" ref="container">
+			<div className={'graph-wrapper'+(this.state.loading ? ' loading' : '')} ref="container">
 
 				{
 					this.state.total &&
 					<div className="total-number">Total: {this.state.total}</div>
 				}
 
-				<div className='graph-container'>
+				<div className="graph-container">
 					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
 				</div>
 
@@ -321,6 +325,8 @@ export default class CategoriesGraph extends React.Component {
 						<option value="relative">relative</option>
 					</select>
 				</div>
+
+				<div className="loading-overlay"></div>
 
 			</div>
 		);

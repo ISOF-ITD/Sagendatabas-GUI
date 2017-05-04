@@ -1,6 +1,6 @@
 export default {
-//	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
-	apiUrl: 'http://130.238.89.158:8000/sagenkarta/es/',
+	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
+//	apiUrl: 'http://130.238.49.182:8000/sagenkarta/es/',
 
 	endpoints: {
 		topics: 'topics/',

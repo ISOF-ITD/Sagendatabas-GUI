@@ -31,6 +31,8 @@ export default class TopicsGraph extends React.Component {
 			data: [],
 			total: null,
 
+			loading: true,
+
 			order: 'parent_doc_count',
 
 			graphContainerWidth: 800,
@@ -97,13 +99,19 @@ export default class TopicsGraph extends React.Component {
 
 		var paramString = paramsHelper.buildParamString(this.state.params);
 
+		this.setState({
+			paramString: paramString,
+			loading: true
+		});
+
 		fetch(config.apiUrl+(this.props.type == 'titles' ? config.endpoints.title_topics : config.endpoints.topics)+'?'+paramString+'&count='+this.topicsCount)
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
 					total: json.hits.total,
-					data: json.aggregations.data.data.data.buckets
+					data: json.aggregations.data.data.data.buckets,
+					loading: false
 				}, function() {
 					this.renderGraph();
 				}.bind(this));
@@ -322,7 +330,7 @@ export default class TopicsGraph extends React.Component {
 
 	render() {
 		return (
-			<div className="graph-wrapper" ref="container">
+			<div className={'graph-wrapper'+(this.state.loading ? ' loading' : '')} ref="container">
 
 				{
 					this.state.total &&
@@ -342,6 +350,8 @@ export default class TopicsGraph extends React.Component {
 						<option value="probability_max">max probability</option>
 					</select>
 				</div>
+
+				<div className="loading-overlay"></div>
 
 			</div>
 		);

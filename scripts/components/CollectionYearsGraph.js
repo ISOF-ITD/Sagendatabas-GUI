@@ -28,6 +28,8 @@ export default class CollectionYearsGraph extends React.Component {
 			data: [],
 			total: null,
 
+			loading: false,
+
 			viewMode: 'absolute',
 
 			graphContainerWidth: 800,
@@ -107,7 +109,8 @@ export default class CollectionYearsGraph extends React.Component {
 		}
 
 		this.setState({
-			paramString: paramString
+			paramString: paramString,
+			loading: true
 		});
 
 		fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramString)
@@ -116,7 +119,8 @@ export default class CollectionYearsGraph extends React.Component {
 			}).then(function(json) {
 				this.setState({
 					total: json.hits.total,
-					data: json.aggregations.data.data.buckets
+					data: json.aggregations.data.data.buckets,
+					loading: false
 				}, function() {
 					this.renderGraph();
 				}.bind(this));
@@ -338,7 +342,7 @@ export default class CollectionYearsGraph extends React.Component {
 
 	render() {
 		return (
-			<div className="graph-wrapper" ref="container">
+			<div className={'graph-wrapper'+(this.state.loading ? ' loading' : '')} ref="container">
 
 				{
 					this.state.total &&
@@ -355,6 +359,8 @@ export default class CollectionYearsGraph extends React.Component {
 						<option value="relative">relative</option>
 					</select>
 				</div>
+
+				<div className="loading-overlay"></div>
 
 			</div>
 		);
