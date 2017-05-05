@@ -20,8 +20,24 @@ export default class DocumentsList extends React.Component {
 	}
 
 	componentDidMount() {
-		if (window.eventBus) {
+		if (window.eventBus && !this.props.disableEventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+		}
+
+		console.log(this.props);
+		if (this.props.similarDocs) {
+			console.log('load similar');
+			this.fetchData({
+				similar: this.props.similarDocs
+			});
+		}
+	}
+
+	componentWillReceiveProps(props) {
+		if (props.similarDocs) {
+			this.fetchData({
+				similar: props.similarDocs
+			});
 		}
 	}
 
@@ -58,8 +74,8 @@ export default class DocumentsList extends React.Component {
 
 	render() {
 		var documentItems = this.state.data.map(function(item) {
-			return <DocumentsListItem key={item._id} doc={item} />
-		});
+			return <DocumentsListItem key={item._id} doc={item} displayScore={this.props.displayScore} />
+		}.bind(this));
 
 		return (
 			<div className={'documents-list'+(this.state.loading ? ' loading' : '')}>

@@ -8,6 +8,7 @@ export default {
 		categories: 'categories/',
 		collection_years: 'collection_years/',
 		birth_years: 'birth_years/',
-		documents: 'documents/'
+		documents: 'documents/',
+		document: 'document/'
 	}
 };

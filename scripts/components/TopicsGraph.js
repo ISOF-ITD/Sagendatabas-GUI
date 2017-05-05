@@ -31,7 +31,7 @@ export default class TopicsGraph extends React.Component {
 			data: [],
 			total: null,
 
-			loading: true,
+			loading: false,
 
 			order: 'parent_doc_count',
 

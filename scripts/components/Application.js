@@ -9,21 +9,44 @@ import CollectionYearsGraph from './CollectionYearsGraph';
 import CategoriesGraph from './CategoriesGraph';
 import BirthYearsGraph from './BirthYearsGraph';
 import DocumentsList from './DocumentsList';
+import AdvancedMapView from './AdvancedMapView';
+
+import PopupWindow from './../../ISOF-React-modules/components/views/PopupWindow';
 
 export default class Application extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.state = {
+			popupVisible: false
+		};
+
+		this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
+		this.popupWindowHideHandler = this.popupWindowHideHandler.bind(this);
+		this.popupCloseHandler = this.popupCloseHandler.bind(this);
+
 		window.eventBus = EventBus;
 	}
 
-	componentDidMount() {
-		this.refs.searchForm.triggerSearch();
+	popupCloseHandler() {
+		hashHistory.push('/');
+	}
+
+	popupWindowShowHandler() {
+		document.body.classList.add('has-overlay');
+	}
+
+	popupWindowHideHandler() {
+		document.body.classList.remove('has-overlay');
 	}
 
 	render() {
+		const {
+			popup
+		} = this.props;
+
 		return (
-			<div className="container">
+			<div className={'container app-container'}>
 
 				<h1>Sägendatabas</h1>
 
@@ -31,8 +54,23 @@ export default class Application extends React.Component {
 
 				<hr/>
 
-				<h2>CategoriesGraph</h2>
-				<CategoriesGraph />
+				<div className="row">
+
+					<div className="twelve columns">
+						<h2>AdvancedMapView</h2>
+						<AdvancedMapView mapHeight="400" />
+					</div>
+
+				</div>
+
+				<div className="row">
+
+					<div className="twelve columns">
+						<h2>CategoriesGraph</h2>
+						<CategoriesGraph />
+					</div>
+
+				</div>
 
 				<div className="row">
 
@@ -71,6 +109,10 @@ export default class Application extends React.Component {
 				</div>
 
 				<DocumentsList />
+
+				<PopupWindow onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
+					{popup}
+				</PopupWindow>
 
 			</div>
 		);

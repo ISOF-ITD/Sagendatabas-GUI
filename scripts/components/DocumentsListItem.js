@@ -23,10 +23,12 @@ export default class DocumentsListItem extends React.Component {
 	}
 
 	componentWillReceiveProps(props) {
-		this.setState({
-			open: false,
-			doc: props.doc
-		})
+		if (this.state.doc._id != props.doc._id) {
+			this.setState({
+				open: false,
+				doc: props.doc
+			})
+		}
 	}
 
 	headerClickHandler() {
@@ -43,7 +45,14 @@ export default class DocumentsListItem extends React.Component {
 
 					<span className="props">
 						<span className="prop">{this.state.doc._source.materialtype}</span>
-						<span className="prop">{this.state.doc._source.taxonomy.category ? (this.state.doc._source.taxonomy.category+': '+this.state.doc._source.taxonomy.name) : ''}</span>
+						{
+							this.state.doc._source.taxonomy.category && 
+							<span className="prop">{this.state.doc._source.taxonomy.category+': '+this.state.doc._source.taxonomy.name}</span>
+						}
+						{
+							this.props.displayScore && 
+							<span className="prop"><div className="score-view">&nbsp;<span className="score" style={{width: this.state.doc._score+'%'}}></span></div></span>
+						}
 					</span>
 
 					<div className="u-cf"></div>
@@ -51,9 +60,10 @@ export default class DocumentsListItem extends React.Component {
 
 				<div className="content">
 					{
-						this.props &&
-						<p dangerouslySetInnerHTML={{__html: this.state.doc.highlight ? this.state.doc.highlight.text[0] : this.pros.doc._source.text}}></p>
+						this.state.doc &&
+						<p className={'text-viewer'+(this.state.doc._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html: this.state.doc.highlight ? this.state.doc.highlight.text[0] : this.state.doc._source.text}}></p>
 					}
+					<a className="button" href={'#/document/'+this.state.doc._id}>Visa</a>
 				</div>
 
 			</div>
