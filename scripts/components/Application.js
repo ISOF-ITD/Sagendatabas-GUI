@@ -53,16 +53,7 @@ export default class Application extends React.Component {
 				<SearchForm ref="searchForm" />
 
 				<hr/>
-
-				<div className="row">
-
-					<div className="twelve columns">
-						<h2>AdvancedMapView</h2>
-						<AdvancedMapView mapHeight="400" />
-					</div>
-
-				</div>
-
+				
 				<div className="row">
 
 					<div className="twelve columns">

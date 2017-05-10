@@ -9,6 +9,7 @@ export default {
 		collection_years: 'collection_years/',
 		birth_years: 'birth_years/',
 		documents: 'documents/',
-		document: 'document/'
+		document: 'document/',
+		county: 'county/'
 	}
 };
