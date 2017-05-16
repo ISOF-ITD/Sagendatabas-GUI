@@ -1859,7 +1859,6 @@ td .play-button {
 .autocomplete-input .autocomplete-list {
   position: absolute;
   top: 37px;
-  width: 100%;
   max-height: 300px;
   border: 1px solid #d1d1d1;
   border-radius: 2px;

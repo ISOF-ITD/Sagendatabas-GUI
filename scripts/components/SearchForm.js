@@ -140,7 +140,7 @@ export default class SearchForm extends React.Component {
 
 						<div className="four columns">
 							<label>Topics:</label>
-							<AutocompleteInput searchUrl={config.apiUrl+config.endpoints.topics_autocomplete+'?search='} 
+							<AutocompleteInput searchUrl={config.apiUrl+config.endpoints.topics_autocomplete+'?search=$s'} 
 								valueField="topic"
 								inputClassName="u-full-width" 
 								onChange={this.topicsInputChangeHandler} 
@@ -149,16 +149,14 @@ export default class SearchForm extends React.Component {
 								listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
 
 							<label>Titel topics:</label>
-							<AutocompleteInput searchUrl={config.apiUrl+config.endpoints.title_topics_autocomplete+'?search='} 
+							<AutocompleteInput searchUrl={config.apiUrl+config.endpoints.title_topics_autocomplete+'?search=$s'} 
 								valueField="topic"
 								inputClassName="u-full-width" 
 								onChange={this.titleTopicsInputChangeHandler} 
 								value={this.state.titleTopicsInputValue} 
 								onEnter={this.triggerSearch}
 								listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
-							<AutocompleteInput searchUrl={'http://localhost:8000/sagenkarta/es/persons/?person='} 
-								valueField="name"
-								inputClassName="u-full-width" />
+
 						</div>
 
 						<div className="four columns">
