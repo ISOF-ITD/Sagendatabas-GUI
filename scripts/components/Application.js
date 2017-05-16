@@ -10,6 +10,7 @@ import CategoriesGraph from './CategoriesGraph';
 import BirthYearsGraph from './BirthYearsGraph';
 import DocumentsList from './DocumentsList';
 import AdvancedMapView from './AdvancedMapView';
+import {TabsContainer, Tab} from './TabControl';
 
 import PopupWindow from './../../ISOF-React-modules/components/views/PopupWindow';
 
@@ -48,17 +49,34 @@ export default class Application extends React.Component {
 		return (
 			<div className={'container app-container'}>
 
-				<h1>Sägendatabas</h1>
+				<h1></h1>
 
 				<SearchForm ref="searchForm" />
 
-				<hr/>
+				<div className="row">
+
+					<div className="twelve columns">
+						<AdvancedMapView mapHeight="400" />
+					</div>
+
+				</div>
+
+				<div className="row">
+
+					<div className="twelve columns">
+
+						<TabsContainer>
+							<Tab tabName="Kategorier">
+								<CategoriesGraph graphHeight="300" />
+							</Tab>
+							<Tab tabName="Topics">
+								<TopicsGraph count="15" graphHeight="300" />
+							</Tab>
+							<Tab tabName="Title topics">
+								<TopicsGraph count="15" type="titles" graphHeight="300" />
+							</Tab>
+						</TabsContainer>
 				
-				<div className="row">
-
-					<div className="twelve columns">
-						<h2>CategoriesGraph</h2>
-						<CategoriesGraph />
 					</div>
 
 				</div>
@@ -66,25 +84,7 @@ export default class Application extends React.Component {
 				<div className="row">
 
 					<div className="twelve columns">
-						<h2>TopicsGraph</h2>
-						<TopicsGraph count="15" graphHeight="300" />
-					</div>
-
-				</div>
-
-				<div className="row">
-
-					<div className="twelve columns">
-						<h2>TopicsGraph: type=titles</h2>
-						<TopicsGraph count="15" type="titles" graphHeight="300" />
-					</div>
-
-				</div>
-
-				<div className="row">
-
-					<div className="twelve columns">
-						<h2>CollectionYearsGraph</h2>
+						<h2>Uppteckningsår</h2>
 						<CollectionYearsGraph graphHeight="300" />
 					</div>
 
@@ -93,7 +93,7 @@ export default class Application extends React.Component {
 				<div className="row">
 
 					<div className="twelve columns">
-						<h2>BirthYearsGraph</h2>
+						<h2>Födelseår</h2>
 						<BirthYearsGraph graphHeight="300" />
 					</div>
 

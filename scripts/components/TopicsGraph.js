@@ -109,8 +109,8 @@ export default class TopicsGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.hits.total,
-					data: json.aggregations.data.data.data.buckets,
+					total: json.metadata.total,
+					data: json.data,
 					loading: false
 				}, function() {
 					this.renderGraph();
@@ -152,36 +152,18 @@ export default class TopicsGraph extends React.Component {
 			.duration(1000)
 			.attr('y', function(d) {
 				if (this.state.order == 'parent_doc_count') {
-					return y(d.parent_doc_count.doc_count);
-				}
-				else if (this.state.order == '_count') {
 					return y(d.doc_count);
 				}
-				else if (this.state.order == 'probability_avg') {
-					return y(d.probability_avg.value);
-				}
-				else if (this.state.order == 'probability_max') {
-					return y(d.probability_max.value);
-				}
-				else if (this.state.order == 'probability_median.50') {
-					return y(d.probability_median.values['50.0']);
+				else if (this.state.order == '_count') {
+					return y(d.terms);
 				}
 			}.bind(this))
 			.attr('height', function(d) {
 				if (this.state.order == 'parent_doc_count') {
-					return this.graphHeight-y(d.parent_doc_count.doc_count);
-				}
-				else if (this.state.order == '_count') {
 					return this.graphHeight-y(d.doc_count);
 				}
-				else if (this.state.order == 'probability_avg') {
-					return this.graphHeight-y(d.probability_avg.value);
-				}
-				else if (this.state.order == 'probability_max') {
-					return this.graphHeight-y(d.probability_max.value);
-				}
-				else if (this.state.order == 'probability_median.50') {
-					return this.graphHeight-y(d.probability_median.values['50.0']);
+				else if (this.state.order == '_count') {
+					return this.graphHeight-y(d.terms);
 				}
 			}.bind(this));
 	}
@@ -189,19 +171,10 @@ export default class TopicsGraph extends React.Component {
 	createYRange() {
 		var yRangeValues = this.state.data.map(function(item) {
 			if (this.state.order == 'parent_doc_count') {
-				return item.parent_doc_count.doc_count;
-			}
-			else if (this.state.order == '_count') {
 				return item.doc_count;
 			}
-			else if (this.state.order == 'probability_avg') {
-				return item.probability_avg.value;
-			}
-			else if (this.state.order == 'probability_max') {
-				return item.probability_max.value;
-			}
-			else if (this.state.order == 'probability_median.50') {
-				return item.probability_median.values['50.0'];
+			else if (this.state.order == '_count') {
+				return item.terms;
 			}
 		}.bind(this));
 
@@ -229,7 +202,7 @@ export default class TopicsGraph extends React.Component {
 			.padding(0.1);
 
 		x.domain(this.state.data.map(function(d) {
-			return d.key;
+			return d.topic;
 		}));
 
 		var y = this.createYRange();
@@ -259,7 +232,7 @@ export default class TopicsGraph extends React.Component {
 			.enter().append('rect')
 			.attr('class', 'bar')
 			.attr('x', function(d) {
-				return x(d.key);
+				return x(d.topic);
 			})
 			.attr('width', x.bandwidth())
 			.attr('y', function(d) {
@@ -272,13 +245,9 @@ export default class TopicsGraph extends React.Component {
 				return colorScale(d.doc_count);
 			})
 			.on('mousemove', function(d) {
-				var html = '<strong>'+d.key+'</strong><br/>'+
-					'Terms: '+d.doc_count+'<br/>'+
-					'Documents: '+d.parent_doc_count.doc_count+'<br/>'+
-					'Avg probability: '+d.probability_avg.value+'<br/>'+
-					'Max probability: '+d.probability_max.value+'<br/>'+
-					'Median probability: '+d.probability_median.values['50.0'];
-
+				var html = '<strong>'+d.topic+'</strong><br/>'+
+					'Terms: '+d.terms+'<br/>'+
+					'Documents: '+d.doc_count+'<br/>';
 				this.tooltip
 					.style('left', d3.event.pageX + 20 + 'px')
 					.style('top', d3.event.pageY + 'px')
@@ -294,36 +263,18 @@ export default class TopicsGraph extends React.Component {
 			.duration(1000)
 			.attr('y', function(d) {
 				if (this.state.order == 'parent_doc_count') {
-					return y(d.parent_doc_count.doc_count);
-				}
-				else if (this.state.order == '_count') {
 					return y(d.doc_count);
 				}
-				else if (this.state.order == 'probability_avg') {
-					return y(d.probability_avg.value);
-				}
-				else if (this.state.order == 'probability_max') {
-					return y(d.probability_max.value);
-				}
-				else if (this.state.order == 'probability_median.50') {
-					return y(d.probability_median.values['50.0']);
+				else if (this.state.order == '_count') {
+					return y(d.terms);
 				}
 			}.bind(this))
 			.attr('height', function(d) {
 				if (this.state.order == 'parent_doc_count') {
-					return this.graphHeight-y(d.parent_doc_count.doc_count);
-				}
-				else if (this.state.order == '_count') {
 					return this.graphHeight-y(d.doc_count);
 				}
-				else if (this.state.order == 'probability_avg') {
-					return this.graphHeight-y(d.probability_avg.value);
-				}
-				else if (this.state.order == 'probability_max') {
-					return this.graphHeight-y(d.probability_max.value);
-				}
-				else if (this.state.order == 'probability_median.50') {
-					return this.graphHeight-y(d.probability_median.values['50.0']);
+				else if (this.state.order == '_count') {
+					return this.graphHeight-y(d.terms);
 				}
 			}.bind(this));
 	}
@@ -345,9 +296,6 @@ export default class TopicsGraph extends React.Component {
 					<select value={this.state.order} onChange={this.orderSelectChangeHandler}>
 						<option value="parent_doc_count">document</option>
 						<option value="_count">term</option>
-						<option value="probability_avg">avg probability</option>
-						<option value="probability_median.50">median probability</option>
-						<option value="probability_max">max probability</option>
 					</select>
 				</div>
 

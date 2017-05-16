@@ -62,8 +62,8 @@ export default class DocumentsList extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.hits.total,
-					data: json.hits.hits,
+					total: json.metadata.total,
+					data: json.data,
 					loading: false
 				});
 			}.bind(this)).catch(function(ex) {

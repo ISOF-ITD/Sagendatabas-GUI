@@ -9,10 +9,13 @@
 
 @import "../ISOF-React-modules/less/ui-components/popupwindow.less";
 @import "../ISOF-React-modules/less/ui-components/map.less";
+@import "../ISOF-React-modules/less/ui-components/tabs.less";
+@import "../ISOF-React-modules/less/ui-components/autocomplete-input.less";
 
 @import "../ISOF-React-modules/less/advanced/graph.less";
 @import "../ISOF-React-modules/less/advanced/map.less";
 @import "../ISOF-React-modules/less/advanced/documents-list.less";
+@import "../ISOF-React-modules/less/advanced/search.less";
 
 @color-red: #a6192e;
 @color-red-lighter: #d4454c;
@@ -41,6 +44,33 @@ body {
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 
 	background: #f8f8f8;
+
+
+	.loading-overlay {
+		position: absolute;
+
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+
+		background-color: rgba(238, 238, 238, 0.8);
+		background-image: url('../img/loading.gif');
+		background-repeat: no-repeat;
+		background-position: center;
+
+		opacity: 0;
+
+		z-index: 1000;
+
+		.transition(opacity 300ms ease-in-out);
+
+		pointer-events: none;
+
+		.loading& {
+			opacity: 1;
+		}
+	}
 }
 
 hr {

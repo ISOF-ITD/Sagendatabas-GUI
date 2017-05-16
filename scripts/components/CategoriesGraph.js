@@ -94,7 +94,7 @@ export default class CategoriesGraph extends React.Component {
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
-				this.totalByCategoryArray = json.aggregations.data.buckets;
+				this.totalByCategoryArray = json.data;
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -118,8 +118,8 @@ export default class CategoriesGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.hits.total,
-					data: json.aggregations.data.buckets,
+					total: json.metadata.total,
+					data: json.data,
 					loading: false
 				}, function() {
 					this.renderGraph();

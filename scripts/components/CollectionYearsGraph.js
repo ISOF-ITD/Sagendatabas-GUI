@@ -86,7 +86,7 @@ export default class CollectionYearsGraph extends React.Component {
 	}
 
 	getTotalByYear(year) {
-		return _.findWhere(this.totalByYearArray, {key_as_string: year}).doc_count;
+		return _.findWhere(this.totalByYearArray, {year: year}).doc_count;
 	}
 
 	fetchTotalByYear() {
@@ -94,7 +94,7 @@ export default class CollectionYearsGraph extends React.Component {
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
-				this.totalByYearArray = json.aggregations.data.data.buckets;
+				this.totalByYearArray = json.data;
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -118,8 +118,8 @@ export default class CollectionYearsGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.hits.total,
-					data: json.aggregations.data.data.buckets,
+					total: json.metadata.total,
+					data: json.data,
 					loading: false
 				}, function() {
 					this.renderGraph();
@@ -164,14 +164,14 @@ export default class CollectionYearsGraph extends React.Component {
 
 		var lineValue = d3.line()
 			.x(function(d) {
-				return x(Number(d.key_as_string));
+				return x(Number(d.year));
 			})
 			.y(function(d) {
 				if (this.state.viewMode == 'absolute') {
 					return y(d.doc_count);
 				}
 				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByYear(d.key_as_string);
+					var total = this.getTotalByYear(d.year);
 
 					return y(total == 0 ? 0 : d.doc_count/total);
 				}
@@ -187,7 +187,7 @@ export default class CollectionYearsGraph extends React.Component {
 		var x = d3.scaleTime().range([0,this.graphWidth]);
 
 		x.domain(d3.extent(this.state.data, function(d) {
-			return d.key_as_string;
+			return d.year;
 		}));
 
 		return x;
@@ -199,7 +199,7 @@ export default class CollectionYearsGraph extends React.Component {
 				return item.doc_count;
 			}
 			else if (this.state.viewMode == 'relative') {
-				var total = this.getTotalByYear(item.key_as_string);
+				var total = this.getTotalByYear(item.year);
 
 				return item.doc_count/total;
 			}
@@ -264,20 +264,20 @@ export default class CollectionYearsGraph extends React.Component {
 
 		var flatLineValue = d3.line()
 			.x(function(d) {
-				return x(Number(d.key_as_string));
+				return x(Number(d.year));
 			})
 			.y(this.graphHeight);
 
 		var lineValue = d3.line()
 			.x(function(d) {
-				return x(Number(d.key_as_string));
+				return x(Number(d.year));
 			})
 			.y(function(d) {
 				if (this.state.viewMode == 'absolute') {
 					return y(d.doc_count);
 				}
 				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByYear(d.key_as_string);
+					var total = this.getTotalByYear(d.year);
 
 					return y(d.doc_count/total);
 				}
@@ -309,7 +309,7 @@ export default class CollectionYearsGraph extends React.Component {
 			.on('mousemove', mousemove);
 
 		var bisectDate = d3.bisector(function(d) {
-			return d.key_as_string;
+			return d.year;
 		}).left;
 
 		var view = this;
@@ -320,7 +320,7 @@ export default class CollectionYearsGraph extends React.Component {
 				var i = bisectDate(view.state.data, x0, 1);
 				var d0 = view.state.data[i - 1];
 				var d1 = view.state.data[i];
-				var d = x0 - d0.key_as_string > d1.key_as_string - x0 ? d1 : d0 || null;
+				var d = x0 - d0.year > d1.year - x0 ? d1 : d0 || null;
 
 				return d;
 			}
@@ -331,9 +331,9 @@ export default class CollectionYearsGraph extends React.Component {
 				.style('left', d3.event.pageX + 20 + 'px')
 				.style('top', d3.event.pageY + 'px')
 				.style('display', 'inline-block')
-				.html('<strong>'+yearData.key_as_string+'</strong><br/>'+
+				.html('<strong>'+yearData.year+'</strong><br/>'+
 					'Antal: '+yearData.doc_count+'<br/>'+
-					'Total: '+view.getTotalByYear(yearData.key_as_string)
+					'Total: '+view.getTotalByYear(yearData.year)
 				);
 
 			view.axisMarker.attr('transform', 'translate('+d3.mouse(this)[0]+', 0)');
