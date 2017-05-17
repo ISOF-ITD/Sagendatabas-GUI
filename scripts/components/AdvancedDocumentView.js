@@ -1,7 +1,7 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
 
-import DocumentsList from './DocumentsList';
+import DocumentList from './DocumentList';
 
 import config from './../config';
 
@@ -62,7 +62,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 				<h3>Liknande sägner</h3>
 
-				<DocumentsList disableEventBus="true" similarDocs={this.state.id} displayScore="true" />
+				<DocumentList disableEventBus="true" similarDocs={this.state.id} displayScore="true" />
 			</div> : 
 		null;
 	}

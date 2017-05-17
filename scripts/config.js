@@ -10,6 +10,9 @@ export default {
 		birth_years: 'birth_years/',
 		documents: 'documents/',
 		document: 'document/',
+		persons: 'persons/',
+		informants: 'informants/',
+		collectors: 'collectors/',
 		county: 'county/',
 		topics_autocomplete: 'topics_autocomplete/',
 		title_topics_autocomplete: 'title_topics_autocomplete/'

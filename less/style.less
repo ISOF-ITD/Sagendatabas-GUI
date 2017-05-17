@@ -2,7 +2,7 @@
 @import "../ISOF-React-modules/less/skeleton.less";
 @import "../ISOF-React-modules/less/leaflet.less";
 @import "../ISOF-React-modules/less/MarkerCluster.Default.less";
-@import "../ISOF-React-modules/less/nouislider.less";
+@import "../ISOF-React-modules/less/nouislider.min.less";
 
 @import "../ISOF-React-modules/less/minimal-scrollbar.less";
 @import "../ISOF-React-modules/less/tables.less";
@@ -11,6 +11,8 @@
 @import "../ISOF-React-modules/less/ui-components/map.less";
 @import "../ISOF-React-modules/less/ui-components/tabs.less";
 @import "../ISOF-React-modules/less/ui-components/autocomplete-input.less";
+@import "../ISOF-React-modules/less/ui-components/slider.less";
+@import "../ISOF-React-modules/less/ui-components/dropdownmenu.less";
 
 @import "../ISOF-React-modules/less/advanced/graph.less";
 @import "../ISOF-React-modules/less/advanced/map.less";
@@ -34,6 +36,10 @@ body {
 		
 		overflow: hidden;
 	}
+}
+
+.bottom-margin-0 {
+	margin-bottom: 0;
 }
 
 .component-frame {
@@ -79,14 +85,4 @@ hr {
 
 .document-view {
 	margin: 0 20px;
-}
-
-.checkbox-list {
-	.item {
-		margin-bottom: 5px;
-
-		input {
-			margin-bottom: 0;
-		}
-	}
 }

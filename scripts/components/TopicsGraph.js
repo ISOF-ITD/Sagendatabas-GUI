@@ -22,7 +22,7 @@ export default class TopicsGraph extends React.Component {
 
 		this.topicsCount = this.props.count || 20;
 
-		this.orderSelectChangeHandler = this.orderSelectChangeHandler.bind(this);
+		this.sortSelectChangeHandler = this.sortSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 
 		this.state = {
@@ -33,7 +33,7 @@ export default class TopicsGraph extends React.Component {
 
 			loading: false,
 
-			order: 'parent_doc_count',
+			sort: 'parent_doc_count',
 
 			graphContainerWidth: 800,
 			graphContainerHeight: this.props.graphHeight || 400,
@@ -64,17 +64,17 @@ export default class TopicsGraph extends React.Component {
 		}.bind(this));
 	}
 
-	orderSelectChangeHandler(event) {
-		this.setOrder(event.target.value);
+	sortSelectChangeHandler(event) {
+		this.setSortOrder(event.target.value);
 	}
 
-	setOrder(order) {
-		var currentOrder = this.state.order;
+	setSortOrder(sort) {
+		var currentSort = this.state.sort;
 
 		this.setState({
-			order: order
+			sort: sort
 		}, function() {
-			if (this.state.order != currentOrder) {
+			if (this.state.sort != currentSort) {
 				this.fetchData();
 			}
 		}.bind(this));
@@ -95,7 +95,7 @@ export default class TopicsGraph extends React.Component {
 
 	fetchData() {
 		var params = this.state.params;
-		params.order = this.state.order;
+		params.sort = this.state.sort;
 
 		var paramString = paramsHelper.buildParamString(this.state.params);
 
@@ -151,18 +151,18 @@ export default class TopicsGraph extends React.Component {
 			.transition()
 			.duration(1000)
 			.attr('y', function(d) {
-				if (this.state.order == 'parent_doc_count') {
+				if (this.state.sort == 'parent_doc_count') {
 					return y(d.doc_count);
 				}
-				else if (this.state.order == '_count') {
+				else if (this.state.sort == '_count') {
 					return y(d.terms);
 				}
 			}.bind(this))
 			.attr('height', function(d) {
-				if (this.state.order == 'parent_doc_count') {
+				if (this.state.sort == 'parent_doc_count') {
 					return this.graphHeight-y(d.doc_count);
 				}
-				else if (this.state.order == '_count') {
+				else if (this.state.sort == '_count') {
 					return this.graphHeight-y(d.terms);
 				}
 			}.bind(this));
@@ -170,10 +170,10 @@ export default class TopicsGraph extends React.Component {
 
 	createYRange() {
 		var yRangeValues = this.state.data.map(function(item) {
-			if (this.state.order == 'parent_doc_count') {
+			if (this.state.sort == 'parent_doc_count') {
 				return item.doc_count;
 			}
-			else if (this.state.order == '_count') {
+			else if (this.state.sort == '_count') {
 				return item.terms;
 			}
 		}.bind(this));
@@ -262,18 +262,18 @@ export default class TopicsGraph extends React.Component {
 			.transition()
 			.duration(1000)
 			.attr('y', function(d) {
-				if (this.state.order == 'parent_doc_count') {
+				if (this.state.sort == 'parent_doc_count') {
 					return y(d.doc_count);
 				}
-				else if (this.state.order == '_count') {
+				else if (this.state.sort == '_count') {
 					return y(d.terms);
 				}
 			}.bind(this))
 			.attr('height', function(d) {
-				if (this.state.order == 'parent_doc_count') {
+				if (this.state.sort == 'parent_doc_count') {
 					return this.graphHeight-y(d.doc_count);
 				}
-				else if (this.state.order == '_count') {
+				else if (this.state.sort == '_count') {
 					return this.graphHeight-y(d.terms);
 				}
 			}.bind(this));
@@ -293,7 +293,7 @@ export default class TopicsGraph extends React.Component {
 				</div>
 
 				<div className="graph-controls">
-					<select value={this.state.order} onChange={this.orderSelectChangeHandler}>
+					<select value={this.state.sort} onChange={this.sortSelectChangeHandler}>
 						<option value="parent_doc_count">document</option>
 						<option value="_count">term</option>
 					</select>

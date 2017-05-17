@@ -3,9 +3,10 @@ import { hashHistory } from 'react-router';
 
 import EventBus from 'eventbusjs';
 
-import CheckBoxList from './../../ISOF-React-modules/components/views/CheckBoxList';
+import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBoxList';
+import Slider from './../../ISOF-React-modules/components/controls/Slider';
 import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCategories';
-import AutocompleteInput from './../../ISOF-React-modules/components/views/AutocompleteInput';
+import AutocompleteInput from './../../ISOF-React-modules/components/controls/AutocompleteInput';
 
 import config from './../config.js';
 
@@ -13,11 +14,10 @@ export default class SearchForm extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.searchInputChangeHandler = this.searchInputChangeHandler.bind(this);
-		this.topicsInputChangeHandler = this.topicsInputChangeHandler.bind(this);
-		this.titleTopicsInputChangeHandler = this.titleTopicsInputChangeHandler.bind(this);
+		this.inputChangeHandler = this.inputChangeHandler.bind(this);
 		this.typeListChangeHandler = this.typeListChangeHandler.bind(this);
 		this.categoryListChangeHandler = this.categoryListChangeHandler.bind(this);
+		this.collectionYearSliderChangeHandler = this.collectionYearSliderChangeHandler.bind(this);
 
 		this.expandButtonClickHandler = this.expandButtonClickHandler.bind(this);
 
@@ -25,32 +25,28 @@ export default class SearchForm extends React.Component {
 
 		this.triggerSearch = this.triggerSearch.bind(this);
 
+		this.sliderStartYear = 1830;
+		this.sliderEndYear = 1985;
+
 		this.state = {
-			searchInputValue: '',
-			topicsInputValue: '',
-			titleTopicsInputValue: '',
+			searchInput: '',
+			topicsInput: '',
+			titleTopicsInput: '',
 			selectedTypes: ['arkiv', 'tryckt'],
 			selectedCategories: [],
+			collectionYearsEnabled: false,
+			collectionYearFrom: this.sliderStartYear,
+			collectionYearTo: this.sliderEndYear,
 
 			expanded: false
 		};
 	}
 
-	searchInputChangeHandler(event) {
-		this.setState({
-			searchInputValue: event.target.value
-		});
-	}
+	inputChangeHandler(event) {
+		var value = event.target.type && event.target.type == 'checkbox' ? event.target.checked : event.target.value;
 
-	topicsInputChangeHandler(event) {
 		this.setState({
-			topicsInputValue: event.target.value
-		});
-	}
-
-	titleTopicsInputChangeHandler(event) {
-		this.setState({
-			titleTopicsInputValue: event.target.value
+			[event.target.name]: value
 		});
 	}
 
@@ -78,19 +74,26 @@ export default class SearchForm extends React.Component {
 		}
 	}
 
+	collectionYearSliderChangeHandler(event) {
+		this.setState({
+			collectionYearFrom: Math.round(event[0]),
+			collectionYearTo: Math.round(event[1])
+		});
+	}
+
 	buildParams() {
 		var params = {};
 
-		if (this.state.searchInputValue != '') {
-			params.search = this.state.searchInputValue;
+		if (this.state.searchInput != '') {
+			params.search = this.state.searchInput;
 		}
 
-		if (this.state.topicsInputValue != '') {
-			params.topics = this.state.topicsInputValue;
+		if (this.state.topicsInput != '') {
+			params.topics = this.state.topicsInput;
 		}
 
-		if (this.state.titleTopicsInputValue != '') {
-			params.title_topics = this.state.titleTopicsInputValue;
+		if (this.state.titleTopicsInput != '') {
+			params.title_topics = this.state.titleTopicsInput;
 		}
 
 		if (this.state.selectedTypes.length > 0) {
@@ -99,6 +102,10 @@ export default class SearchForm extends React.Component {
 
 		if (this.state.selectedCategories.length > 0) {
 			params.category = this.state.selectedCategories.join(',');
+		}
+
+		if (this.state.collectionYearsEnabled) {
+			params.collection_years = this.state.collectionYearFrom+','+this.state.collectionYearTo;
 		}
 
 		return params;
@@ -120,56 +127,88 @@ export default class SearchForm extends React.Component {
 		return (
 			<div className={'advanced-search-form'+(this.state.expanded ? ' expanded' : '')}>
 
-				<div className="row">
-
-					<div className="search-input-wrapper ten columns">
-						<input className="search-input u-full-width" type="text" onChange={this.searchInputChangeHandler} value={this.state.searchInputValue} onKeyPress={this.searchInputKeypressHandler} />
-
-						<button className="expand-button" onClick={this.expandButtonClickHandler}><span>...</span></button>
-					</div>
-
-					<div className="two columns">
-						<button className="search-button button-primary u-pull-right u-full-width" onClick={this.triggerSearch}>Sök</button>
-					</div>
-
-				</div>
-
-				<div className="expanded-content">
+				<div className="container">
 
 					<div className="row">
 
-						<div className="four columns">
-							<label>Topics:</label>
-							<AutocompleteInput searchUrl={config.apiUrl+config.endpoints.topics_autocomplete+'?search=$s'} 
-								valueField="topic"
-								inputClassName="u-full-width" 
-								onChange={this.topicsInputChangeHandler} 
-								value={this.state.topicsInputValue} 
-								onEnter={this.triggerSearch}
-								listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
+						<div className="search-input-wrapper ten columns">
+							<input name="searchInput" 
+								className="search-input u-full-width" 
+								type="text" 
+								onChange={this.inputChangeHandler} 
+								value={this.state.searchInput} 
+								onKeyPress={this.searchInputKeypressHandler} />
 
-							<label>Titel topics:</label>
-							<AutocompleteInput searchUrl={config.apiUrl+config.endpoints.title_topics_autocomplete+'?search=$s'} 
-								valueField="topic"
-								inputClassName="u-full-width" 
-								onChange={this.titleTopicsInputChangeHandler} 
-								value={this.state.titleTopicsInputValue} 
-								onEnter={this.triggerSearch}
-								listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
+							<button className="expand-button" onClick={this.expandButtonClickHandler}><span>...</span></button>
+						</div>
+
+						<div className="two columns">
+							<button className="search-button button-primary u-pull-right u-full-width" onClick={this.triggerSearch}>Sök</button>
+						</div>
+
+					</div>
+
+					<div className="expanded-content">
+
+						<div className="row">
+
+							<div className="four columns">
+								<label>Topics:</label>
+								<AutocompleteInput inputName="topicsInput" 
+									searchUrl={config.apiUrl+config.endpoints.topics_autocomplete+'?search=$s'} 
+									valueField="topic"
+									inputClassName="u-full-width" 
+									onChange={this.inputChangeHandler} 
+									value={this.state.topicsInput} 
+									onEnter={this.triggerSearch}
+									listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
+
+								<label>Titel topics:</label>
+								<AutocompleteInput inputName="titleTopicsInput" 
+									searchUrl={config.apiUrl+config.endpoints.title_topics_autocomplete+'?search=$s'} 
+									valueField="topic" 
+									inputClassName="u-full-width" 
+									onChange={this.inputChangeHandler} 
+									value={this.state.titleTopicsInput} 
+									onEnter={this.triggerSearch} 
+									listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
+
+							</div>
+
+							<div className="four columns">
+								<label>Typ:</label>
+
+								<CheckBoxList values={['arkiv', 'tryckt', 'register']} 
+									selectedItems={this.state.selectedTypes} 
+									onChange={this.typeListChangeHandler} />
+							</div>
+
+							<div className="four columns">
+								<label>Kategorier:</label>
+
+								<CheckBoxList values={sagenkartaCategories.categories} 
+									valueField="letter" 
+									labelField="label" 
+									selectedItems={this.state.selectedCategories} 
+									onChange={this.categoryListChangeHandler} />
+
+							</div>
 
 						</div>
 
-						<div className="four columns">
-							<label>Typ:</label>
+						<div className="row">
 
-							<CheckBoxList values={['arkiv', 'tryckt', 'register']} selectedItems={this.state.selectedTypes} onChange={this.typeListChangeHandler} />
-						</div>
-
-						<div className="four columns">
-							<label>Kategorier:</label>
-
-							<CheckBoxList values={sagenkartaCategories.categories} valueField="letter" labelField="label" selectedItems={this.state.selectedCategories} onChange={this.categoryListChangeHandler} />
-
+							<div className="six columns">
+								<label><input name="collectionYearsEnabled" 
+									onChange={this.inputChangeHandler} 
+									className="bottom-margin-0" 
+									type="checkbox" 
+									checked={this.state.collectionYearsEnabled} /> Uppteckningsår:</label>
+								<Slider start={[this.sliderStartYear, this.sliderEndYear]} 
+									enabled={this.state.collectionYearsEnabled} 
+									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
+									onChange={this.collectionYearSliderChangeHandler} />
+							</div>
 						</div>
 
 					</div>
