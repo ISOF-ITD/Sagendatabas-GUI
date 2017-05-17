@@ -1,3 +1,3 @@
 # Sagendatabas-GUI
 
-Användargränssnitt för den avancerad versionen av sägenkartan.
+Användargränssnitt för avancerade versionen av sägenkartan.
