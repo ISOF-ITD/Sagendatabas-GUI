@@ -11,6 +11,8 @@ import BirthYearsGraph from './BirthYearsGraph';
 import DocumentList from './DocumentList';
 import PersonList from './PersonList';
 import AdvancedMapView from './AdvancedMapView';
+import GenderGraphDisplay from './GenderGraphDisplay';
+
 import {TabsContainer, Tab} from './TabControl';
 
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
@@ -50,7 +52,7 @@ export default class Application extends React.Component {
 		return (
 			<div className={'app-container'}>
 
-				<SearchForm ref="searchForm" />
+				<SearchForm />
 
 				<AdvancedMapView mapHeight="500" />
 
@@ -67,7 +69,7 @@ export default class Application extends React.Component {
 								<Tab tabName="Topics">
 									<TopicsGraph count="15" graphHeight="300" />
 								</Tab>
-								<Tab tabName="Title topics">
+								<Tab tabName="Titel topics">
 									<TopicsGraph count="15" type="titles" graphHeight="300" />
 								</Tab>
 							</TabsContainer>
@@ -79,8 +81,12 @@ export default class Application extends React.Component {
 					<div className="row">
 
 						<div className="twelve columns">
-							<h2>Uppteckningsår</h2>
-							<CollectionYearsGraph graphHeight="300" />
+
+							<div className="graph-wrapper no-header">
+								<CollectionYearsGraph title="Uppteckningsår" graphHeight="250" />
+								<BirthYearsGraph title="Födelseår" graphHeight="250" />	
+							</div>
+
 						</div>
 
 					</div>
@@ -88,15 +94,17 @@ export default class Application extends React.Component {
 					<div className="row">
 
 						<div className="twelve columns">
-							<h2>Födelseår</h2>
-							<BirthYearsGraph graphHeight="300" />
+							<GenderGraphDisplay title="Kön" />
 						</div>
 
 					</div>
 
+
 					<TabsContainer>
+
 						<DocumentList tabName="Dokumenter" />
 						<PersonList tabName="Personer" />
+
 					</TabsContainer>
 
 				</div>

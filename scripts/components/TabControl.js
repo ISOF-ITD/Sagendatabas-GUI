@@ -14,15 +14,12 @@ export class TabsContainer extends React.Component {
 	}
 
 	tabClickHandler(event) {
-		console.log(event.target);
 		this.setState({
 			tabIndex: event.target.dataset.tabindex
 		});
 	}
 
 	render() {
-		console.log(this.state);
-
 		var tabs = this.props.children.map(function(children, index) {
 			return <a key={index} className={'tab tab-'+index+(index == this.state.tabIndex ? ' selected' : '')} data-tabindex={index} onClick={this.tabClickHandler}>{children.props.tabName}</a>
 		}.bind(this));
@@ -47,7 +44,7 @@ export class TabsContainer extends React.Component {
 export class Tab extends React.Component {
 	render() {
 		return (
-			<div>
+			<div className={this.props.className}>
 
 				{
 					this.props.children

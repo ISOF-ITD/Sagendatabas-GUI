@@ -1,9 +1,12 @@
 export default {
-	buildParamString(params) {
-
+	buildParamString(p) {
+		var params = JSON.parse(JSON.stringify(p));
 		var paramStrings = [];
+
 		for (var key in params) {
-			paramStrings.push(key+'='+params[key]);
+			if (params[key] != null) {
+				paramStrings.push(key+'='+params[key]);
+			}
 		}
 
 		return paramStrings.join('&');

@@ -26,7 +26,7 @@ export default class TopicsGraph extends React.Component {
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 
 		this.state = {
-			paramString: '',
+			paramString: null,
 			params: null,
 			data: [],
 			total: null,

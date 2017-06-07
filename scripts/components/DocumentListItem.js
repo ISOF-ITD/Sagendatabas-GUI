@@ -4,7 +4,7 @@ import _ from 'underscore';
 
 import config from './../config';
 
-export default class dataumentListItem extends React.Component {
+export default class DocumentListItem extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -62,9 +62,9 @@ export default class dataumentListItem extends React.Component {
 				<div className="content">
 					{
 						this.state.data &&
-						<p className={'text-viewer'+(this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html: this.state.data.highlight ? this.state.data.highlight.text[0] : this.state.data._source.text}}></p>
+						<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html: this.state.data.highlight ? this.state.data.highlight.text[0] : this.state.data._source.text}}></p>
 					}
-					<a className="button" href={'#/dataument/'+this.state.data._id}>Visa</a>
+					<a className="button" href={'#/document/'+this.state.data._id}>Visa</a>
 				</div>
 
 			</div>

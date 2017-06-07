@@ -15,6 +15,10 @@ export default {
 		collectors: 'collectors/',
 		county: 'county/',
 		topics_autocomplete: 'topics_autocomplete/',
-		title_topics_autocomplete: 'title_topics_autocomplete/'
-	}
+		title_topics_autocomplete: 'title_topics_autocomplete/',
+		gender: 'gender/'
+	},
+
+	minYear: 1750,
+	maxYear: 1960
 };

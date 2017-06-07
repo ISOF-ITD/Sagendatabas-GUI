@@ -2075,13 +2075,15 @@ td .play-button {
 .graph-wrapper {
   position: relative;
   padding: 50px 10px 0 0;
+}
+.graph-wrapper:not(.disable-component-frame) {
   margin-bottom: 20px;
   box-sizing: border-box;
   border-radius: 1px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   background: #f8f8f8;
 }
-.graph-wrapper .loading-overlay {
+.graph-wrapper:not(.disable-component-frame) .loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -2098,8 +2100,11 @@ td .play-button {
   transition: opacity 300ms ease-in-out;
   pointer-events: none;
 }
-.loading.graph-wrapper .loading-overlay {
+.loading.graph-wrapper:not(.disable-component-frame) .loading-overlay {
   opacity: 1;
+}
+.graph-wrapper.no-header {
+  padding-top: 10px;
 }
 .graph-wrapper .total-number {
   position: absolute;
@@ -2108,37 +2113,76 @@ td .play-button {
   font-size: 0.9rem;
   color: #737373;
 }
-.graph-wrapper .graph-container .axis {
+.graph-wrapper .axis {
   font: 1.4rem;
 }
-.graph-wrapper .graph-container .axis path,
-.graph-wrapper .graph-container .axis line {
+.graph-wrapper .axis path,
+.graph-wrapper .axis line {
   fill: none;
   stroke: #D4D8DA;
   stroke-width: 1px;
   shape-rendering: crispEdges;
 }
-.graph-wrapper .graph-container path.line {
-  fill: none;
+.graph-wrapper .bar.clickable {
+  cursor: pointer;
 }
-.graph-wrapper .graph-container .overlay {
+.graph-wrapper path.line {
+  fill: none;
+  stroke-width: 1.4px;
+}
+.graph-wrapper .overlay {
   fill: none;
   pointer-events: all;
 }
-.graph-wrapper .graph-container .focus circle {
+.graph-wrapper .time-range {
+  fill: #999;
+}
+.graph-wrapper .focus circle {
   fill: #F1F3F3;
   stroke: #6F257F;
   stroke-width: 5px;
 }
-.graph-wrapper .graph-container .axis-marker {
+.graph-wrapper .axis-marker {
   stroke: #999;
   stroke-width: 1px;
   stroke-dasharray: 3,3;
 }
-.graph-wrapper .graph-controls {
+.graph-wrapper .arc path {
+  stroke: #fff;
+}
+.graph-wrapper .graph-controls select {
   position: absolute;
   top: 10px;
   right: 10px;
+}
+.graph-wrapper .graph-controls h3 {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  margin: 10px 5px;
+  color: #333;
+  font-size: 1rem;
+}
+.graph-wrapper .graph-header {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  left: 10px;
+  text-align: center;
+}
+.legends {
+  padding: 0px 40px 10px 40px;
+}
+.legends .legend {
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+.legends .legend .color {
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+  border-radius: 2px;
 }
 .map-wrapper {
   position: relative;
@@ -2211,13 +2255,15 @@ td .play-button {
 }
 .documents-list {
   position: relative;
+}
+.documents-list:not(.container-style-disabled) {
   margin-bottom: 20px;
   box-sizing: border-box;
   border-radius: 1px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   background: #f8f8f8;
 }
-.documents-list .loading-overlay {
+.documents-list:not(.container-style-disabled) .loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -2234,7 +2280,7 @@ td .play-button {
   transition: opacity 300ms ease-in-out;
   pointer-events: none;
 }
-.loading.documents-list .loading-overlay {
+.loading.documents-list:not(.container-style-disabled) .loading-overlay {
   opacity: 1;
 }
 .documents-list .list-heading {
@@ -2246,6 +2292,7 @@ td .play-button {
   height: auto;
   padding: 5px;
   margin-bottom: 0;
+  margin-right: 10px;
   border: none;
   border-radius: 0;
   color: #931123;
@@ -2373,29 +2420,105 @@ td .play-button {
 }
 .advanced-search-form {
   position: relative;
-  padding: 30px 0 5px 0;
+  padding: 30px 0 15px 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   background: #f8f8f8;
   z-index: 10;
+  /* fix */
 }
-.advanced-search-form .search-input,
-.advanced-search-form .search-button {
-  height: 44px;
+.advanced-search-form h1 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.2rem;
+  color: #5c5c5c;
 }
-.advanced-search-form .search-input {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+.advanced-search-form.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1200;
 }
 .advanced-search-form .search-input-wrapper {
   position: relative;
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  -webkit-transition: all 300ms ease-in-out;
+  -o-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+}
+.advanced-search-form .search-input-wrapper.focused {
+  border-color: #a66e77;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.advanced-search-form .search-input-wrapper .search-input,
+.advanced-search-form .search-input-wrapper .search-button {
+  height: 44px;
+  margin-bottom: 0;
+}
+.advanced-search-form .search-input-wrapper .search-input {
+  border: none;
+  background: transparent;
+  opacity: 0;
+  -webkit-transition: all 300ms ease-in-out;
+  -o-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+}
+.expanded.advanced-search-form .search-input-wrapper .search-input,
+.has-focus.advanced-search-form .search-input-wrapper .search-input {
+  opacity: 1;
+}
+.advanced-search-form .search-input-wrapper .search-label {
+  position: absolute;
+  top: 0;
+  right: 40px;
+  bottom: 0;
+  left: 10px;
+  color: #989898;
+  font-size: 0.9rem;
+  line-height: 45px;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-transition: all 300ms ease-in-out;
+  -o-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+}
+.expanded.advanced-search-form .search-input-wrapper .search-label,
+.has-focus.advanced-search-form .search-input-wrapper .search-label {
+  opacity: 0;
+}
+.advanced-search-form .search-input-wrapper .search-label strong {
+  color: #333;
+}
+.advanced-search-form .search-input-wrapper .search-label:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100px;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&0+0,1+80 */
+  background: -moz-linear-gradient(left, rgba(255, 255, 255, 0) 0%, #ffffff 80%, #ffffff 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%, #ffffff 80%, #ffffff 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #ffffff 80%, #ffffff 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff', GradientType=1);
+  /* IE6-9 */
 }
 .advanced-search-form .search-input-wrapper .expand-button {
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  right: 1px;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
   width: 40px;
-  height: 42px;
   padding: 0;
+  margin-bottom: 0;
   font-size: 1.4rem;
   font-family: serif;
   color: #a6192e;
@@ -2477,6 +2600,10 @@ body.has-overlay {
 }
 .bottom-margin-0 {
   margin-bottom: 0;
+}
+.app-container {
+  /*	margin-top: 106px; */
+  margin-top: 154px;
 }
 .component-frame {
   margin-bottom: 20px;

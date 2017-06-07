@@ -20,8 +20,11 @@ export default class SearchForm extends React.Component {
 		this.collectionYearSliderChangeHandler = this.collectionYearSliderChangeHandler.bind(this);
 
 		this.expandButtonClickHandler = this.expandButtonClickHandler.bind(this);
-
+		this.mouseEnterHandler = this.mouseEnterHandler.bind(this);
+		this.mouseLeaveHandler = this.mouseLeaveHandler.bind(this);
 		this.searchInputKeypressHandler = this.searchInputKeypressHandler.bind(this);
+		this.searchInputFocusHandler = this.searchInputFocusHandler.bind(this);
+		this.searchInputBlurHandler = this.searchInputBlurHandler.bind(this);
 
 		this.triggerSearch = this.triggerSearch.bind(this);
 
@@ -32,13 +35,16 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			topicsInput: '',
 			titleTopicsInput: '',
-			selectedTypes: ['arkiv', 'tryckt'],
+			selectedTypes: ['arkiv', 'tryckt', 'register'],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
 			collectionYearFrom: this.sliderStartYear,
 			collectionYearTo: this.sliderEndYear,
 
-			expanded: false
+			lastSearchParams: null,
+
+			expanded: false,
+			hasFocus: false
 		};
 	}
 
@@ -47,6 +53,42 @@ export default class SearchForm extends React.Component {
 
 		this.setState({
 			[event.target.name]: value
+		});
+	}
+
+	searchInputFocusHandler() {
+		this.setState({
+			hasFocus: true,
+			expanded: true
+		});
+	}
+
+	searchInputBlurHandler() {
+		this.setState({
+			hasFocus: false
+		});
+	}
+
+	mouseEnterHandler() {
+/*
+		this.setState({
+			expanded: true
+		});
+*/
+		if (this.mouseIdleTimer) {
+			clearTimeout(this.mouseIdleTimer);
+		}
+	}
+
+	mouseLeaveHandler() {
+		if (!this.state.hasFocus) {
+			this.mouseIdleTimer = setTimeout(this.mouseIdleHandler.bind(this), 1000);
+		}
+	}
+
+	mouseIdleHandler() {
+		this.setState({
+			expanded: false
 		});
 	}
 
@@ -113,8 +155,14 @@ export default class SearchForm extends React.Component {
 
 	triggerSearch() {
 		if (window.eventBus) {
+			var params = this.buildParams();
+
 			window.eventBus.dispatch('searchForm.search', this, {
-				params: this.buildParams()
+				params: params
+			});
+
+			this.setState({
+				lastSearchParams: params
 			});
 		}
 	}
@@ -123,23 +171,71 @@ export default class SearchForm extends React.Component {
 		return item.topic+' ('+item.doc_count+')';
 	}
 
+	describeSearch() {
+		var lastSearchParams = JSON.parse(JSON.stringify(this.state.lastSearchParams));
+
+		if (lastSearchParams) {
+			var searchTerms = [];
+
+			if (lastSearchParams.search && lastSearchParams.search != '') {
+				searchTerms.push('Söksträng: <strong>'+lastSearchParams.search+'</strong>');
+			}
+			if (lastSearchParams.type && lastSearchParams.type != '') {
+				searchTerms.push('Typ: <strong>'+lastSearchParams.type.split(',').join(', ')+'</strong>');
+			}
+			if (lastSearchParams.category && lastSearchParams.category != '') {
+				var categories = lastSearchParams.category.split(',');
+
+				searchTerms.push(categories.length == 0 ? 'Kategori: ' : 'Kategorier: <strong>'+(
+					categories.map(function(category) {
+						return sagenkartaCategories.getCategoryName(category);
+					}).join(', ')
+				)+'</strong>');
+			}
+			if (lastSearchParams.topics && lastSearchParams.topics != '') {
+				searchTerms.push('Topics: <strong>'+lastSearchParams.topics.split(',').join(', ')+'</strong>');
+			}
+			if (lastSearchParams.title_topics && lastSearchParams.title_topics != '') {
+				searchTerms.push('Titel topics: <strong>'+lastSearchParams.title_topics.split(',').join(', ')+'</strong>');
+			}
+			if (lastSearchParams.collection_years && lastSearchParams.collection_years != '') {
+				searchTerms.push('Uppteckningsår: <strong>'+lastSearchParams.collection_years.split(',').join('-')+'</strong>');
+			}
+
+			return this.state.lastSearchParams ? searchTerms.join(', ') : '';
+		}
+		else {
+			return '';
+		}
+	}
+
 	render() {
 		return (
-			<div className={'advanced-search-form'+(this.state.expanded ? ' expanded' : '')}>
+			<div className={'advanced-search-form fixed'+(this.state.expanded ? ' expanded' : '')+(this.state.hasFocus || !this.state.lastSearchParams ? ' has-focus' : '')}
+				onMouseEnter={this.mouseEnterHandler} 
+				onMouseLeave={this.mouseLeaveHandler}>
 
 				<div className="container">
 
+					<h1>Digitalt kulturarv</h1>
+
 					<div className="row">
 
-						<div className="search-input-wrapper ten columns">
-							<input name="searchInput" 
-								className="search-input u-full-width" 
-								type="text" 
-								onChange={this.inputChangeHandler} 
-								value={this.state.searchInput} 
-								onKeyPress={this.searchInputKeypressHandler} />
+						<div className="ten columns">
+							<div className={'search-input-wrapper'+(this.state.hasFocus ? ' focused' : '')}>
+								<div className="search-label" dangerouslySetInnerHTML={{__html: this.describeSearch()}}></div>
+								<input name="searchInput" 
+									placeholder="Söksträng" 
+									className="search-input u-full-width" 
+									type="text" 
+									onChange={this.inputChangeHandler} 
+									onFocus={this.searchInputFocusHandler} 
+									onBlur={this.searchInputBlurHandler} 
+									onKeyPress={this.searchInputKeypressHandler} 
+									value={this.state.searchInput} />
 
-							<button className="expand-button" onClick={this.expandButtonClickHandler}><span>...</span></button>
+								<button className="expand-button" onClick={this.expandButtonClickHandler}><span>...</span></button>
+							</div>
 						</div>
 
 						<div className="two columns">
@@ -178,7 +274,7 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Typ:</label>
 
-								<CheckBoxList values={['arkiv', 'tryckt', 'register']} 
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'inspelning']} 
 									selectedItems={this.state.selectedTypes} 
 									onChange={this.typeListChangeHandler} />
 							</div>

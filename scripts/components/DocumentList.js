@@ -14,6 +14,8 @@ export default class DocumentList extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.filters = {};
+
 		this.state = {
 			total: null,
 			data: [],
@@ -22,6 +24,10 @@ export default class DocumentList extends React.Component {
 			sort: '_score',
 			sortOrder: 'asc'
 		};
+
+		if (window.eventBus) {
+			window.eventBus.addEventListener('graph.filter', this.graphFilterHandler.bind(this));
+		}
 	}
 
 	componentDidMount() {
@@ -61,7 +67,23 @@ export default class DocumentList extends React.Component {
 		}
 	}
 
+	graphFilterHandler(event, data) {
+		this.filters[data.filter] = typeof data.value == 'array' ? data.value.join(',') : data.value;
+
+		for (var key in this.filters) {
+			if (this.filters[key] == null) {
+				console.log('delete filters['+key+']');
+				delete this.filters[key];
+			}
+		}
+
+
+		this.fetchData();
+	}
+
 	searchHandler(event, data) {
+		this.filters = {};
+		
 		this.setState({
 			params: data.params
 		}, function() {
@@ -69,8 +91,15 @@ export default class DocumentList extends React.Component {
 		}.bind(this));
 	}
 
-	fetchData(params) {
-		var params = params || this.state.params;
+	fetchData(p) {
+		var params = p || this.state.params;
+
+		params = JSON.parse(JSON.stringify(params));
+
+		console.log(params);
+		console.log(this.filters);
+
+		params = Object.assign(params, this.filters);
 
 		if (!this.props.similarDocs) {
 			params.sort = this.state.sort;
@@ -110,14 +139,17 @@ export default class DocumentList extends React.Component {
 
 		return (
 			<div className="documents-list-wrapper">
-				<div className={'documents-list'+(this.state.loading ? ' loading' : '')}>
-					<div className="list-heading">
-						<DropdownMenu label={'Sortering: '+this.state.sort+', '+this.state.sortOrder}>
-							<div className="sort-item"><strong>Score</strong>: <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="asc">asc</a> <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="desc">desc</a></div>
-							<div className="sort-item"><strong>Uppteckningsår</strong>: <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="desc">desc</a></div>
-							<div className="sort-item"><strong>Category</strong>: <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="desc">desc</a></div>
-						</DropdownMenu>
-					</div>
+				<div className={'documents-list'+(this.state.loading ? ' loading' : '')+(this.props.disableContainerStyle ? ' container-style-disabled' : '')}>
+					{
+						!this.props.disableSorting &&
+						<div className="list-heading">
+							<DropdownMenu label={'Sortering: '+this.state.sort+', '+this.state.sortOrder}>
+								<div className="sort-item"><strong>Score</strong>: <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="asc">asc</a> <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="desc">desc</a></div>
+								<div className="sort-item"><strong>Uppteckningsår</strong>: <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="desc">desc</a></div>
+								<div className="sort-item"><strong>Category</strong>: <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="desc">desc</a></div>
+							</DropdownMenu>
+						</div>
+					}
 
 					<div className="items">
 						{documentItems}

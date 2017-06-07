@@ -38,10 +38,26 @@ export default class AdvancedDocumentView extends React.Component {
 	}
 
 	render() {
+		var topicRows = this.state.doc && this.state.doc.topics ? this.state.doc.topics.map(function(topic, index) {
+			var termEls = topic.terms.map(function(term, index) {
+				return <span key={index}>{term.term}, </span>;
+			});
+
+			return <div key={index}>{termEls}</div>;
+		}) : [];
+
+		console.log(topicRows);
+
 		return this.state.doc ? 
 			<div className="document-view">
 				<h2>{this.state.doc.title}</h2>
 				<p dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
+
+				<hr/>
+
+				<div>
+					{topicRows}
+				</div>
 
 				<hr/>
 
@@ -62,7 +78,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 				<h3>Liknande sägner</h3>
 
-				<DocumentList disableEventBus="true" similarDocs={this.state.id} displayScore="true" />
+				<DocumentList disableEventBus="true" disableSorting="true" similarDocs={this.state.id} displayScore="true" />
 			</div> : 
 		null;
 	}

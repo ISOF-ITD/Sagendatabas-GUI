@@ -23,9 +23,10 @@ export default class CategoriesGraph extends React.Component {
 
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
+		this.barClickHandler = this.barClickHandler.bind(this);
 
 		this.state = {
-			paramString: '',
+			paramString: null,
 			data: [],
 			total: null,
 
@@ -60,7 +61,7 @@ export default class CategoriesGraph extends React.Component {
 		this.setState({
 			graphContainerWidth: this.refs.container.clientWidth
 		}, function() {
-			this.renderGraph();
+			this.renderGraph(true);
 		}.bind(this));
 	}
 
@@ -102,6 +103,8 @@ export default class CategoriesGraph extends React.Component {
 	}
 
 	fetchData(params) {
+		this.selectedBar = null;
+
 		var paramString = paramsHelper.buildParamString(params);
 
 		if (paramString == this.state.paramString) {
@@ -207,7 +210,7 @@ export default class CategoriesGraph extends React.Component {
 		return y;
 	}
 
-	renderGraph() {
+	renderGraph(disableAnimation) {
 		d3.selectAll('svg#'+this.state.graphId+' > *').remove();
 
 		if (this.state.data.length == 0) {
@@ -255,7 +258,10 @@ export default class CategoriesGraph extends React.Component {
 		this.vis.selectAll('.bar')
 			.data(this.state.data)
 			.enter().append('rect')
-			.attr('class', 'bar')
+			.attr('class', 'bar clickable')
+			.attr('data-key', function(d) {
+				return d.key;
+			})
 			.attr('x', function(d) {
 				return x(d.key);
 			})
@@ -267,8 +273,12 @@ export default class CategoriesGraph extends React.Component {
 				return this.graphHeight-y(0);
 			}.bind(this))
 			.attr('fill', function(d, i) {
-				return colorScale(d.doc_count);
-			}).on('mousemove', function(d) {
+				return colorScale(i);
+			})
+			.attr('opacity', function(d, i) {
+				return this.selectedBar && this.selectedBar != d.key ? 0.2 : 1;
+			}.bind(this))
+			.on('mousemove', function(d) {
 				var total = this.getTotalByCategory(d.key);
 
 				this.tooltip
@@ -279,11 +289,12 @@ export default class CategoriesGraph extends React.Component {
 			}.bind(this))
 			.on('mouseout', function(d) {
 				this.tooltip.style('display', 'none');
-			}.bind(this));
+			}.bind(this))
+			.on('click', this.barClickHandler)
 
 		this.vis.selectAll('.bar')
 			.transition()
-			.duration(1000)
+			.duration(disableAnimation ? 0 : 1000)
 			.attr('y', function(d) {
 				if (this.state.viewMode == 'absolute') {
 					return y(d.doc_count);
@@ -304,6 +315,40 @@ export default class CategoriesGraph extends React.Component {
 					return this.graphHeight-y(d.doc_count/total);
 				}
 			}.bind(this));
+	}
+
+	barClickHandler(event) {
+//		return;
+
+		if (this.selectedBar && this.selectedBar == event.key) {
+			this.vis.selectAll('.bar')
+				.transition()
+				.duration(200)
+				.attr('opacity', 1);
+
+			this.selectedBar = null;
+		}
+		else {
+			this.selectedBar = event.key;	
+
+			var bar = this.vis.select('.bar[data-key="'+event.key+'"]');
+
+			this.vis.selectAll('.bar:not([data-key="'+event.key+'"])')
+				.transition()
+				.duration(200)
+				.attr('opacity', 0.2);			
+
+			bar.transition()
+				.duration(200)
+				.attr('opacity', 1);
+		}
+
+		if (window.eventBus) {
+			window.eventBus.dispatch('graph.filter', this, {
+				filter: 'category',
+				value: this.selectedBar
+			});
+		}
 	}
 
 	render() {
