@@ -39,9 +39,15 @@ export default class PersonListItem extends React.Component {
 		return this.state.data ? (
 			<div className={'item'+(this.state.open ? ' open' : '')}>
 				<div className="header" onClick={this.headerClickHandler}>
-					<span className="title">{this.state.data.name} <span className="light">({this.state.data.doc_count})</span></span>
+					<span className="title">{this.state.data.name}
+						{
+							this.state.data.birth_year &&
+							<span className="light"> ({this.state.data.birth_year})</span>
+						}
+					</span>
 
 					<span className="props">
+						{this.state.data.doc_count}
 						{
 							this.state.data.home &&
 							<span className="prop">{this.state.data.home.name}</span>

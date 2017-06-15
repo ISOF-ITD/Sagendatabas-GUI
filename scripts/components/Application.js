@@ -12,6 +12,7 @@ import DocumentList from './DocumentList';
 import PersonList from './PersonList';
 import AdvancedMapView from './AdvancedMapView';
 import GenderGraphDisplay from './GenderGraphDisplay';
+import TypesGraph from './TypesGraph';
 
 import {TabsContainer, Tab} from './TabControl';
 
@@ -71,6 +72,9 @@ export default class Application extends React.Component {
 								</Tab>
 								<Tab tabName="Titel topics">
 									<TopicsGraph count="15" type="titles" graphHeight="300" />
+								</Tab>
+								<Tab tabName="Typ">
+									<TypesGraph graphHeight="300" />
 								</Tab>
 							</TabsContainer>
 					

@@ -14,6 +14,8 @@ export default class PersonList extends React.Component {
 
 		this.listTypeChangeHandler = this.listTypeChangeHandler.bind(this);
 
+		this.filters = {};
+
 		this.state = {
 			total: null,
 			data: [],
@@ -21,6 +23,10 @@ export default class PersonList extends React.Component {
 			params: null,
 			listType: 'persons'
 		};
+
+		if (window.eventBus) {
+			window.eventBus.addEventListener('graph.filter', this.graphFilterHandler.bind(this));
+		}
 	}
 
 	componentDidMount() {
@@ -41,7 +47,23 @@ export default class PersonList extends React.Component {
 		});
 	}
 
+	graphFilterHandler(event, data) {
+		this.filters[data.filter] = typeof data.value == 'array' ? data.value.join(',') : data.value;
+
+		for (var key in this.filters) {
+			if (this.filters[key] == null) {
+				console.log('delete filters['+key+']');
+				delete this.filters[key];
+			}
+		}
+
+
+		this.fetchData();
+	}
+
 	searchHandler(event, data) {
+		this.filters = {};
+		
 		this.setState({
 			params: data.params
 		}, function() {
@@ -49,10 +71,16 @@ export default class PersonList extends React.Component {
 		}.bind(this));
 	}
 
-	fetchData(params, force) {
+	fetchData(p, force) {
 		var params = params || this.state.params;
 
+		var params = p || this.state.params;
+
+		params = params ? JSON.parse(JSON.stringify(params)) : {};
+
 		params.count = 100;
+
+		params = Object.assign(params, this.filters);
 
 		var paramString = paramsHelper.buildParamString(params);
 
@@ -92,7 +120,12 @@ export default class PersonList extends React.Component {
 			<div className="documents-list-wrapper">
 				<div className={'documents-list'+(this.state.loading ? ' loading' : '')+(this.props.disableContainerStyle ? ' container-style-disabled' : '')}>
 					<div className="list-heading">
-						<button className={this.state.listType == 'informants' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="informants">Informantar</button> <button className={this.state.listType == 'collectors' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="collectors">Upptäckare</button> <button className={this.state.listType == 'persons' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="persons">Båda</button>
+						<button className={this.state.listType == 'informants' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="informants">Informantar</button> <button className={this.state.listType == 'collectors' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="collectors">Upptecknare</button> <button className={this.state.listType == 'persons' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="persons">Båda</button>
+
+						{
+							paramsHelper.describeParams(this.filters) != '' &&
+							<div className="heading-info" dangerouslySetInnerHTML={{__html: 'Filtrering: '+paramsHelper.describeParams(this.filters) }} />
+						}
 					</div>
 
 					<div className="items">

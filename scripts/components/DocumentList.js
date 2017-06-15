@@ -72,11 +72,9 @@ export default class DocumentList extends React.Component {
 
 		for (var key in this.filters) {
 			if (this.filters[key] == null) {
-				console.log('delete filters['+key+']');
 				delete this.filters[key];
 			}
 		}
-
 
 		this.fetchData();
 	}
@@ -94,10 +92,7 @@ export default class DocumentList extends React.Component {
 	fetchData(p) {
 		var params = p || this.state.params;
 
-		params = JSON.parse(JSON.stringify(params));
-
-		console.log(params);
-		console.log(this.filters);
+		params = params ? JSON.parse(JSON.stringify(params)) : {};
 
 		params = Object.assign(params, this.filters);
 
@@ -148,6 +143,11 @@ export default class DocumentList extends React.Component {
 								<div className="sort-item"><strong>Uppteckningsår</strong>: <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="desc">desc</a></div>
 								<div className="sort-item"><strong>Category</strong>: <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="desc">desc</a></div>
 							</DropdownMenu>
+
+							{
+								paramsHelper.describeParams(this.filters) != '' &&
+								<div className="heading-info" dangerouslySetInnerHTML={{__html: 'Filtrering: '+paramsHelper.describeParams(this.filters) }} />
+							}
 						</div>
 					}
 

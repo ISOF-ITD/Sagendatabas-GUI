@@ -1,12 +1,19 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
 
+import L from 'leaflet';
+import 'leaflet-draw';
+
 import EventBus from 'eventbusjs';
 
 import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBoxList';
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
 import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCategories';
 import AutocompleteInput from './../../ISOF-React-modules/components/controls/AutocompleteInput';
+import DropdownMenu from './../../ISOF-React-modules/components/controls/DropdownMenu';
+import MapBase from './../../ISOF-React-modules/components/views/MapBase';
+
+import paramsHelper from './../utils/paramsHelper';
 
 import config from './../config.js';
 
@@ -26,20 +33,31 @@ export default class SearchForm extends React.Component {
 		this.searchInputFocusHandler = this.searchInputFocusHandler.bind(this);
 		this.searchInputBlurHandler = this.searchInputBlurHandler.bind(this);
 
+		this.mapDrawLayerCreatedHandler = this.mapDrawLayerCreatedHandler.bind(this);
+
 		this.triggerSearch = this.triggerSearch.bind(this);
 
-		this.sliderStartYear = 1830;
-		this.sliderEndYear = 1985;
+		this.sliderStartYear = config.minYear;
+		this.sliderEndYear = config.maxYear;
 
 		this.state = {
 			searchInput: '',
 			topicsInput: '',
 			titleTopicsInput: '',
-			selectedTypes: ['arkiv', 'tryckt', 'register'],
+			selectedTypes: ['arkiv', 'tryckt'],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
-			collectionYearFrom: this.sliderStartYear,
-			collectionYearTo: this.sliderEndYear,
+			collectionYears: [this.sliderStartYear, this.sliderEndYear],
+			informantNameInput: '',
+			collectorNameInput: '',
+			informantsGenderInput: '',
+			collectorsGenderInput: '',
+			collectorsBirthYearsEnabled: false,
+			collectorsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+			informantsBirthYearsEnabled: false,
+			informantsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+
+			geoBoundingBox: null,
 
 			lastSearchParams: null,
 
@@ -48,11 +66,87 @@ export default class SearchForm extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		L.Control.RemoveAll = L.Control.extend({
+			options: {
+				position: 'topleft',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control leaflet-bar leaflet-draw-toolbar');
+				var controlUI = L.DomUtil.create('a', 'leaflet-draw-edit-remove', controlDiv);
+				controlUI.title = 'Remove all drawn items';
+				controlUI.setAttribute('href', '#');
+
+				L.DomEvent
+					.addListener(controlUI, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlUI, 'click', L.DomEvent.preventDefault)
+					.addListener(controlUI, 'click', function () {
+						this.drawLayer.clearLayers();
+
+						this.setState({
+							geoBoundingBox: null
+						});
+					}.bind(this));
+				return controlDiv;
+			}.bind(this)
+		});
+
+		var removeAllControl = new L.Control.RemoveAll();
+
+		this.drawLayer = new L.FeatureGroup();
+		this.refs.mapView.map.addLayer(this.drawLayer);
+
+		var drawControl = new L.Control.Draw({
+			draw: {
+				polyline: false,
+				polygon: false,
+				circle: false,
+				marker: false
+			}
+		});
+
+		this.refs.mapView.map.addControl(drawControl);
+		this.refs.mapView.map.addControl(removeAllControl);
+
+		this.refs.mapView.map.on(L.Draw.Event.CREATED, this.mapDrawLayerCreatedHandler);
+
+		this.refs.mapView.map.on(L.Draw.Event.DRAWSTART, function(event) {
+			this.drawLayer.clearLayers();
+		}.bind(this));
+	}
+
+	mapDrawLayerCreatedHandler(event) {
+		var layer = event.layer;
+
+		this.drawLayer.addLayer(layer);
+
+		this.setState({
+			geoBoundingBox: {
+				topLeft: {
+					lat: event.layer._bounds._northEast.lat,
+					lng: event.layer._bounds._southWest.lng
+				},
+				bottomRight: {
+					lat: event.layer._bounds._southWest.lat,
+					lng: event.layer._bounds._northEast.lng
+				}
+			}
+		}, function() {
+			console.log(this.state);
+		}.bind(this));
+	}
+
 	inputChangeHandler(event) {
 		var value = event.target.type && event.target.type == 'checkbox' ? event.target.checked : event.target.value;
 
+		console.log(event.target.name);
+		console.log(value);
+
 		this.setState({
 			[event.target.name]: value
+		}, function() {
+			console.log(this.state);
 		});
 	}
 
@@ -117,6 +211,7 @@ export default class SearchForm extends React.Component {
 	}
 
 	collectionYearSliderChangeHandler(event) {
+		console.log(event);
 		this.setState({
 			collectionYearFrom: Math.round(event[0]),
 			collectionYearTo: Math.round(event[1])
@@ -147,13 +242,45 @@ export default class SearchForm extends React.Component {
 		}
 
 		if (this.state.collectionYearsEnabled) {
-			params.collection_years = this.state.collectionYearFrom+','+this.state.collectionYearTo;
+			params.collection_years = this.state.collectionYears.join(',');
+		}
+
+		if (this.state.collectorNameInput != '') {
+			params.collector = this.state.collectorNameInput;
+		}
+
+		if (this.state.informantNameInput != '') {
+			params.informant = this.state.informantNameInput;
+		}
+
+		if (this.state.collectorsGenderInput != '') {
+			params.collectors_gender = this.state.collectorsGenderInput;
+		}
+
+		if (this.state.informantsGenderInput != '') {
+			params.informants_gender = this.state.informantsGenderInput;
+		}
+
+		if (this.state.collectorsBirthYearsEnabled) {
+			params.collectors_birth_years = this.state.collectorsBirthYears.join(',');
+		}
+
+		if (this.state.informantsBirthYearsEnabled) {
+			params.informants_birth_years = this.state.informantsBirthYears.join(',');
+		}
+
+		if (this.state.geoBoundingBox) {
+			params.geo_box = this.state.geoBoundingBox.topLeft.lat+','+this.state.geoBoundingBox.topLeft.lng+','+this.state.geoBoundingBox.bottomRight.lat+','+this.state.geoBoundingBox.bottomRight.lng;
 		}
 
 		return params;
 	}
 
 	triggerSearch() {
+		this.setState({
+			expanded: false
+		});
+
 		if (window.eventBus) {
 			var params = this.buildParams();
 
@@ -171,42 +298,8 @@ export default class SearchForm extends React.Component {
 		return item.topic+' ('+item.doc_count+')';
 	}
 
-	describeSearch() {
-		var lastSearchParams = JSON.parse(JSON.stringify(this.state.lastSearchParams));
-
-		if (lastSearchParams) {
-			var searchTerms = [];
-
-			if (lastSearchParams.search && lastSearchParams.search != '') {
-				searchTerms.push('Söksträng: <strong>'+lastSearchParams.search+'</strong>');
-			}
-			if (lastSearchParams.type && lastSearchParams.type != '') {
-				searchTerms.push('Typ: <strong>'+lastSearchParams.type.split(',').join(', ')+'</strong>');
-			}
-			if (lastSearchParams.category && lastSearchParams.category != '') {
-				var categories = lastSearchParams.category.split(',');
-
-				searchTerms.push(categories.length == 0 ? 'Kategori: ' : 'Kategorier: <strong>'+(
-					categories.map(function(category) {
-						return sagenkartaCategories.getCategoryName(category);
-					}).join(', ')
-				)+'</strong>');
-			}
-			if (lastSearchParams.topics && lastSearchParams.topics != '') {
-				searchTerms.push('Topics: <strong>'+lastSearchParams.topics.split(',').join(', ')+'</strong>');
-			}
-			if (lastSearchParams.title_topics && lastSearchParams.title_topics != '') {
-				searchTerms.push('Titel topics: <strong>'+lastSearchParams.title_topics.split(',').join(', ')+'</strong>');
-			}
-			if (lastSearchParams.collection_years && lastSearchParams.collection_years != '') {
-				searchTerms.push('Uppteckningsår: <strong>'+lastSearchParams.collection_years.split(',').join('-')+'</strong>');
-			}
-
-			return this.state.lastSearchParams ? searchTerms.join(', ') : '';
-		}
-		else {
-			return '';
-		}
+	personsAutocompleteFormatListLabel(item) {
+		return item.name+' ('+item.doc_count+')';
 	}
 
 	render() {
@@ -223,7 +316,7 @@ export default class SearchForm extends React.Component {
 
 						<div className="ten columns">
 							<div className={'search-input-wrapper'+(this.state.hasFocus ? ' focused' : '')}>
-								<div className="search-label" dangerouslySetInnerHTML={{__html: this.describeSearch()}}></div>
+								<div className="search-label" dangerouslySetInnerHTML={{__html: paramsHelper.describeParams(this.state.lastSearchParams)}}></div>
 								<input name="searchInput" 
 									placeholder="Söksträng" 
 									className="search-input u-full-width" 
@@ -292,6 +385,8 @@ export default class SearchForm extends React.Component {
 
 						</div>
 
+						<hr />
+
 						<div className="row">
 
 							<div className="six columns">
@@ -300,11 +395,116 @@ export default class SearchForm extends React.Component {
 									className="bottom-margin-0" 
 									type="checkbox" 
 									checked={this.state.collectionYearsEnabled} /> Uppteckningsår:</label>
-								<Slider start={[this.sliderStartYear, this.sliderEndYear]} 
+								<Slider inputName="collectionYears" 
+									start={[this.sliderStartYear, this.sliderEndYear]} 
 									enabled={this.state.collectionYearsEnabled} 
 									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
-									onChange={this.collectionYearSliderChangeHandler} />
+									onChange={this.inputChangeHandler} />
 							</div>
+
+							<div className="six columns">
+								<label>Geografiskt område:</label>
+								<DropdownMenu label="Välj område" dropdownHeight="350" dropdownWidth="400" onOpen={function() {
+									this.refs.mapView.invalidateSize();
+								}.bind(this)}>
+									<MapBase ref="mapView" disableSwedenMap="true" mapHeight="350" />
+								</DropdownMenu>
+							</div>
+							
+						</div>
+
+						<hr />
+
+						<div className="row">
+
+							<div className="six columns">
+
+								<div className="row">
+
+									<div className="eight columns">
+										<label>Upptecknare:</label>
+										<AutocompleteInput inputName="collectorNameInput" 
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=collector'} 
+											valueField="name"
+											inputClassName="u-full-width" 
+											onChange={this.inputChangeHandler} 
+											value={this.state.collectorNameInput} 
+											onEnter={this.triggerSearch}
+											listLabelFormatFunc={this.personsAutocompleteFormatListLabel} />
+									</div>
+
+									<div className="four columns">
+										<label>Upptecknare kön:</label>
+										<select name="collectorsGenderInput"
+											onChange={this.inputChangeHandler}
+											value={this.state.collectorsGenderInput}
+										>
+											<option value=""></option>
+											<option value="female">kvinnor</option>
+											<option value="male">män</option>
+											<option value="unknown">okänt</option>
+										</select>
+									</div>
+
+								</div>
+										
+								<label><input name="collectorsBirthYearsEnabled" 
+									onChange={this.inputChangeHandler} 
+									className="bottom-margin-0" 
+									type="checkbox" 
+									checked={this.state.collectorsBirthYearsEnabled} /> Födelseår, upptecknare:</label>
+								<Slider inputName="collectorsBirthYears" 
+									start={[this.sliderStartYear, this.sliderEndYear]} 
+									enabled={this.state.collectorsBirthYearsEnabled} 
+									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
+									onChange={this.inputChangeHandler} />
+
+							</div>
+
+							<div className="six columns">
+
+								<div className="row">
+
+									<div className="eight columns">
+										<label>Informant:</label>
+										<AutocompleteInput inputName="informantNameInput" 
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=informant'} 
+											valueField="name"
+											inputClassName="u-full-width" 
+											onChange={this.inputChangeHandler} 
+											value={this.state.informantNameInput} 
+											onEnter={this.triggerSearch}
+											listLabelFormatFunc={this.personsAutocompleteFormatListLabel} />
+									</div>
+
+									<div className="four columns">
+										<label>Informant kön:</label>
+										<select name="informantsGenderInput"
+											onChange={this.inputChangeHandler}
+											value={this.state.informantsGenderInput}
+										>
+											<option value=""></option>
+											<option value="female">kvinnor</option>
+											<option value="male">män</option>
+											<option value="unknown">okänt</option>
+										</select>
+									</div>
+
+								</div>
+
+								<label><input name="informantsBirthYearsEnabled" 
+									onChange={this.inputChangeHandler} 
+									className="bottom-margin-0" 
+									type="checkbox" 
+									checked={this.state.informantsBirthYearsEnabled} /> Födelseår, informant:</label>
+								<Slider inputName="informantsBirthYears" 
+									start={[this.sliderStartYear, this.sliderEndYear]} 
+									enabled={this.state.informantsBirthYearsEnabled} 
+									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
+									onChange={this.inputChangeHandler} />
+
+							</div>
+						
 						</div>
 
 					</div>

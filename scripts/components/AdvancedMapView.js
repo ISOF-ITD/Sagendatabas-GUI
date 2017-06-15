@@ -4,6 +4,7 @@ import _ from 'underscore';
 
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
+import 'leaflet-draw';
 
 import chroma from 'chroma-js';
 
@@ -21,6 +22,8 @@ export default class AdvancedMapView extends React.Component {
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.mapModeSelectChangeHandler = this.mapModeSelectChangeHandler.bind(this);
 		this.baseLayerChangeHandler = this.baseLayerChangeHandler.bind(this);
+
+		this.mapDrawLayerCreatedHandler = this.mapDrawLayerCreatedHandler.bind(this);
 
 		this.mapModes = {
 			county: {
@@ -51,6 +54,50 @@ export default class AdvancedMapView extends React.Component {
 	componentDidMount() {
 		if (window.eventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+		}
+
+		this.drawLayer = new L.FeatureGroup();
+		this.refs.mapView.map.addLayer(this.drawLayer);
+
+		var drawControl = new L.Control.Draw({
+			draw: {
+				polyline: false,
+				polygon: false,
+				circle: false,
+				marker: false
+			}
+		});
+		this.refs.mapView.map.addControl(drawControl);
+
+
+		this.refs.mapView.map.on(L.Draw.Event.CREATED, this.mapDrawLayerCreatedHandler);
+
+		this.refs.mapView.map.on(L.Draw.Event.DRAWSTART, function(event) {
+			this.drawLayer.clearLayers();
+		}.bind(this));
+	}
+
+	mapDrawLayerCreatedHandler(event) {
+		var layer = event.layer;
+
+		this.drawLayer.addLayer(layer);
+
+		var geoBoundingBox = {
+			topLeft: {
+				lat: event.layer._bounds._northEast.lat,
+				lng: event.layer._bounds._southWest.lng
+			},
+			bottomRight: {
+				lat: event.layer._bounds._southWest.lat,
+				lng: event.layer._bounds._northEast.lng
+			}
+		};
+
+		if (window.eventBus) {
+			window.eventBus.dispatch('graph.filter', this, {
+				filter: 'geo_box',
+				value: [geoBoundingBox.topLeft.lat, geoBoundingBox.topLeft.lng, geoBoundingBox.bottomRight.lat, geoBoundingBox.bottomRight.lng]
+			});
 		}
 	}
 

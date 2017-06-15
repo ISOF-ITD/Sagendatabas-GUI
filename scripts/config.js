@@ -1,6 +1,6 @@
 export default {
+//	apiUrl: 'http://uuc-isof003-t.its.uu.se/sagenkarta/es/',
 	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
-//	apiUrl: 'http://130.238.49.182:8000/sagenkarta/es/',
 
 	endpoints: {
 		topics: 'topics/',
@@ -16,7 +16,9 @@ export default {
 		county: 'county/',
 		topics_autocomplete: 'topics_autocomplete/',
 		title_topics_autocomplete: 'title_topics_autocomplete/',
-		gender: 'gender/'
+		gender: 'gender/',
+		persons_autocomplete: 'persons_autocomplete/',
+		types: 'types/'
 	},
 
 	minYear: 1750,

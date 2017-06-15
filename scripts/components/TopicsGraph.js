@@ -247,7 +247,7 @@ export default class TopicsGraph extends React.Component {
 			.on('mousemove', function(d) {
 				var html = '<strong>'+d.topic+'</strong><br/>'+
 					'Terms: '+d.terms+'<br/>'+
-					'Documents: '+d.doc_count+'<br/>';
+					'Dokument: '+d.doc_count+'<br/>';
 				this.tooltip
 					.style('left', d3.event.pageX + 20 + 'px')
 					.style('top', d3.event.pageY + 'px')
