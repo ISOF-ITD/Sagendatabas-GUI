@@ -67,6 +67,8 @@ export default class SearchForm extends React.Component {
 	}
 
 	componentDidMount() {
+		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
+		
 		L.Control.RemoveAll = L.Control.extend({
 			options: {
 				position: 'topleft',
@@ -75,7 +77,7 @@ export default class SearchForm extends React.Component {
 			onAdd: function (map) {
 				var controlDiv = L.DomUtil.create('div', 'leaflet-control leaflet-bar leaflet-draw-toolbar');
 				var controlUI = L.DomUtil.create('a', 'leaflet-draw-edit-remove', controlDiv);
-				controlUI.title = 'Remove all drawn items';
+				controlUI.title = 'Ta bort valt område';
 				controlUI.setAttribute('href', '#');
 
 				L.DomEvent
@@ -132,21 +134,14 @@ export default class SearchForm extends React.Component {
 					lng: event.layer._bounds._northEast.lng
 				}
 			}
-		}, function() {
-			console.log(this.state);
-		}.bind(this));
+		});
 	}
 
 	inputChangeHandler(event) {
 		var value = event.target.type && event.target.type == 'checkbox' ? event.target.checked : event.target.value;
 
-		console.log(event.target.name);
-		console.log(value);
-
 		this.setState({
 			[event.target.name]: value
-		}, function() {
-			console.log(this.state);
 		});
 	}
 
@@ -211,7 +206,6 @@ export default class SearchForm extends React.Component {
 	}
 
 	collectionYearSliderChangeHandler(event) {
-		console.log(event);
 		this.setState({
 			collectionYearFrom: Math.round(event[0]),
 			collectionYearTo: Math.round(event[1])

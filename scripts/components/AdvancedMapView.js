@@ -17,29 +17,37 @@ export default class AdvancedMapView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.tooltipMouseMove = this.tooltipMouseMove.bind(this);
-		this.tooltipMouseOut = this.tooltipMouseOut.bind(this);
+		this.vectorGridMouseMove = this.vectorGridMouseMove.bind(this);
+		this.vectorGridMouseOut = this.vectorGridMouseOut.bind(this);
+		this.vectorGridClick = this.vectorGridClick.bind(this);
+
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.mapModeSelectChangeHandler = this.mapModeSelectChangeHandler.bind(this);
 		this.baseLayerChangeHandler = this.baseLayerChangeHandler.bind(this);
 
 		this.mapDrawLayerCreatedHandler = this.mapDrawLayerCreatedHandler.bind(this);
 
-		this.mapModes = {
-			county: {
-				layer: 'sverige_lan:an_riks'
+		this.mapModes = [
+			{
+				label: 'Socken',
+				name: 'socken',
+				type: 'vectortile',
+				layer: 'SockenStad_ExtGranskning:SockenStad_ExtGranskn_v1.0'
 			},
-			socken: {
-				layer: 'sverige_socken:sverige_socken_wgs84'
+			{
+				label: 'Län',
+				name: 'county',
+				type: 'vectortile',
+				layer: 'sverige_lan:an_riks'
 			}
-		}
+		];
 
 		this.state = {
 			params: null,
 			data: null,
 			loading: false,
 			viewMode: 'absolute',
-			mapMode: 'county',
+			mapMode: 'socken',
 			tooltip: {
 				title: '',
 				text: '',
@@ -52,10 +60,39 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	componentDidMount() {
+		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
+
 		if (window.eventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
 		}
 
+		L.Control.RemoveAll = L.Control.extend({
+			options: {
+				position: 'topleft',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control leaflet-bar leaflet-draw-toolbar');
+				var controlUI = L.DomUtil.create('a', 'leaflet-draw-edit-remove', controlDiv);
+				controlUI.title = 'Ta bort valt område';
+				controlUI.setAttribute('href', '#');
+
+				L.DomEvent
+					.addListener(controlUI, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlUI, 'click', L.DomEvent.preventDefault)
+					.addListener(controlUI, 'click', function () {
+						this.drawLayer.clearLayers();
+
+						window.eventBus.dispatch('graph.filter', this, {
+							filter: 'geo_box',
+							value: null
+						});
+					}.bind(this));
+				return controlDiv;
+			}.bind(this)
+		});
+
+		var removeAllControl = new L.Control.RemoveAll();
 		this.drawLayer = new L.FeatureGroup();
 		this.refs.mapView.map.addLayer(this.drawLayer);
 
@@ -68,7 +105,7 @@ export default class AdvancedMapView extends React.Component {
 			}
 		});
 		this.refs.mapView.map.addControl(drawControl);
-
+		this.refs.mapView.map.addControl(removeAllControl);
 
 		this.refs.mapView.map.on(L.Draw.Event.CREATED, this.mapDrawLayerCreatedHandler);
 
@@ -170,6 +207,8 @@ export default class AdvancedMapView extends React.Component {
 			return;
 		}
 
+		this.drawLayer.clearLayers();
+
 		var params = this.state.params;
 
 		var paramString = paramsHelper.buildParamString(params);
@@ -218,7 +257,9 @@ export default class AdvancedMapView extends React.Component {
 			this.refs.mapView.map.removeLayer(this.vectorGridLayer);
 		}
 
-		this.vectorGridLayer = L.vectorGrid.protobuf('http://localhost:8084/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER='+this.mapModes[this.state.mapMode].layer+'&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}', {
+		var layerName = _.findWhere(this.mapModes, {name: this.state.mapMode}).layer;
+
+		this.vectorGridLayer = L.vectorGrid.protobuf(config.geoserverUrl+'/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER='+layerName+'&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}', {
 			interactive: true,
 			vectorTileLayerStyles: {
 				an_riks: function(properties, zoom) {
@@ -244,26 +285,40 @@ export default class AdvancedMapView extends React.Component {
 						fillOpacity: 0.8,
 						fillColor: foundFeature ? colorScale(foundFeature.doc_count).hex() : null
 					}
+				}.bind(this),
+				"SockenStad_ExtGranskn_v1.0": function(properties, zoom) {
+					console.log(properties);
+					var foundFeature = this.getFeatureData(properties.SnSt_Namn+' sn');
+
+					return {
+						weight: foundFeature ? 0.2 : 0,
+						color: '#000',
+						strokeOpacity: 0.5,
+						fill: Boolean(foundFeature),
+						fillOpacity: 0.8,
+						fillColor: foundFeature ? colorScale(foundFeature.doc_count).hex() : null
+					}
 				}.bind(this)
 			},
 			getFeatureId: function(feature) {
 				var featureName = this.state.mapMode == 'county' ? feature.properties.LANSNAMN : 
-					this.state.mapMode == 'socken' ? feature.properties.DISTRNAMN : '';
+					this.state.mapMode == 'socken' ? feature.properties.SnSt_Namn : '';
 				return feature.properties.LANSNAMN;
 			}.bind(this)
 		});
 
-		this.vectorGridLayer.on('mousemove', this.tooltipMouseMove);
-		this.vectorGridLayer.on('mouseout', this.tooltipMouseOut);
+		this.vectorGridLayer.on('mousemove', this.vectorGridMouseMove);
+		this.vectorGridLayer.on('mouseout', this.vectorGridMouseOut);
+		this.vectorGridLayer.on('click', this.vectorGridClick);
 
 		this.vectorGridLayer.addTo(this.refs.mapView.map);
 
 		this.vectorGridLayer.bringToFront();
 	}
 
-	tooltipMouseMove(event) {
+	vectorGridMouseMove(event) {
 		var featureName = this.state.mapMode == 'county' ? event.layer.properties.LANSNAMN : 
-			this.state.mapMode == 'socken' ? event.layer.properties.DISTRNAMN+' sn' : '';
+			this.state.mapMode == 'socken' ? event.layer.properties.SnSt_Namn+' sn' : '';
 		this.setState({
 			tooltip: {
 				title: featureName,
@@ -274,7 +329,7 @@ export default class AdvancedMapView extends React.Component {
 		});
 	}
 
-	tooltipMouseOut(event) {
+	vectorGridMouseOut(event) {
 		this.setState({
 			tooltip: {
 				title: ''
@@ -282,18 +337,23 @@ export default class AdvancedMapView extends React.Component {
 		});
 	}
 
+	vectorGridClick(event) {
+		console.log(event);
+	}
+
 	render() {
+		var mapModeSelectElements = this.mapModes.map(function(item, index) {
+			return <option key={index} value={item.name}>{item.label}</option>;
+		})
 		return (
 			<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
 
-				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" onBaseLayerChange={this.baseLayerChangeHandler} />
+				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" scrollWheelZoom="true" onBaseLayerChange={this.baseLayerChangeHandler} />
 
 				<div className="map-controls">
 
 					<select value={this.state.mapMode} onChange={this.mapModeSelectChangeHandler}>
-						<option value="county">Län</option>
-						<option value="landskap">Landskap</option>
-						<option value="socken">Socken</option>
+						{mapModeSelectElements}
 					</select>
 
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>

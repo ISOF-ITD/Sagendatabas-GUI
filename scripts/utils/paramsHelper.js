@@ -15,7 +15,6 @@ export default {
 	},
 
 	describeParams(params) {
-		console.log(params);
 		var params = JSON.parse(JSON.stringify(params));
 
 		if (params) {

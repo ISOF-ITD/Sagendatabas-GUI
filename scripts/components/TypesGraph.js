@@ -21,6 +21,7 @@ export default class TypesGraph extends React.Component {
 		};
 
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
+		this.barClickHandler = this.barClickHandler.bind(this);
 
 		this.state = {
 			paramString: null,
@@ -55,7 +56,7 @@ export default class TypesGraph extends React.Component {
 		this.setState({
 			graphContainerWidth: this.refs.container.clientWidth
 		}, function() {
-			this.renderGraph();
+			this.renderGraph(true);
 		}.bind(this));
 	}
 
@@ -72,6 +73,8 @@ export default class TypesGraph extends React.Component {
 	}
 
 	fetchData() {
+		this.selectedBar = null;
+
 		var params = this.state.params;
 
 		var paramString = paramsHelper.buildParamString(this.state.params);
@@ -149,7 +152,7 @@ export default class TypesGraph extends React.Component {
 		return y;
 	}
 
-	renderGraph() {
+	renderGraph(disableAnimation) {
 		d3.selectAll('svg#'+this.state.graphId+' > *').remove();
 
 		if (this.state.data.length == 0) {
@@ -192,7 +195,10 @@ export default class TypesGraph extends React.Component {
 		this.vis.selectAll('.bar')
 			.data(this.state.data)
 			.enter().append('rect')
-			.attr('class', 'bar')
+			.attr('class', 'bar clickable')
+			.attr('data-key', function(d) {
+				return d.type;
+			})
 			.attr('x', function(d) {
 				return x(d.type);
 			})
@@ -206,9 +212,11 @@ export default class TypesGraph extends React.Component {
 			.attr('fill', function(d, i) {
 				return colorScale(d.doc_count);
 			})
+			.attr('opacity', function(d, i) {
+				return this.selectedBar && this.selectedBar != d.type ? 0.2 : 1;
+			}.bind(this))
 			.on('mousemove', function(d) {
 				var html = '<strong>'+d.type+'</strong><br/>'+
-					'Terms: '+d.terms+'<br/>'+
 					'Dokument: '+d.doc_count+'<br/>';
 				this.tooltip
 					.style('left', d3.event.pageX + 20 + 'px')
@@ -218,17 +226,50 @@ export default class TypesGraph extends React.Component {
 				}.bind(this))
 				.on('mouseout', function(d) {
 					this.tooltip.style('display', 'none');
-				}.bind(this));
+				}.bind(this))
+				.on('click', this.barClickHandler);
 
 		this.vis.selectAll('.bar')
 			.transition()
-			.duration(1000)
+			.duration(disableAnimation ? 0 : 1000)
 			.attr('y', function(d) {
 				return y(d.doc_count);
 			}.bind(this))
 			.attr('height', function(d) {
 				return this.graphHeight-y(d.doc_count);
 			}.bind(this));
+	}
+
+	barClickHandler(event) {
+		if (this.selectedBar && this.selectedBar == event.key) {
+			this.vis.selectAll('.bar')
+				.transition()
+				.duration(200)
+				.attr('opacity', 1);
+
+			this.selectedBar = null;
+		}
+		else {
+			this.selectedBar = event.type;	
+
+			var bar = this.vis.select('.bar[data-key="'+this.selectedBar+'"]');
+
+			this.vis.selectAll('.bar:not([data-key="'+this.selectedBar+'"])')
+				.transition()
+				.duration(200)
+				.attr('opacity', 0.2);			
+
+			bar.transition()
+				.duration(200)
+				.attr('opacity', 1);
+		}
+
+		if (window.eventBus) {
+			window.eventBus.dispatch('graph.filter', this, {
+				filter: 'type',
+				value: this.selectedBar
+			});
+		}
 	}
 
 	render() {

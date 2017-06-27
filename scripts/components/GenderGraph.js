@@ -32,6 +32,7 @@ export default class GenderGraph extends React.Component {
 		};
 
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
+		this.barClickHandler = this.barClickHandler.bind(this);
 
 		this.state = {
 			paramString: '',
@@ -166,7 +167,10 @@ export default class GenderGraph extends React.Component {
 		this.vis.selectAll('.bar')
 			.data(this.state.data)
 			.enter().append('rect')
-			.attr('class', 'bar')
+			.attr('class', 'bar clickable')
+			.attr('data-key', function(d) {
+				return d.gender;
+			})
 			.attr('x', function(d) {
 				return x(d.gender);
 			})
@@ -179,7 +183,11 @@ export default class GenderGraph extends React.Component {
 			}.bind(this))
 			.attr('fill', function(d, i) {
 				return colorScale(i);
-			}).on('mousemove', function(d) {
+			})
+			.attr('opacity', function(d, i) {
+				return this.selectedBar && this.selectedBar != d.gender ? 0.2 : 1;
+			}.bind(this))
+			.on('mousemove', function(d) {
 //				var total = this.getTotalByGender(d.gender);
 
 				this.tooltip
@@ -190,7 +198,8 @@ export default class GenderGraph extends React.Component {
 			}.bind(this))
 			.on('mouseout', function(d) {
 				this.tooltip.style('display', 'none');
-			}.bind(this));
+			}.bind(this))
+			.on('click', this.barClickHandler);
 
 		this.vis.selectAll('.bar')
 			.transition()
@@ -218,6 +227,38 @@ export default class GenderGraph extends React.Component {
 					return this.graphHeight-y(d.person_count/total);
 				}
 			}.bind(this));
+	}
+
+	barClickHandler(event) {
+		if (this.selectedBar && this.selectedBar == event.gender) {
+			this.vis.selectAll('.bar')
+				.transition()
+				.duration(200)
+				.attr('opacity', 1);
+
+			this.selectedBar = null;
+		}
+		else {
+			this.selectedBar = event.gender;	
+
+			var bar = this.vis.select('.bar[data-key="'+event.gender+'"]');
+
+			this.vis.selectAll('.bar:not([data-key="'+event.gender+'"])')
+				.transition()
+				.duration(200)
+				.attr('opacity', 0.2);			
+
+			bar.transition()
+				.duration(200)
+				.attr('opacity', 1);
+		}
+
+		if (window.eventBus) {
+			window.eventBus.dispatch('graph.filter', this, {
+				filter: 'gender',
+				value: this.selectedBar
+			});
+		}
 	}
 
 	render() {

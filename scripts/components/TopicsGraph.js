@@ -24,6 +24,7 @@ export default class TopicsGraph extends React.Component {
 
 		this.sortSelectChangeHandler = this.sortSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
+		this.barClickHandler = this.barClickHandler.bind(this);
 
 		this.state = {
 			paramString: null,
@@ -94,6 +95,8 @@ export default class TopicsGraph extends React.Component {
 	}
 
 	fetchData() {
+		this.selectedBar = null;
+
 		var params = this.state.params;
 		params.sort = this.state.sort;
 
@@ -187,7 +190,7 @@ export default class TopicsGraph extends React.Component {
 		return y;
 	}
 
-	renderGraph() {
+	renderGraph(disableAnimation) {
 		d3.selectAll('svg#'+this.state.graphId+' > *').remove();
 
 		if (this.state.data.length == 0) {
@@ -230,7 +233,10 @@ export default class TopicsGraph extends React.Component {
 		this.vis.selectAll('.bar')
 			.data(this.state.data)
 			.enter().append('rect')
-			.attr('class', 'bar')
+			.attr('class', 'bar clickable')
+			.attr('data-key', function(d) {
+				return d.topic;
+			})
 			.attr('x', function(d) {
 				return x(d.topic);
 			})
@@ -244,6 +250,9 @@ export default class TopicsGraph extends React.Component {
 			.attr('fill', function(d, i) {
 				return colorScale(d.doc_count);
 			})
+			.attr('opacity', function(d, i) {
+				return this.selectedBar && this.selectedBar != d.topic ? 0.2 : 1;
+			}.bind(this))
 			.on('mousemove', function(d) {
 				var html = '<strong>'+d.topic+'</strong><br/>'+
 					'Terms: '+d.terms+'<br/>'+
@@ -256,11 +265,12 @@ export default class TopicsGraph extends React.Component {
 				}.bind(this))
 				.on('mouseout', function(d) {
 					this.tooltip.style('display', 'none');
-				}.bind(this));
+				}.bind(this))
+				.on('click', this.barClickHandler);
 
 		this.vis.selectAll('.bar')
 			.transition()
-			.duration(1000)
+			.duration(disableAnimation ? 0 : 1000)
 			.attr('y', function(d) {
 				if (this.state.sort == 'parent_doc_count') {
 					return y(d.doc_count);
@@ -277,6 +287,38 @@ export default class TopicsGraph extends React.Component {
 					return this.graphHeight-y(d.terms);
 				}
 			}.bind(this));
+	}
+
+	barClickHandler(event) {
+		if (this.selectedBar && this.selectedBar == event.topic) {
+			this.vis.selectAll('.bar')
+				.transition()
+				.duration(200)
+				.attr('opacity', 1);
+
+			this.selectedBar = null;
+		}
+		else {
+			this.selectedBar = event.topic;	
+
+			var bar = this.vis.select('.bar[data-key="'+event.topic+'"]');
+
+			this.vis.selectAll('.bar:not([data-key="'+event.topic+'"])')
+				.transition()
+				.duration(200)
+				.attr('opacity', 0.2);			
+
+			bar.transition()
+				.duration(200)
+				.attr('opacity', 1);
+		}
+
+		if (window.eventBus) {
+			window.eventBus.dispatch('graph.filter', this, {
+				filter: this.props.type == 'titles' ? 'title_topics' : 'topics',
+				value: this.selectedBar
+			});
+		}
 	}
 
 	render() {

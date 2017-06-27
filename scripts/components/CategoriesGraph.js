@@ -290,7 +290,7 @@ export default class CategoriesGraph extends React.Component {
 			.on('mouseout', function(d) {
 				this.tooltip.style('display', 'none');
 			}.bind(this))
-			.on('click', this.barClickHandler)
+			.on('click', this.barClickHandler);
 
 		this.vis.selectAll('.bar')
 			.transition()
@@ -318,8 +318,6 @@ export default class CategoriesGraph extends React.Component {
 	}
 
 	barClickHandler(event) {
-//		return;
-
 		if (this.selectedBar && this.selectedBar == event.key) {
 			this.vis.selectAll('.bar')
 				.transition()

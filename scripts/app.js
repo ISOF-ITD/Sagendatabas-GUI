@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Router, Route, Link, hashHistory, Redirect } from 'react-router'
 
 import Application from './components/Application';
+import NetworkApplication from './components/NetworkApplication';
 import AdvancedDocumentView from './components/AdvancedDocumentView';
 
 // IE 11 backwards compatibility
@@ -14,6 +15,7 @@ if (!window.Promise) {
 
 ReactDOM.render(
 	<Router history={hashHistory}>
+		<Route path="/graph" component={NetworkApplication} />
 		<Route path="/" component={Application}>
 			<Route path="/document/:id" components={{popup: AdvancedDocumentView}} />
 		</Route>

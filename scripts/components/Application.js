@@ -13,6 +13,7 @@ import PersonList from './PersonList';
 import AdvancedMapView from './AdvancedMapView';
 import GenderGraphDisplay from './GenderGraphDisplay';
 import TypesGraph from './TypesGraph';
+import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverlay';
 
 import {TabsContainer, Tab} from './TabControl';
 
@@ -116,6 +117,8 @@ export default class Application extends React.Component {
 				<PopupWindow onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
 					{popup}
 				</PopupWindow>
+
+				<ImageOverlay />
 
 			</div>
 		);
