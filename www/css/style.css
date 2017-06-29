@@ -2270,6 +2270,25 @@ td .play-button {
   bottom: 0;
   overflow-y: auto;
 }
+.dropdown-wrapper .dropdown-container.dropdown-list.has-footer .list-container {
+  bottom: 66px;
+}
+.dropdown-wrapper .dropdown-container.dropdown-list .dropdown-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 66px;
+  box-shadow: none;
+  padding: 24px;
+  color: #333;
+  font-size: 1rem;
+  border-top: 1px solid #dcdcdc;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  box-sizing: border-box;
+  background: #edeff1;
+}
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item {
   display: block;
   padding: 10px 15px;
