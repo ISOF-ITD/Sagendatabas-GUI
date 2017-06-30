@@ -90,12 +90,20 @@ export default {
 				searchTerms.push('Informant: <strong>'+params.informant+'</strong>');
 			}
 			
+			if (params.gender && params.gender != '') {
+				searchTerms.push('Kön: <strong>'+(params.gender == 'female' ? 'kvinnor' : params.gender == 'male' ? 'män' : params.gender == 'unknown' ? 'okänt' : '')+'</strong>');
+			}
+
 			if (params.informants_gender && params.informants_gender != '') {
 				searchTerms.push('Informants kön: <strong>'+(params.informants_gender == 'female' ? 'kvinnor' : params.informants_gender == 'male' ? 'män' : params.informants_gender == 'unknown' ? 'okänt' : '')+'</strong>');
 			}
 
 			if (params.collectors_gender && params.collectors_gender != '') {
 				searchTerms.push('Upptecknare kön: <strong>'+(params.collectors_gender == 'female' ? 'kvinnor' : params.collectors_gender == 'male' ? 'män' : params.collectors_gender == 'unknown' ? 'okänt' : '')+'</strong>');
+			}
+
+			if (params.socken && params.socken != '') {
+				searchTerms.push('Socken: <strong>'+params.socken+'</strong>');
 			}
 
 			if (params.geo_box) {

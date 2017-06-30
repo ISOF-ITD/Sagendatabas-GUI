@@ -10,6 +10,7 @@ import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBo
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
 import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCategories';
 import AutocompleteInput from './../../ISOF-React-modules/components/controls/AutocompleteInput';
+import PopulatedSelect from './../../ISOF-React-modules/components/controls/PopulatedSelect';
 import DropdownMenu from './../../ISOF-React-modules/components/controls/DropdownMenu';
 import MapBase from './../../ISOF-React-modules/components/views/MapBase';
 
@@ -56,6 +57,8 @@ export default class SearchForm extends React.Component {
 			collectorsBirthYears: [this.sliderStartYear, this.sliderEndYear],
 			informantsBirthYearsEnabled: false,
 			informantsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+			sockenInput: '',
+			landskapInput: '',
 
 			geoBoundingBox: null,
 
@@ -263,6 +266,14 @@ export default class SearchForm extends React.Component {
 			params.informants_birth_years = this.state.informantsBirthYears.join(',');
 		}
 
+		if (this.state.landskapInput != '') {
+			params.landskap = this.state.landskapInput;
+		}
+
+		if (this.state.sockenInput != '') {
+			params.socken = this.state.sockenInput;
+		}
+
 		if (this.state.geoBoundingBox) {
 			params.geo_box = this.state.geoBoundingBox.topLeft.lat+','+this.state.geoBoundingBox.topLeft.lng+','+this.state.geoBoundingBox.bottomRight.lat+','+this.state.geoBoundingBox.bottomRight.lng;
 		}
@@ -294,6 +305,14 @@ export default class SearchForm extends React.Component {
 
 	personsAutocompleteFormatListLabel(item) {
 		return item.name+' ('+item.doc_count+')';
+	}
+
+	sockenAutocompleteFormatListLabel(item) {
+		return item.name+', '+item.lan;
+	}
+
+	landskapSelectFormatListLabel(item) {
+		return item.name;
 	}
 
 	render() {
@@ -403,6 +422,38 @@ export default class SearchForm extends React.Component {
 								}.bind(this)}>
 									<MapBase ref="mapView" disableSwedenMap="true" mapHeight="350" />
 								</DropdownMenu>
+
+								<br/>
+
+								<div className="row">
+
+									<div className="six columns">
+										<label>Socken:</label>
+										<PopulatedSelect inputName="sockenInput" 
+											dataUrl={config.apiUrl+config.endpoints.socken} 
+											valueField="name"
+											sortOptions="true"
+											inputClassName="u-full-width" 
+											onChange={this.inputChangeHandler} 
+											value={this.state.sockenInput} 
+											onEnter={this.triggerSearch}
+											listLabelFormatFunc={this.sockenAutocompleteFormatListLabel} />
+									</div>
+
+									<div className="six columns">
+										<label>Landskap:</label>
+										<PopulatedSelect inputName="landskapInput" 
+											dataUrl={config.apiUrl+config.endpoints.landskap} 
+											valueField="name"
+											sortOptions="true"
+											inputClassName="u-full-width" 
+											onChange={this.inputChangeHandler} 
+											value={this.state.landskapInput} 
+											onEnter={this.triggerSearch}
+											listLabelFormatFunc={this.landskapSelectFormatListLabel} />
+									</div>
+								</div>
+
 							</div>
 							
 						</div>

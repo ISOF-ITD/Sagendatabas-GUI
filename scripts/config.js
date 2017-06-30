@@ -1,6 +1,7 @@
 export default {
 //	apiUrl: 'http://uuc-isof003-t.its.uu.se/sagenkarta/es/',
 	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
+
 	appUrl: 'http://www4.sprakochfolkminnen.se/sagner/avancerad/',
 
 	geoserverUrl: 'https://oden-test.sprakochfolkminnen.se/geoserver',
@@ -14,17 +15,25 @@ export default {
 		collection_years: 'collection_years/',
 		birth_years: 'birth_years/',
 		documents: 'documents/',
-		document: 'document/',
 		persons: 'persons/',
 		informants: 'informants/',
 		collectors: 'collectors/',
-		county: 'county/',
-		topics_autocomplete: 'topics_autocomplete/',
-		title_topics_autocomplete: 'title_topics_autocomplete/',
 		gender: 'gender/',
-		persons_autocomplete: 'persons_autocomplete/',
 		types: 'types/',
-		topics_graph: 'graph/'
+
+		document: 'document/',
+
+		topics_graph: 'graph/',
+
+		county: 'county/',
+		landskap: 'landskap/',
+		socken: 'socken/',
+
+
+		topics_autocomplete: 'autocomplete/topics/',
+		title_topics_autocomplete: 'autocomplete/title_topics/',
+		persons_autocomplete: 'autocomplete/persons/',
+		socken_autocomplete: 'autocomplete/socken/'
 	},
 
 	minYear: 1750,

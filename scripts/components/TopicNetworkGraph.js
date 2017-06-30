@@ -30,7 +30,7 @@ export default class TopicNetworkGraph extends React.Component {
 
 		this.state = {
 			paramString: null,
-			data: [],
+			data: null,
 			total: null,
 
 			loading: false,
@@ -371,7 +371,7 @@ export default class TopicNetworkGraph extends React.Component {
 
 	render() {
 		return (
-			<div className={'network-graph-wrapper '+(this.state.loading ? ' loading' : '')} ref="container">
+			<div className={'network-graph-wrapper '+(this.state.loading ? ' loading' : '')+(!this.state.data ? ' empty' : '')} ref="container">
 
 				<div className="graph-container">
 					<svg id={this.state.graphId} ref='graphContainer'/>

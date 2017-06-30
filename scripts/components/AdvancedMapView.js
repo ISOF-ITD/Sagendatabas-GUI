@@ -3,6 +3,7 @@ import EventBus from 'eventbusjs';
 import _ from 'underscore';
 
 import L from 'leaflet';
+import './../../ISOF-React-modules/lib/leaflet-heat';
 import 'leaflet.vectorgrid';
 import 'leaflet-draw';
 
@@ -29,25 +30,39 @@ export default class AdvancedMapView extends React.Component {
 
 		this.mapModes = [
 			{
-				label: 'Socken',
+				label: 'Polygoner',
 				name: 'socken',
-				type: 'vectortile',
-				layer: 'SockenStad_ExtGranskning:SockenStad_ExtGranskn_v1.0'
+				endpoint: config.endpoints.socken,
+				type: 'vectorgrid',
+				layer: 'SockenStad_ExtGranskning-clipped:SockenStad_ExtGranskn_v1.0_clipped'
 			},
+			/*
 			{
 				label: 'Län',
 				name: 'county',
-				type: 'vectortile',
+				endpoint: config.endpoints.county,
+				type: 'vectorgrid',
 				layer: 'sverige_lan:an_riks'
+			},
+			*/
+			{
+				label: 'Heatmap',
+				name: 'heatmap',
+				endpoint: config.endpoints.socken,
+				type: 'heatmap'
 			}
 		];
+
+		this.total = {
+			socken: []
+		};
 
 		this.state = {
 			params: null,
 			data: null,
 			loading: false,
 			viewMode: 'absolute',
-			mapMode: 'socken',
+			mapMode: this.mapModes[0],
 			tooltip: {
 				title: '',
 				text: '',
@@ -153,11 +168,18 @@ export default class AdvancedMapView extends React.Component {
 	setViewMode(viewMode) {
 		var currentViewMode = this.state.viewMode;
 
+		if (viewMode == currentViewMode) {
+			return;
+		}
+
 		this.setState({
 			viewMode: viewMode
 		}, function() {
-			if (this.state.viewMode != currentViewMode) {
+			if (viewModeData.type == 'vectorgrid') {
 				this.renderVectorGrid();
+			}
+			if (viewModeData.type == 'heatmap') {
+				this.renderHeatmap();
 			}
 		}.bind(this));
 
@@ -168,34 +190,34 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	baseLayerChangeHandler() {
-		if (this.vectorGridLayer) {
-			this.vectorGridLayer.bringToFront();
+		if (this.dataLayer) {
+			this.dataLayer.bringToFront();
 		}
 	}
 
 	setMapMode(mapMode) {
-		var currentMapMode = this.state.mapMode;
+		var currentMapMode = this.state.mapMode.name;
 
 		this.setState({
-			mapMode: mapMode
+			mapMode: _.findWhere(this.mapModes, {name: mapMode})
 		}, function() {
-			if (this.state.mapMode != currentMapMode) {
+			if (this.state.mapMode.name != currentMapMode) {
 				this.fetchData(true);
 			}
 		}.bind(this));
 
 	}
 
-	getTotalByCounty(county) {
-		return _.findWhere(this.totalByCountyArray, {name: county}).doc_count;
+	getTotal(dataType, name) {
+		return _.findWhere(this.total[dataType], {name: name}).doc_count;
 	}
 
 	fetchTotal() {
-		fetch(config.apiUrl+config.endpoints.county)
+		fetch(config.apiUrl+config.endpoints.socken)
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
-				this.totalByCountyArray = json.data;
+				this.total.socken = json.data;
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -222,7 +244,7 @@ export default class AdvancedMapView extends React.Component {
 			loading: true
 		});
 
-		fetch(config.apiUrl+this.state.mapMode+'/?'+paramString)
+		fetch(config.apiUrl+this.state.mapMode.endpoint+'/?'+paramString)
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
@@ -231,7 +253,13 @@ export default class AdvancedMapView extends React.Component {
 					data: json.data,
 					loading: false
 				}, function() {
-					this.renderVectorGrid();
+					if (this.state.mapMode.type == 'vectorgrid') {
+						this.renderVectorGrid();
+					}
+
+					if (this.state.mapMode.type == 'heatmap') {
+						this.renderHeatmap();
+					}
 				}.bind(this));
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
@@ -240,26 +268,49 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	getFeatureData(id) {
-		var found = _.findWhere(this.state.data, {name: id});
+		var found = _.findWhere(this.state.data, {lm_id: id});
 
 		return found || false;
 	}
 
-	renderVectorGrid() {
+	renderHeatmap() {
+		if (this.dataLayer) {
+			this.refs.mapView.map.removeLayer(this.dataLayer);
+		}
+
 		var minValue = _.min(_.pluck(this.state.data, 'doc_count'));
 		var maxValue = _.max(_.pluck(this.state.data, 'doc_count'));
 
-		var colorScale = chroma.scale(['#33f0c7', '#02ff00', '#f00']).domain([0, maxValue]);
-//		var colorScale = chroma.scale('YlOrRd').domain([0, maxValue]);
-//		var colorScale = chroma.scale(['#72ff2c', '#f00']).domain([0, maxValue]);
+		this.dataLayer = L.heatLayer([], {
+			minOpacity: 0.35,
+			radius: 18,
+			max: maxValue,
+			blur: 15
+		});
 
-		if (this.vectorGridLayer) {
-			this.refs.mapView.map.removeLayer(this.vectorGridLayer);
+		this.dataLayer.addTo(this.refs.mapView.map);
+
+		var latLngs = _.map(this.state.data, function(mapItem) {
+			console.log('doc_count: '+mapItem.doc_count+' / maxValue: '+maxValue+' = '+mapItem.doc_count/maxValue);
+			return [mapItem.location[0], mapItem.location[1], Number(mapItem.doc_count)];
+		}.bind(this));
+
+		this.dataLayer.setLatLngs(latLngs);
+	}
+
+	renderVectorGrid() {
+		if (this.dataLayer) {
+			this.refs.mapView.map.removeLayer(this.dataLayer);
 		}
 
-		var layerName = _.findWhere(this.mapModes, {name: this.state.mapMode}).layer;
+		var minValue = _.min(_.pluck(this.state.data, 'doc_count'));
+		var maxValue = _.max(_.pluck(this.state.data, 'doc_count'));
 
-		this.vectorGridLayer = L.vectorGrid.protobuf(config.geoserverUrl+'/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER='+layerName+'&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}', {
+//		var colorScale = chroma.scale(['#33f0c7', '#02ff00', '#f00']).domain([0, maxValue]);
+		var colorScale = chroma.scale('YlOrRd').domain([0, maxValue]);
+//		var colorScale = chroma.scale(['#72ff2c', '#f00']).domain([0, maxValue]);
+
+		this.dataLayer = L.vectorGrid.protobuf(config.geoserverUrl+'/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER='+this.state.mapMode.layer+'&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}', {
 			interactive: true,
 			vectorTileLayerStyles: {
 				an_riks: function(properties, zoom) {
@@ -282,20 +333,19 @@ export default class AdvancedMapView extends React.Component {
 						color: '#000',
 						strokeOpacity: 0.5,
 						fill: Boolean(foundFeature),
-						fillOpacity: 0.8,
+						fillOpacity: 0.9,
 						fillColor: foundFeature ? colorScale(foundFeature.doc_count).hex() : null
 					}
 				}.bind(this),
-				"SockenStad_ExtGranskn_v1.0": function(properties, zoom) {
-					console.log(properties);
-					var foundFeature = this.getFeatureData(properties.SnSt_Namn+' sn');
+				'SockenStad_ExtGranskn_v1.0_clipped': function(properties, zoom) {
+					var foundFeature = this.getFeatureData(properties.SnSt_Id);
 
 					return {
 						weight: foundFeature ? 0.2 : 0,
 						color: '#000',
 						strokeOpacity: 0.5,
 						fill: Boolean(foundFeature),
-						fillOpacity: 0.8,
+						fillOpacity: 0.9,
 						fillColor: foundFeature ? colorScale(foundFeature.doc_count).hex() : null
 					}
 				}.bind(this)
@@ -307,22 +357,24 @@ export default class AdvancedMapView extends React.Component {
 			}.bind(this)
 		});
 
-		this.vectorGridLayer.on('mousemove', this.vectorGridMouseMove);
-		this.vectorGridLayer.on('mouseout', this.vectorGridMouseOut);
-		this.vectorGridLayer.on('click', this.vectorGridClick);
+		this.dataLayer.on('mousemove', this.vectorGridMouseMove);
+		this.dataLayer.on('mouseout', this.vectorGridMouseOut);
+		this.dataLayer.on('click', this.vectorGridClick);
 
-		this.vectorGridLayer.addTo(this.refs.mapView.map);
+		this.dataLayer.addTo(this.refs.mapView.map);
 
-		this.vectorGridLayer.bringToFront();
+		this.dataLayer.bringToFront();
 	}
 
 	vectorGridMouseMove(event) {
-		var featureName = this.state.mapMode == 'county' ? event.layer.properties.LANSNAMN : 
-			this.state.mapMode == 'socken' ? event.layer.properties.SnSt_Namn+' sn' : '';
+		var featureName = this.state.mapMode.name == 'county' ? event.layer.properties.LANSNAMN : 
+			this.state.mapMode.name == 'socken' ? event.layer.properties.SnSt_Namn : '';
+		var featureId = this.state.mapMode.name == 'county' ? event.layer.properties.LANSNAMN : 
+			this.state.mapMode.name == 'socken' ? event.layer.properties.SnSt_Id : '';
 		this.setState({
 			tooltip: {
 				title: featureName,
-				text: this.getFeatureData(featureName).doc_count,
+				text: this.getFeatureData(event.layer.properties.SnSt_Id).doc_count,
 				x: event.originalEvent.x,
 				y: event.originalEvent.y
 			}
@@ -338,7 +390,16 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	vectorGridClick(event) {
-		console.log(event);
+		var featureData = this.getFeatureData(event.layer.properties.SnSt_Id);
+
+		if (!featureData || featureData.doc_count == 0) {
+			return;
+		}
+
+		window.eventBus.dispatch('graph.filter', this, {
+			filter: this.state.mapMode.name,
+			value: featureData.name
+		});
 	}
 
 	render() {
@@ -352,7 +413,7 @@ export default class AdvancedMapView extends React.Component {
 
 				<div className="map-controls">
 
-					<select value={this.state.mapMode} onChange={this.mapModeSelectChangeHandler}>
+					<select value={this.state.mapMode.name} onChange={this.mapModeSelectChangeHandler}>
 						{mapModeSelectElements}
 					</select>
 
@@ -365,7 +426,7 @@ export default class AdvancedMapView extends React.Component {
 
 				<div className="loading-overlay"></div>
 
-				<div style={{top: this.state.tooltip.y+20, left: this.state.tooltip.x+20}} className={'graph-tooltip position-fixed'+(this.state.tooltip.title != '' ? ' visible' : '')}>
+				<div style={{top: this.state.tooltip.y+20, left: this.state.tooltip.x+20}} className={'graph-tooltip position-fixed'+(this.state.tooltip.title != '' && this.state.tooltip.text ? ' visible' : '')}>
 					<strong>{this.state.tooltip.title}</strong><br/>
 					{this.state.tooltip.text}
 				</div>
