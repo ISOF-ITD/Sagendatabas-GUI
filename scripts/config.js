@@ -1,6 +1,6 @@
 export default {
-//	apiUrl: 'http://uuc-isof003-t.its.uu.se/sagenkarta/es/',
-	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
+	apiUrl: 'http://uuc-isof003-t.its.uu.se/sagenkarta/es/',
+//	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
 
 	appUrl: 'http://www4.sprakochfolkminnen.se/sagner/avancerad/',
 

@@ -60,6 +60,8 @@ export default class SearchForm extends React.Component {
 			sockenInput: '',
 			landskapInput: '',
 
+			searchOptions: '',
+
 			geoBoundingBox: null,
 
 			lastSearchParams: null,
@@ -145,7 +147,9 @@ export default class SearchForm extends React.Component {
 
 		this.setState({
 			[event.target.name]: value
-		});
+		}, function() {
+			console.log(this.state);
+		}.bind(this));
 	}
 
 	searchInputFocusHandler() {
@@ -278,6 +282,10 @@ export default class SearchForm extends React.Component {
 			params.geo_box = this.state.geoBoundingBox.topLeft.lat+','+this.state.geoBoundingBox.topLeft.lng+','+this.state.geoBoundingBox.bottomRight.lat+','+this.state.geoBoundingBox.bottomRight.lng;
 		}
 
+		if (this.state.searchOptions != '') {
+			params.search_options = this.state.searchOptions;
+		}
+
 		return params;
 	}
 
@@ -351,6 +359,15 @@ export default class SearchForm extends React.Component {
 					</div>
 
 					<div className="expanded-content">
+
+						<div className="radio-list-inline">
+							<div className="list-heading">Fras-sökning inställningar: </div>
+							<label><input type="radio" name="searchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
+							<label><input type="radio" name="searchOptions" onChange={this.inputChangeHandler} value="nearer" /> Nära</label>
+							<label><input type="radio" name="searchOptions" onChange={this.inputChangeHandler} value="near" /> Närmare</label>
+						</div>
+
+						<hr />
 
 						<div className="row">
 

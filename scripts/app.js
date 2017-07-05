@@ -15,7 +15,7 @@ if (!window.Promise) {
 
 ReactDOM.render(
 	<Router history={hashHistory}>
-		<Route path="/graph" component={NetworkApplication} />
+		<Route path="/network" component={NetworkApplication} />
 		<Route path="/" component={Application}>
 			<Route path="/document/:id" components={{popup: AdvancedDocumentView}} />
 		</Route>

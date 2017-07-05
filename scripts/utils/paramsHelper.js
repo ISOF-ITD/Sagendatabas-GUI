@@ -106,6 +106,10 @@ export default {
 				searchTerms.push('Socken: <strong>'+params.socken+'</strong>');
 			}
 
+			if (params.landskap && params.landskap != '') {
+				searchTerms.push('Landskap: <strong>'+params.landskap+'</strong>');
+			}
+
 			if (params.geo_box) {
 				var latLngs = params.geo_box.split ? params.geo_box.split(',') : params.geo_box;
 				latLngs = latLngs.map(function(n) {
