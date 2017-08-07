@@ -4,7 +4,7 @@ import { hashHistory } from 'react-router';
 import EventBus from 'eventbusjs';
 
 import SearchForm from './SearchForm';
-import TopicsGraph from './TopicsGraph';
+import TermsGraph from './TermsGraph';
 import CollectionYearsGraph from './CollectionYearsGraph';
 import CategoriesGraph from './CategoriesGraph';
 import BirthYearsGraph from './BirthYearsGraph';
@@ -35,7 +35,7 @@ export default class Application extends React.Component {
 	}
 
 	popupCloseHandler() {
-		hashHistory.push('/');
+		hashHistory.push('/search');
 	}
 
 	popupWindowShowHandler() {
@@ -68,11 +68,11 @@ export default class Application extends React.Component {
 								<Tab tabName="Kategorier">
 									<CategoriesGraph graphHeight="300" />
 								</Tab>
-								<Tab tabName="Topics">
-									<TopicsGraph count="15" graphHeight="300" />
+								<Tab tabName="Topic terms">
+									<TermsGraph count="15" graphHeight="300" />
 								</Tab>
-								<Tab tabName="Titel topics">
-									<TopicsGraph count="15" type="titles" graphHeight="300" />
+								<Tab tabName="Titel topic termss">
+									<TermsGraph count="15" type="titles" graphHeight="300" />
 								</Tab>
 								<Tab tabName="Typ">
 									<TypesGraph graphHeight="300" />

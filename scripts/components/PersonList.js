@@ -120,7 +120,7 @@ export default class PersonList extends React.Component {
 			<div className="documents-list-wrapper">
 				<div className={'documents-list'+(this.state.loading ? ' loading' : '')+(this.props.disableContainerStyle ? ' container-style-disabled' : '')}>
 					<div className="list-heading">
-						<button className={this.state.listType == 'informants' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="informants">Informantar</button> <button className={this.state.listType == 'collectors' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="collectors">Upptecknare</button> <button className={this.state.listType == 'persons' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="persons">Båda</button>
+						<button className={this.state.listType == 'informants' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="informants">Informanter</button> <button className={this.state.listType == 'collectors' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="collectors">Upptecknare</button> <button className={this.state.listType == 'persons' ? ' selected' : ''} onClick={this.listTypeChangeHandler} data-type="persons">Båda</button>
 
 						{
 							paramsHelper.describeParams(this.filters) != '' &&

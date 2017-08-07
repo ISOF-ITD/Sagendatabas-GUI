@@ -12,6 +12,8 @@ import chroma from 'chroma-js';
 import MapBase from './../../ISOF-React-modules/components/views/MapBase';
 import paramsHelper from './../utils/paramsHelper';
 
+import ColorLegendsGraph from './ColorLegendsGraph';
+
 import config from './../config';
 
 export default class AdvancedMapView extends React.Component {
@@ -67,6 +69,7 @@ export default class AdvancedMapView extends React.Component {
 			loading: false,
 			viewMode: 'absolute',
 			mapMode: this.mapModes[0],
+			colorScale: null,
 			tooltip: {
 				title: '',
 				text: '',
@@ -176,8 +179,6 @@ export default class AdvancedMapView extends React.Component {
 			return;
 		}
 
-		console.log('setViewMode: '+viewMode);
-
 		this.setState({
 			viewMode: viewMode
 		}, function() {
@@ -215,8 +216,6 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	getTotal(dataType, id) {
-		console.log(this.total);
-		console.log(_.findWhere(this.total[dataType], {id: id}));
 		return _.findWhere(this.total[dataType], {id: id}).doc_count;
 	}
 
@@ -313,7 +312,13 @@ export default class AdvancedMapView extends React.Component {
 			strokeOpacity: 0.5,
 			fill: Boolean(foundFeature),
 			fillOpacity: selected ? 1 : 0.9,
-			fillColor: selected ? '#1f77b4' : foundFeature ? this.colorScale(foundFeature.doc_count).hex() : null
+			fillColor: selected ? '#1f77b4' : foundFeature ? this.state.colorScale(
+				(
+					this.state.viewMode == 'relative' ?
+					foundFeature.doc_count/this.getTotal(this.state.mapMode.name, foundFeature.id) :
+					foundFeature.doc_count
+				)
+			).hex() : null
 		};
 	}
 
@@ -336,14 +341,19 @@ export default class AdvancedMapView extends React.Component {
 				return item.doc_count/this.getTotal(this.state.mapMode.name, item.id);
 			}.bind(this));
 
-			console.log(values);
 			minValue = _.min(values);
 			maxValue = _.max(values);
 		}
 
 //		this.colorScale = chroma.scale(['#33f0c7', '#02ff00', '#f00']).domain([0, maxValue]);
-		this.colorScale = chroma.scale('YlOrRd').domain([0, maxValue]);
-//		this.colorScale = chroma.scale(['#72ff2c', '#f00']).domain([0, maxValue]);
+		var colorScale = chroma.scale('YlOrRd').domain([minValue, maxValue]);
+
+		console.log('set colorScale');
+		this.setState({
+			colorScale: colorScale
+		});
+
+//		this.colorScale = chroma.scale(['#72ff2c', '#f00']).domain([minValue, maxValue]);
 
 		var layerBounds = [];
 
@@ -371,7 +381,7 @@ export default class AdvancedMapView extends React.Component {
 						strokeOpacity: 0.5,
 						fill: Boolean(foundFeature),
 						fillOpacity: 0.9,
-						fillColor: foundFeature ? colorScale(foundFeature.doc_count).hex() : null
+						fillColor: foundFeature ? colorScale(colorValue).hex() : null
 					}
 				}.bind(this),
 				'SockenStad_ExtGranskn_v1.0_clipped': function(properties, zoom) {
@@ -381,7 +391,7 @@ export default class AdvancedMapView extends React.Component {
 						layerBounds.push(foundFeature.location);
 					}
 
-					return this.createVectorStyle(foundFeature);
+					return this.createVectorStyle(foundFeature, null);
 				}.bind(this)
 			},
 			getFeatureId: function(feature) {
@@ -407,10 +417,13 @@ export default class AdvancedMapView extends React.Component {
 		var featureName = this.state.mapMode.name == 'county' ? event.layer.properties.LANSNAMN : 
 			this.state.mapMode.name == 'socken' ? event.layer.properties.SnSt_Namn : '';
 		var featureId = event.layer.properties[this.state.mapMode.idField];
+
+		var featureData = this.getFeatureData(featureId);
+
 		this.setState({
 			tooltip: {
 				title: featureName,
-				text: this.getFeatureData(event.layer.properties[this.state.mapMode.idField]).doc_count,
+				text: featureData ? featureData.doc_count+' (total '+this.getTotal(this.state.mapMode.name, featureData.id)+')' : '',
 				x: event.originalEvent.x,
 				y: event.originalEvent.y
 			}
@@ -431,8 +444,6 @@ export default class AdvancedMapView extends React.Component {
 		if (!featureData || featureData.doc_count == 0) {
 			return;
 		}
-
-		console.log(event);
 
 		_.each(this.state.data, function(item) {
 			this.dataLayer.resetFeatureStyle(item.lm_id)
@@ -463,6 +474,11 @@ export default class AdvancedMapView extends React.Component {
 
 				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" scrollWheelZoom="true" onBaseLayerChange={this.baseLayerChangeHandler} />
 
+				{
+					this.state.mapMode.type == 'vectorgrid' &&
+					<ColorLegendsGraph colorScale={this.state.colorScale} />
+				}
+
 				<div className="map-controls">
 
 					<select value={this.state.mapMode.name} onChange={this.mapModeSelectChangeHandler}>
@@ -480,7 +496,7 @@ export default class AdvancedMapView extends React.Component {
 
 				<div style={{top: this.state.tooltip.y+20, left: this.state.tooltip.x+20}} className={'graph-tooltip position-fixed'+(this.state.tooltip.title != '' && this.state.tooltip.text ? ' visible' : '')}>
 					<strong>{this.state.tooltip.title}</strong><br/>
-					{this.state.tooltip.text}
+					<span dangerouslySetInnerHTML={{__html: this.state.tooltip.text}}></span>
 				</div>
 
 			</div>

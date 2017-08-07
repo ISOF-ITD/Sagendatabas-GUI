@@ -129,7 +129,7 @@ export default class DocumentList extends React.Component {
 
 	render() {
 		var documentItems = this.state.data.map(function(item) {
-			return <DocumentListItem key={item._id} data={item} displayScore={this.props.displayScore} />
+			return <DocumentListItem hideAttributes={this.props.hideAttributes} key={item._id} data={item} displayScore={this.props.displayScore} />
 		}.bind(this));
 
 		return (

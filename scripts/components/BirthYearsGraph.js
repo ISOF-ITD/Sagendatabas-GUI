@@ -474,7 +474,7 @@ export default class BirthYearsGraph extends React.Component {
 				.style('top', d3.event.pageY + 'px')
 				.style('display', 'inline-block')
 				.html('<strong>'+yearData.year+'</strong><br/>'+
-					'Informantar: '+getTotalByType(yearData.year, 'informantsData')+'<br/>'+
+					'Informanter: '+getTotalByType(yearData.year, 'informantsData')+'<br/>'+
 					'Upptecknare: '+getTotalByType(yearData.year, 'collectorsData')+'<br/>'+
 					'Total: '+yearData.person_count
 				);
@@ -530,7 +530,7 @@ export default class BirthYearsGraph extends React.Component {
 				<div className="loading-overlay"></div>
 
 				<div className="legends">
-					<div className="legend"><div className="color" style={{backgroundColor: 'rgb(255, 127, 14)'}}/> Informantar</div>
+					<div className="legend"><div className="color" style={{backgroundColor: 'rgb(255, 127, 14)'}}/> Informanter</div>
 					<div className="legend"><div className="color" style={{backgroundColor: 'rgb(44, 160, 44)'}}/> Upptecknare</div>
 				</div>
 

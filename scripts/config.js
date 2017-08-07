@@ -9,8 +9,8 @@ export default {
 	imageUrl: 'http://www4.sprakochfolkminnen.se/Folkminnen/Svenska_sagor_filer/',
 
 	endpoints: {
-		topics: 'topics/',
-		title_topics: 'title_topics/',
+		terms: 'terms/',
+		title_terms: 'title_terms/',
 		categories: 'categories/',
 		collection_years: 'collection_years/',
 		birth_years: 'birth_years/',
@@ -23,7 +23,7 @@ export default {
 
 		document: 'document/',
 
-		topics_graph: 'graph/',
+		terms_graph: 'graph/',
 
 		county: 'county/',
 		landskap: 'landskap/',

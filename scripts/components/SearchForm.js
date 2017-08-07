@@ -1,5 +1,5 @@
 import React from 'react';
-import { hashHistory } from 'react-router';
+import { hashHistory, Link } from 'react-router';
 
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -43,8 +43,8 @@ export default class SearchForm extends React.Component {
 
 		this.state = {
 			searchInput: '',
-			topicsInput: '',
-			titleTopicsInput: '',
+			termsInput: '',
+			titleTermsInput: '',
 			selectedTypes: ['arkiv', 'tryckt'],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
@@ -226,12 +226,12 @@ export default class SearchForm extends React.Component {
 			params.search = this.state.searchInput;
 		}
 
-		if (this.state.topicsInput != '') {
-			params.topics = this.state.topicsInput;
+		if (this.state.termsInput != '') {
+			params.terms = this.state.termsInput;
 		}
 
-		if (this.state.titleTopicsInput != '') {
-			params.title_topics = this.state.titleTopicsInput;
+		if (this.state.titleTermsInput != '') {
+			params.title_terms = this.state.titleTermsInput;
 		}
 
 		if (this.state.selectedTypes.length > 0) {
@@ -307,8 +307,8 @@ export default class SearchForm extends React.Component {
 		}
 	}
 
-	topicsAutocompleteFormatListLabel(item) {
-		return item.topic+' ('+item.doc_count+')';
+	termsAutocompleteFormatListLabel(item) {
+		return item.term+' ('+item.doc_count+')';
 	}
 
 	personsAutocompleteFormatListLabel(item) {
@@ -330,6 +330,16 @@ export default class SearchForm extends React.Component {
 				onMouseLeave={this.mouseLeaveHandler}>
 
 				<div className="container">
+
+					<div className="main-menu">
+						<DropdownMenu>
+							<nav className="app-nav">
+								<Link to="/">Hem</Link>
+								<Link to="/search">Sök</Link>
+								<Link to="/network">Topic terms nätverk</Link>
+							</nav>
+						</DropdownMenu>
+					</div>
 
 					<h1>Digitalt kulturarv</h1>
 
@@ -362,9 +372,9 @@ export default class SearchForm extends React.Component {
 
 						<div className="radio-list-inline">
 							<div className="list-heading">Fras-sökning inställningar: </div>
-							<label><input type="radio" name="searchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
-							<label><input type="radio" name="searchOptions" onChange={this.inputChangeHandler} value="nearer" /> Nära</label>
-							<label><input type="radio" name="searchOptions" onChange={this.inputChangeHandler} value="near" /> Närmare</label>
+							<label><input type="radio" checked={this.state.searchOptions == ''} name="searchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
+							<label><input type="radio" checked={this.state.searchOptions == 'nearer'} name="searchOptions" onChange={this.inputChangeHandler} value="nearer" /> Närmare</label>
+							<label><input type="radio" checked={this.state.searchOptions == 'near'} name="searchOptions" onChange={this.inputChangeHandler} value="near" /> Nära</label>
 						</div>
 
 						<hr />
@@ -372,25 +382,25 @@ export default class SearchForm extends React.Component {
 						<div className="row">
 
 							<div className="four columns">
-								<label>Topics:</label>
-								<AutocompleteInput inputName="topicsInput" 
-									searchUrl={config.apiUrl+config.endpoints.topics_autocomplete+'?search=$s'} 
-									valueField="topic"
+								<label>Terms:</label>
+								<AutocompleteInput inputName="termsInput" 
+									searchUrl={config.apiUrl+config.endpoints.terms_autocomplete+'?search=$s'} 
+									valueField="term"
 									inputClassName="u-full-width" 
 									onChange={this.inputChangeHandler} 
-									value={this.state.topicsInput} 
+									value={this.state.termsInput} 
 									onEnter={this.triggerSearch}
-									listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
+									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
-								<label>Titel topics:</label>
-								<AutocompleteInput inputName="titleTopicsInput" 
-									searchUrl={config.apiUrl+config.endpoints.title_topics_autocomplete+'?search=$s'} 
-									valueField="topic" 
+								<label>Titel terms:</label>
+								<AutocompleteInput inputName="titleTermsInput" 
+									searchUrl={config.apiUrl+config.endpoints.title_terms_autocomplete+'?search=$s'} 
+									valueField="term" 
 									inputClassName="u-full-width" 
 									onChange={this.inputChangeHandler} 
-									value={this.state.titleTopicsInput} 
+									value={this.state.titleTermsInput} 
 									onEnter={this.triggerSearch} 
-									listLabelFormatFunc={this.topicsAutocompleteFormatListLabel} />
+									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
 							</div>
 

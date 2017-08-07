@@ -117,7 +117,7 @@ export default class GenderGraphDisplay extends React.Component {
 					</div>
 
 					<div className="four columns">
-						<GenderGraph label="Informantar" total={this.state.total.informants} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data.informants || []} />
+						<GenderGraph label="Informanter" total={this.state.total.informants} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data.informants || []} />
 					</div>
 
 					<div className="four columns">

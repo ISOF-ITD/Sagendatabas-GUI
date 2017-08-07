@@ -5,8 +5,9 @@ import { hashHistory } from 'react-router';
 import EventBus from 'eventbusjs';
 
 import SearchForm from './SearchForm';
+import DocumentList from './DocumentList';
 
-import TopicNetworkGraph from './TopicNetworkGraph';
+import TermsNetworkGraph from './TermsNetworkGraph';
 
 import {TabsContainer, Tab} from './TabControl';
 
@@ -49,7 +50,15 @@ export default class NetworkApplication extends React.Component {
 
 				<SearchForm />
 
-				<TopicNetworkGraph />
+				<div className="graph-sidebar">
+					<DocumentList hideAttributes="true" />
+				</div>
+
+				<TermsNetworkGraph />
+
+				<PopupWindow onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
+					{popup}
+				</PopupWindow>
 
 			</div>
 		);

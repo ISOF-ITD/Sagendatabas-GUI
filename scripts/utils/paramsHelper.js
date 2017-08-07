@@ -38,12 +38,12 @@ export default {
 				)+'</strong>');
 			}
 
-			if (params.topics && params.topics != '') {
-				searchTerms.push('Topics: <strong>'+params.topics.split(',').join(', ')+'</strong>');
+			if (params.terms && params.terms != '') {
+				searchTerms.push('Terms: <strong>'+params.terms.split(',').join(', ')+'</strong>');
 			}
 
-			if (params.title_topics && params.title_topics != '') {
-				searchTerms.push('Titel topics: <strong>'+params.title_topics.split(',').join(', ')+'</strong>');
+			if (params.title_terms && params.title_terms != '') {
+				searchTerms.push('Titel terms: <strong>'+params.title_terms.split(',').join(', ')+'</strong>');
 			}
 
 			if (params.collection_years && (params.collection_years != '' || typeof params.collection_years.join)) {
