@@ -23,6 +23,8 @@ export default class TypesGraph extends React.Component {
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 		this.barClickHandler = this.barClickHandler.bind(this);
 
+		this.searchHandler = this.searchHandler.bind(this);
+
 		this.state = {
 			paramString: null,
 			params: null,
@@ -46,10 +48,16 @@ export default class TypesGraph extends React.Component {
 		}.bind(this));
 
 		if (window.eventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
 		}
 
 		window.addEventListener('resize', this.windowResizeHandler);
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+		}
 	}
 
 	windowResizeHandler() {

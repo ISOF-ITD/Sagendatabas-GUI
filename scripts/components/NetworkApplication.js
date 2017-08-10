@@ -6,19 +6,19 @@ import EventBus from 'eventbusjs';
 
 import SearchForm from './SearchForm';
 import DocumentList from './DocumentList';
-
 import TermsNetworkGraph from './TermsNetworkGraph';
-
 import {TabsContainer, Tab} from './TabControl';
-
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+
+import config from './../config';
 
 export default class NetworkApplication extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			popupVisible: false
+			popupVisible: false,
+			hasFilters: false
 		};
 
 		this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
@@ -26,10 +26,18 @@ export default class NetworkApplication extends React.Component {
 		this.popupCloseHandler = this.popupCloseHandler.bind(this);
 
 		window.eventBus = EventBus;
+
+		window.eventBus.addEventListener('graph.filter', this.graphFilterHandler.bind(this));
+	}
+
+	graphFilterHandler(event, data) {
+		this.setState({
+			hasFilters: Boolean(data.value)
+		});
 	}
 
 	popupCloseHandler() {
-		hashHistory.push('/');
+		hashHistory.push('/network');
 	}
 
 	popupWindowShowHandler() {
@@ -50,8 +58,8 @@ export default class NetworkApplication extends React.Component {
 
 				<SearchForm />
 
-				<div className="graph-sidebar">
-					<DocumentList hideAttributes="true" />
+				<div className={'graph-sidebar'+(this.state.hasFilters ? ' visible' : '')}>
+					<DocumentList baseRoute="network" hideAttributes="true" />
 				</div>
 
 				<TermsNetworkGraph />

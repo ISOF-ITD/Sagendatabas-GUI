@@ -16,6 +16,9 @@ export default class DocumentList extends React.Component {
 
 		this.filters = {};
 
+		this.graphFilterHandler = this.graphFilterHandler.bind(this);
+		this.searchHandler = this.searchHandler.bind(this);
+
 		this.state = {
 			total: null,
 			data: [],
@@ -26,13 +29,13 @@ export default class DocumentList extends React.Component {
 		};
 
 		if (window.eventBus) {
-			window.eventBus.addEventListener('graph.filter', this.graphFilterHandler.bind(this));
+			window.eventBus.addEventListener('graph.filter', this.graphFilterHandler);
 		}
 	}
 
 	componentDidMount() {
 		if (window.eventBus && !this.props.disableEventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
 		}
 
 		this.orderLinkClickHandler = this.orderLinkClickHandler.bind(this);
@@ -41,6 +44,13 @@ export default class DocumentList extends React.Component {
 			this.fetchData({
 				similar: this.props.similarDocs
 			});
+		}
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+			window.eventBus.removeEventListener('graph.filter', this.graphFilterHandler);
 		}
 	}
 
@@ -129,7 +139,7 @@ export default class DocumentList extends React.Component {
 
 	render() {
 		var documentItems = this.state.data.map(function(item) {
-			return <DocumentListItem hideAttributes={this.props.hideAttributes} key={item._id} data={item} displayScore={this.props.displayScore} />
+			return <DocumentListItem baseRoute={this.props.baseRoute} hideAttributes={this.props.hideAttributes} key={item._id} data={item} displayScore={this.props.displayScore} />
 		}.bind(this));
 
 		return (

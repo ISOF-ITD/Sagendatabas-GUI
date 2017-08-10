@@ -67,7 +67,7 @@ export default class DocumentListItem extends React.Component {
 						this.state.data &&
 						<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html: this.state.data.highlight ? this.state.data.highlight.text[0] : this.state.data._source.text}}></p>
 					}
-					<a className="button" href={'#/search/document/'+this.state.data._id}>Visa</a>
+					<a className="button" href={'#/'+(this.props.baseRoute ? this.props.baseRoute : 'search')+'/document/'+this.state.data._id}>Visa</a>
 				</div>
 
 			</div>

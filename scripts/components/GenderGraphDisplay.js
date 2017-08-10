@@ -17,6 +17,8 @@ export default class GenderGraphDisplay extends React.Component {
 
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 
+		this.searchHandler = this.searchHandler.bind(this);
+
 		this.fetchTotalByGender();
 
 		this.state = {
@@ -34,7 +36,13 @@ export default class GenderGraphDisplay extends React.Component {
 
 	componentDidMount() {
 		if (window.eventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
+		}
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
 		}
 	}
 

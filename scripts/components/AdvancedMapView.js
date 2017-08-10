@@ -32,6 +32,8 @@ export default class AdvancedMapView extends React.Component {
 
 		this.mapDrawLayerCreatedHandler = this.mapDrawLayerCreatedHandler.bind(this);
 
+		this.searchHandler = this.searchHandler.bind(this);
+
 		this.mapModes = [
 			{
 				label: 'Polygoner',
@@ -85,7 +87,7 @@ export default class AdvancedMapView extends React.Component {
 		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
 
 		if (window.eventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
 		}
 
 		L.Control.RemoveAll = L.Control.extend({
@@ -134,6 +136,12 @@ export default class AdvancedMapView extends React.Component {
 		this.refs.mapView.map.on(L.Draw.Event.DRAWSTART, function(event) {
 			this.drawLayer.clearLayers();
 		}.bind(this));
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+		}
 	}
 
 	mapDrawLayerCreatedHandler(event) {
@@ -298,7 +306,6 @@ export default class AdvancedMapView extends React.Component {
 		this.dataLayer.addTo(this.refs.mapView.map);
 
 		var latLngs = _.map(this.state.data, function(mapItem) {
-			console.log('doc_count: '+mapItem.doc_count+' / maxValue: '+maxValue+' = '+mapItem.doc_count/maxValue);
 			return [mapItem.location[0], mapItem.location[1], Number(mapItem.doc_count)];
 		}.bind(this));
 
@@ -348,7 +355,6 @@ export default class AdvancedMapView extends React.Component {
 //		this.colorScale = chroma.scale(['#33f0c7', '#02ff00', '#f00']).domain([0, maxValue]);
 		var colorScale = chroma.scale('YlOrRd').domain([minValue, maxValue]);
 
-		console.log('set colorScale');
 		this.setState({
 			colorScale: colorScale
 		});

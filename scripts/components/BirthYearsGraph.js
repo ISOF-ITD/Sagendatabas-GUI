@@ -29,6 +29,8 @@ export default class BirthYearsGraph extends React.Component {
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 
+		this.searchHandler = this.searchHandler.bind(this);
+
 		this.state = {
 			paramString: null,
 			data: [],
@@ -55,10 +57,16 @@ export default class BirthYearsGraph extends React.Component {
 		}.bind(this));
 
 		if (window.eventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
 		}
 
 		window.addEventListener('resize', this.windowResizeHandler);
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+		}
 	}
 
 	windowResizeHandler() {

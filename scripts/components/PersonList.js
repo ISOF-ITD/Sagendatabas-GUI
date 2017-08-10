@@ -14,6 +14,9 @@ export default class PersonList extends React.Component {
 
 		this.listTypeChangeHandler = this.listTypeChangeHandler.bind(this);
 
+		this.searchHandler = this.searchHandler.bind(this);
+		this.graphFilterHandler = this.graphFilterHandler.bind(this);
+
 		this.filters = {};
 
 		this.state = {
@@ -25,13 +28,20 @@ export default class PersonList extends React.Component {
 		};
 
 		if (window.eventBus) {
-			window.eventBus.addEventListener('graph.filter', this.graphFilterHandler.bind(this));
+			window.eventBus.addEventListener('graph.filter', this.graphFilterHandler);
 		}
 	}
 
 	componentDidMount() {
 		if (window.eventBus && !this.props.disableEventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
+		}
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+			window.eventBus.removeEventListener('graph.filter', this.graphFilterHandler);
 		}
 	}
 

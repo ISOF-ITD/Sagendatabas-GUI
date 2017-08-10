@@ -2632,6 +2632,19 @@ td .play-button {
   background: #f8f8f8;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   z-index: 200;
+  -webkit-transform: translateX(150%);
+  -moz-transform: translateX(150%);
+  -ms-transform: translateX(150%);
+  transform: translateX(150%);
+  -webkit-transition: all 300ms ease-in-out;
+  -o-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+}
+.graph-sidebar.visible {
+  -webkit-transform: translateX(0);
+  -moz-transform: translateX(0);
+  -ms-transform: translateX(0);
+  transform: translateX(0);
 }
 .graph-sidebar .documents-list {
   position: initial;

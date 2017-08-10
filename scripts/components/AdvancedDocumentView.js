@@ -12,6 +12,8 @@ export default class AdvancedDocumentView extends React.Component {
 
 		this.mediaImageClickHandler = this.mediaImageClickHandler.bind(this);
 
+		this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'network' : 'search';
+
 		this.state = {
 			doc: null
 		};
@@ -171,7 +173,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 				<h3>Liknande sägner</h3>
 
-				<DocumentList disableEventBus="true" disableSorting="true" similarDocs={this.state.id} displayScore="true" />
+				<DocumentList baseRoute={this.baseRoute} disableEventBus="true" disableSorting="true" similarDocs={this.state.id} displayScore="true" />
 			</div> : 
 		null;
 	}

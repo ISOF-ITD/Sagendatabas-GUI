@@ -23,8 +23,6 @@ export default class ColorLegendsGraph extends React.Component {
 		if (props.colorScale && (!this.state.colorScale || (this.state.colorScale.domain()[0] != props.colorScale.domain()[0] || this.state.colorScale.domain()[1] != props.colorScale.domain()[1]))) {
 			this.setState({
 				colorScale: props.colorScale
-			}, function() {
-				console.log('state was set');
 			});
 		}
 	}

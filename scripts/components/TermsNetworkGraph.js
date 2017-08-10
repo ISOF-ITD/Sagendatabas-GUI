@@ -20,6 +20,8 @@ export default class TermsNetworkGraph extends React.Component {
 		this.graphNodeDragEndedHandler = this.graphNodeDragEndedHandler.bind(this);
 		this.graphNodeClickHandler = this.graphNodeClickHandler.bind(this);
 
+		this.searchHandler = this.searchHandler.bind(this);
+
 		this.zoom = 1;
 
 		this.graphMargins = {
@@ -54,10 +56,16 @@ export default class TermsNetworkGraph extends React.Component {
 		}.bind(this));
 
 		if (window.eventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler.bind(this));
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
 		}
 
 		window.addEventListener('resize', this.windowResizeHandler);
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+		}
 	}
 
 	windowResizeHandler() {
@@ -84,6 +92,11 @@ export default class TermsNetworkGraph extends React.Component {
 			loading: true,
 			total: null,
 			selectedNodes: []
+		});
+
+		window.eventBus.dispatch('graph.filter', this, {
+			filter: 'terms',
+			value: null
 		});
 
 		fetch(config.apiUrl+config.endpoints.terms_graph+'?'+paramString)
@@ -145,6 +158,7 @@ export default class TermsNetworkGraph extends React.Component {
 	}
 
 	graphNodeClickHandler(event) {
+		console.log(event);
 		var selectedNodes = this.state.selectedNodes;
 
 		if (selectedNodes.indexOf(event.term) == -1) {
@@ -153,6 +167,8 @@ export default class TermsNetworkGraph extends React.Component {
 		else {
 			selectedNodes.splice(selectedNodes.indexOf(event.term), 1);
 		}
+
+		this.updateSelectedNodes(selectedNodes);
 
 		this.setState({
 			selectedNodes: selectedNodes
@@ -163,6 +179,12 @@ export default class TermsNetworkGraph extends React.Component {
 					value: this.state.selectedNodes.length == 0 ? null : this.state.selectedNodes.join(',')
 				});
 			}
+		}.bind(this));
+	}
+
+	updateSelectedNodes(selectedNodes) {
+		this.node.style('stroke', function(d) {
+			return selectedNodes.indexOf(d.term) == -1 ? '' : '#FF3D00';
 		}.bind(this));
 	}
 
@@ -225,7 +247,7 @@ export default class TermsNetworkGraph extends React.Component {
 			return false;
 		}
 
-		var link = graph.append('g')
+		this.link = graph.append('g')
 			.attr('class', 'links')
 			.selectAll('line')
 			.data(this.state.data.connections)
@@ -234,7 +256,7 @@ export default class TermsNetworkGraph extends React.Component {
 				return this.getStrokeWidth(d.doc_count);
 			}.bind(this));
 
-		var node = graph.append('g')
+		this.node = graph.append('g')
 			.attr('class', 'nodes')
 			.selectAll('circle')
 			.data(this.state.data.vertices)
@@ -250,7 +272,7 @@ export default class TermsNetworkGraph extends React.Component {
 				.on('drag', this.graphNodeDraggedHandler.bind(this))
 				.on('end', this.graphNodeDragEndedHandler.bind(this)));
 
-		var label = graph.append('g')
+		this.label = graph.append('g')
 			.attr('class', 'labels')
 			.selectAll('text')
 			.data(this.state.data.vertices)
@@ -260,8 +282,8 @@ export default class TermsNetworkGraph extends React.Component {
 				return d.term;
 			});
 
-		node.on('mouseover', function(d) {
-			link
+		this.node.on('mouseover', function(d) {
+			this.link
 				.style('stroke-width', function(l) {
 					var ret;
 					if (d === l.source || d === l.target) {
@@ -288,7 +310,7 @@ export default class TermsNetworkGraph extends React.Component {
 					}
 				});
 
-			node.attr('r', function(n) {
+			this.node.attr('r', function(n) {
 				if (isConnected(d, n)) {
 					return 3.5/this.zoom;
 				}
@@ -297,7 +319,7 @@ export default class TermsNetworkGraph extends React.Component {
 				}
 			}.bind(this));
 
-			label.style('visibility', function(n) {
+			this.label.style('visibility', function(n) {
 				if (isConnected(d, n)) {
 					return 'visble';
 				}
@@ -308,21 +330,21 @@ export default class TermsNetworkGraph extends React.Component {
 
 		}.bind(this));
 
-		node.on('mouseout', function() {
-			link.style('stroke-width', function(d) {
+		this.node.on('mouseout', function() {
+			this.link.style('stroke-width', function(d) {
 					return this.getStrokeWidth(d.doc_count);
 				}.bind(this))
 				.style('stroke-opacity', 1)
 				.style('stroke', '#333');
 
-			node.attr('r', function() {
+			this.node.attr('r', function() {
 				return 3/this.zoom;
 			}.bind(this));
 
-			label.style('visibility', 'visible');
+			this.label.style('visibility', 'visible');
 		}.bind(this));
 
-		node.on('click', this.graphNodeClickHandler);
+		this.node.on('click', this.graphNodeClickHandler);
 		
 		this.simulation
 			.nodes(this.state.data.vertices)
@@ -332,7 +354,7 @@ export default class TermsNetworkGraph extends React.Component {
 			.links(this.state.data.connections);
 
 		function ticked() {
-			link
+			this.link
 				.attr('x1', function(d) {
 					return d.source.x;
 				})
@@ -346,7 +368,7 @@ export default class TermsNetworkGraph extends React.Component {
 					return d.target.y;
 				});
 
-			node
+			this.node
 				.attr('cx', function(d) {
 					return d.x;
 				}.bind(this))
@@ -354,7 +376,7 @@ export default class TermsNetworkGraph extends React.Component {
 					return d.y;
 				}.bind(this));
 
-			label
+			this.label
 				.attr('x', function(d) {
 					return d.x + (8/this.zoom);
 				}.bind(this))
@@ -372,7 +394,7 @@ export default class TermsNetworkGraph extends React.Component {
 			this.zoom = d3.event.transform.k;
 			graph.attr("transform", d3.event.transform);
 
-			label.style('font-size', function() {
+			this.label.style('font-size', function() {
 					return 14/d3.event.transform.k
 				})
 				.attr('x', function(d) {
@@ -382,11 +404,11 @@ export default class TermsNetworkGraph extends React.Component {
 					return d.y + (3/this.zoom);
 				}.bind(this));
 
-			link.style('stroke-width', function(l) {
+			this.link.style('stroke-width', function(l) {
 				return this.getStrokeWidth(l.doc_count);
 			}.bind(this));
 
-			node.attr('r', function() {
+			this.node.attr('r', function() {
 				return 3/d3.event.transform.k
 			})
 			.style('stroke-width', function() {

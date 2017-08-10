@@ -8,12 +8,12 @@ import EventBus from 'eventbusjs';
 
 import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBoxList';
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
-import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCategories';
 import AutocompleteInput from './../../ISOF-React-modules/components/controls/AutocompleteInput';
 import PopulatedSelect from './../../ISOF-React-modules/components/controls/PopulatedSelect';
 import DropdownMenu from './../../ISOF-React-modules/components/controls/DropdownMenu';
 import MapBase from './../../ISOF-React-modules/components/views/MapBase';
 
+import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCategories';
 import paramsHelper from './../utils/paramsHelper';
 
 import config from './../config.js';
@@ -21,6 +21,8 @@ import config from './../config.js';
 export default class SearchForm extends React.Component {
 	constructor(props) {
 		super(props);
+
+		window.searchForm = this;
 
 		this.inputChangeHandler = this.inputChangeHandler.bind(this);
 		this.typeListChangeHandler = this.typeListChangeHandler.bind(this);
@@ -59,16 +61,135 @@ export default class SearchForm extends React.Component {
 			informantsBirthYears: [this.sliderStartYear, this.sliderEndYear],
 			sockenInput: '',
 			landskapInput: '',
+			geoBoundingBox: null,
 
 			searchOptions: '',
 
-			geoBoundingBox: null,
+			searchIndex: 0,
+			savedSearches: [],
+
 
 			lastSearchParams: null,
 
 			expanded: false,
 			hasFocus: false
 		};
+	}
+
+	getCurrentSearch() {
+		return JSON.parse(JSON.stringify({
+			searchInput: this.state.searchInput || '',
+			termsInput: this.state.termsInput || '',
+			titleTermsInput: this.state.titleTermsInput || '',
+			selectedTypes: this.state.selectedTypes || ['arkiv', 'tryckt'],
+			selectedCategories: this.state.selectedCategories || [],
+			collectionYearsEnabled: this.state.collectionYearsEnabled,
+			collectionYears: this.state.collectionYears || [this.sliderStartYear, this.sliderEndYear],
+			informantNameInput: this.state.informantNameInput || '',
+			collectorNameInput: this.state.collectorNameInput || '',
+			informantsGenderInput: this.state.informantsGenderInput || '',
+			collectorsGenderInput: this.state.collectorsGenderInput || '',
+			collectorsBirthYearsEnabled: this.state.collectorsBirthYearsEnabled,
+			collectorsBirthYears: this.state.collectorsBirthYears || [this.sliderStartYear, this.sliderEndYear],
+			informantsBirthYearsEnabled: this.state.informantsBirthYearsEnabled,
+			informantsBirthYears: this.state.informantsBirthYears || [this.sliderStartYear, this.sliderEndYear],
+			sockenInput: this.state.sockenInput || '',
+			landskapInput: this.state.landskapInput || '',
+			geoBoundingBox: this.state.geoBoundingBox
+		}));
+	}
+
+	setSearch(index) {
+		var currentSearch = this.getCurrentSearch();
+
+		var savedSearches = this.state.savedSearches;
+
+		if (savedSearches[this.state.searchIndex]) {
+			savedSearches[this.state.searchIndex] = currentSearch;
+		}
+
+		if (savedSearches[index]) {
+			currentSearch = savedSearches[index];
+		}
+
+		this.setState({
+			searchInput: currentSearch.searchInput,
+			termsInput: currentSearch.termsInput,
+			titleTermsInput: currentSearch.titleTermsInput,
+			selectedTypes: currentSearch.selectedTypes,
+			selectedCategories: currentSearch.selectedCategories,
+			collectionYearsEnabled: currentSearch.collectionYearsEnabled,
+			collectionYears: currentSearch.collectionYears,
+			informantNameInput: currentSearch.informantNameInput,
+			collectorNameInput: currentSearch.collectorNameInput,
+			informantsGenderInput: currentSearch.informantsGenderInput,
+			collectorsGenderInput: currentSearch.collectorsGenderInput,
+			collectorsBirthYearsEnabled: currentSearch.collectorsBirthYearsEnabled,
+			collectorsBirthYears: currentSearch.collectorsBirthYears,
+			informantsBirthYearsEnabled: currentSearch.informantsBirthYearsEnabled,
+			informantsBirthYears: currentSearch.informantsBirthYears,
+			sockenInput: currentSearch.sockenInput,
+			landskapInput: currentSearch.landskapInput,
+			geoBoundingBox: currentSearch.geoBoundingBox,
+
+			savedSearches: savedSearches,
+			searchIndex: index
+		}, function() {
+			this.triggerSearch();
+		}.bind(this));
+	}
+
+	addSearch() {
+		var currentSearch = this.getCurrentSearch();
+
+		var savedSearches = this.state.savedSearches;
+		savedSearches.push(currentSearch);
+		savedSearches.push({
+			searchInput: '',
+			termsInput: '',
+			titleTermsInput: '',
+			selectedTypes: ['arkiv', 'tryckt'],
+			selectedCategories: [],
+			collectionYearsEnabled: false,
+			collectionYears: [this.sliderStartYear, this.sliderEndYear],
+			informantNameInput: '',
+			collectorNameInput: '',
+			informantsGenderInput: '',
+			collectorsGenderInput: '',
+			collectorsBirthYearsEnabled: false,
+			collectorsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+			informantsBirthYearsEnabled: false,
+			informantsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+			sockenInput: '',
+			landskapInput: '',
+			geoBoundingBox: null,
+		});
+
+		this.setState({
+			searchInput: '',
+			termsInput: '',
+			titleTermsInput: '',
+			selectedTypes: ['arkiv', 'tryckt'],
+			selectedCategories: [],
+			collectionYearsEnabled: false,
+			collectionYears: [this.sliderStartYear, this.sliderEndYear],
+			informantNameInput: '',
+			collectorNameInput: '',
+			informantsGenderInput: '',
+			collectorsGenderInput: '',
+			collectorsBirthYearsEnabled: false,
+			collectorsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+			informantsBirthYearsEnabled: false,
+			informantsBirthYears: [this.sliderStartYear, this.sliderEndYear],
+			sockenInput: '',
+			landskapInput: '',
+			geoBoundingBox: null,
+
+			lastSearchParams: {},
+
+			savedSearches: savedSearches,
+			searchIndex: savedSearches.length-1
+		});
 	}
 
 	componentDidMount() {
@@ -147,9 +268,7 @@ export default class SearchForm extends React.Component {
 
 		this.setState({
 			[event.target.name]: value
-		}, function() {
-			console.log(this.state);
-		}.bind(this));
+		});
 	}
 
 	searchInputFocusHandler() {
@@ -290,6 +409,8 @@ export default class SearchForm extends React.Component {
 	}
 
 	triggerSearch() {
+		console.log('triggerSearch');
+
 		this.setState({
 			expanded: false
 		});
