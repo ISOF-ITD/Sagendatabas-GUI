@@ -30,8 +30,8 @@ export default {
 		socken: 'socken/',
 
 
-		topics_autocomplete: 'autocomplete/topics/',
-		title_topics_autocomplete: 'autocomplete/title_topics/',
+		terms_autocomplete: 'autocomplete/terms/',
+		title_terms_autocomplete: 'autocomplete/title_terms/',
 		persons_autocomplete: 'autocomplete/persons/',
 		socken_autocomplete: 'autocomplete/socken/'
 	},

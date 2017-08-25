@@ -12,7 +12,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 		this.mediaImageClickHandler = this.mediaImageClickHandler.bind(this);
 
-		this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'network' : 'search';
+		this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
 
 		this.state = {
 			doc: null
@@ -71,6 +71,14 @@ export default class AdvancedDocumentView extends React.Component {
 			</tr>;
 		}) : [];
 
+		var personItems = this.state.doc && this.state.doc.persons && this.state.doc.persons.length > 0 ? this.state.doc.persons.map(function(person, index) {
+			return <tr key={index}>
+				<td><a href={'#person/'+person.id}>{person.name}</a></td>
+				<th>{person.birth_year ? person.birth_year : ''}</th>
+				<th>{person.relation == 'collector' ? 'Upptecknare' : person.relation == 'informant' ? 'Informant' : ''}</th>
+			</tr>;
+		}) : [];
+
 		return this.state.doc ? 
 			<div className="document-view">
 				<h2>{this.state.doc.title}</h2>
@@ -123,6 +131,41 @@ export default class AdvancedDocumentView extends React.Component {
 									this.state.doc.places && this.state.doc.places.length > 0 && this.state.doc.places[0].lat && this.state.doc.places[0].lng &&
 									<SimpleMap marker={{lat: this.state.doc.places[0].lat, lng: this.state.doc.places[0].lng, label: this.state.doc.places[0].name}} />
 								}
+							</div>
+
+						</div>
+
+						<hr/>
+
+					</div>
+				}
+
+				{
+					personItems.length > 0 &&
+					<div>
+
+						<div className="row">
+
+							<div className="eight columns">
+								<h3>Personer</h3>
+
+								<div className="table-wrapper">
+									<table width="100%">
+
+										<thead>
+											<tr>
+												<th>Namn</th>
+												<th>Födelseår</th>
+												<th>Roll</th>
+											</tr>
+										</thead>
+
+										<tbody>
+											{personItems}
+										</tbody>
+
+									</table>
+								</div>
 							</div>
 
 						</div>

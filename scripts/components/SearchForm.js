@@ -40,6 +40,12 @@ export default class SearchForm extends React.Component {
 
 		this.triggerSearch = this.triggerSearch.bind(this);
 
+		this.addSearchClickHandler = this.addSearchClickHandler.bind(this);
+		this.searchTabClickHandler = this.searchTabClickHandler.bind(this);
+		this.tabCloseButtonClickHandler = this.tabCloseButtonClickHandler.bind(this);
+
+		this.appMenuItemClickHandler = this.appMenuItemClickHandler.bind(this);
+
 		this.sliderStartYear = config.minYear;
 		this.sliderEndYear = config.maxYear;
 
@@ -95,16 +101,18 @@ export default class SearchForm extends React.Component {
 			informantsBirthYears: this.state.informantsBirthYears || [this.sliderStartYear, this.sliderEndYear],
 			sockenInput: this.state.sockenInput || '',
 			landskapInput: this.state.landskapInput || '',
-			geoBoundingBox: this.state.geoBoundingBox
+			geoBoundingBox: this.state.geoBoundingBox,
+
+			newSearch: false
 		}));
 	}
 
-	setSearch(index) {
+	setSearch(index, discardCurrentSearch) {
 		var currentSearch = this.getCurrentSearch();
 
 		var savedSearches = this.state.savedSearches;
 
-		if (savedSearches[this.state.searchIndex]) {
+		if (savedSearches[this.state.searchIndex] && !discardCurrentSearch) {
 			savedSearches[this.state.searchIndex] = currentSearch;
 		}
 
@@ -143,7 +151,14 @@ export default class SearchForm extends React.Component {
 		var currentSearch = this.getCurrentSearch();
 
 		var savedSearches = this.state.savedSearches;
-		savedSearches.push(currentSearch);
+
+		if (savedSearches[this.state.searchIndex]) {
+			savedSearches[this.state.searchIndex] = currentSearch;
+		}
+		else {
+			savedSearches.push(currentSearch);
+		}
+
 		savedSearches.push({
 			searchInput: '',
 			termsInput: '',
@@ -163,6 +178,8 @@ export default class SearchForm extends React.Component {
 			sockenInput: '',
 			landskapInput: '',
 			geoBoundingBox: null,
+
+			newSearch: true
 		});
 
 		this.setState({
@@ -190,6 +207,40 @@ export default class SearchForm extends React.Component {
 			savedSearches: savedSearches,
 			searchIndex: savedSearches.length-1
 		});
+	}
+
+	addSearchClickHandler() {
+		this.addSearch();
+	}
+
+	searchTabClickHandler(event) {
+		if (event.currentTarget.dataset.index != this.state.searchIndex) {
+			this.setSearch(event.currentTarget.dataset.index);
+		}
+	}
+
+	tabCloseButtonClickHandler(event) {
+		event.stopPropagation();
+
+		var tabIndex = event.currentTarget.dataset.index;
+
+		var savedSearches = this.state.savedSearches;
+		var searchIndex = this.state.searchIndex;
+
+		savedSearches.splice(tabIndex, 1);
+
+		searchIndex = searchIndex == 0 ? searchIndex : searchIndex >= tabIndex ? searchIndex-1 : searchIndex;
+
+		this.setState({
+			savedSearches: savedSearches,
+			searchIndex: searchIndex
+		}, function() {
+			this.setSearch(searchIndex, true);
+		}.bind(this));
+	}
+
+	appMenuItemClickHandler(event) {
+		this.refs.appMenu.closeMenu();
 	}
 
 	componentDidMount() {
@@ -338,81 +389,90 @@ export default class SearchForm extends React.Component {
 		});
 	}
 
-	buildParams() {
+	buildParams(searchParams) {
 		var params = {};
 
-		if (this.state.searchInput != '') {
-			params.search = this.state.searchInput;
+		searchParams = searchParams || this.state;
+
+		if (searchParams.searchInput != '') {
+			params.search = searchParams.searchInput;
 		}
 
-		if (this.state.termsInput != '') {
-			params.terms = this.state.termsInput;
+		if (searchParams.termsInput != '') {
+			params.terms = searchParams.termsInput;
 		}
 
-		if (this.state.titleTermsInput != '') {
-			params.title_terms = this.state.titleTermsInput;
+		if (searchParams.titleTermsInput != '') {
+			params.title_terms = searchParams.titleTermsInput;
 		}
 
-		if (this.state.selectedTypes.length > 0) {
-			params.type = this.state.selectedTypes.join(',');
+		if (searchParams.selectedCategories.length > 0) {
+			params.category = searchParams.selectedCategories.join(',');
 		}
 
-		if (this.state.selectedCategories.length > 0) {
-			params.category = this.state.selectedCategories.join(',');
+		if (searchParams.collectionYearsEnabled) {
+			params.collection_years = searchParams.collectionYears.join(',');
 		}
 
-		if (this.state.collectionYearsEnabled) {
-			params.collection_years = this.state.collectionYears.join(',');
+		if (searchParams.collectorNameInput != '') {
+			params.collector = searchParams.collectorNameInput;
 		}
 
-		if (this.state.collectorNameInput != '') {
-			params.collector = this.state.collectorNameInput;
+		if (searchParams.informantNameInput != '') {
+			params.informant = searchParams.informantNameInput;
 		}
 
-		if (this.state.informantNameInput != '') {
-			params.informant = this.state.informantNameInput;
+		if (searchParams.collectorsGenderInput != '') {
+			params.collectors_gender = searchParams.collectorsGenderInput;
 		}
 
-		if (this.state.collectorsGenderInput != '') {
-			params.collectors_gender = this.state.collectorsGenderInput;
+		if (searchParams.informantsGenderInput != '') {
+			params.informants_gender = searchParams.informantsGenderInput;
 		}
 
-		if (this.state.informantsGenderInput != '') {
-			params.informants_gender = this.state.informantsGenderInput;
+		if (searchParams.collectorsBirthYearsEnabled) {
+			params.collectors_birth_years = searchParams.collectorsBirthYears.join(',');
 		}
 
-		if (this.state.collectorsBirthYearsEnabled) {
-			params.collectors_birth_years = this.state.collectorsBirthYears.join(',');
+		if (searchParams.informantsBirthYearsEnabled) {
+			params.informants_birth_years = searchParams.informantsBirthYears.join(',');
 		}
 
-		if (this.state.informantsBirthYearsEnabled) {
-			params.informants_birth_years = this.state.informantsBirthYears.join(',');
+		if (searchParams.landskapInput != '') {
+			params.landskap = searchParams.landskapInput;
 		}
 
-		if (this.state.landskapInput != '') {
-			params.landskap = this.state.landskapInput;
+		if (searchParams.sockenInput != '') {
+			params.socken = searchParams.sockenInput;
 		}
 
-		if (this.state.sockenInput != '') {
-			params.socken = this.state.sockenInput;
+		if (searchParams.selectedTypes.length > 0) {
+			params.type = searchParams.selectedTypes.join(',');
 		}
 
-		if (this.state.geoBoundingBox) {
-			params.geo_box = this.state.geoBoundingBox.topLeft.lat+','+this.state.geoBoundingBox.topLeft.lng+','+this.state.geoBoundingBox.bottomRight.lat+','+this.state.geoBoundingBox.bottomRight.lng;
+		if (searchParams.geoBoundingBox) {
+			params.geo_box = searchParams.geoBoundingBox.topLeft.lat+','+searchParams.geoBoundingBox.topLeft.lng+','+searchParams.geoBoundingBox.bottomRight.lat+','+searchParams.geoBoundingBox.bottomRight.lng;
 		}
 
-		if (this.state.searchOptions != '') {
-			params.search_options = this.state.searchOptions;
+		if (searchParams.searchOptions != '') {
+			params.search_options = searchParams.searchOptions;
 		}
 
 		return params;
 	}
 
 	triggerSearch() {
-		console.log('triggerSearch');
+		var currentSearch = this.getCurrentSearch();
+
+		var savedSearches = this.state.savedSearches;
+
+		if (savedSearches[this.state.searchIndex]) {
+			savedSearches[this.state.searchIndex] = currentSearch;
+		}
 
 		this.setState({
-			expanded: false
+			expanded: false,
+			savedSearches: savedSearches
 		});
 
 		if (window.eventBus) {
@@ -445,6 +505,14 @@ export default class SearchForm extends React.Component {
 	}
 
 	render() {
+		var searchTabs = this.state.savedSearches.length > 0 ? this.state.savedSearches.map(function(searchItem, index) {
+			var paramsDescription = searchItem.newSearch ? 'Ny sökning' : paramsHelper.describeParams(this.buildParams(searchItem), true);
+
+			return <a key={index} onClick={this.searchTabClickHandler} data-index={index} className={'tab'+(index == this.state.searchIndex ? ' selected' : '')} title={paramsDescription}>{searchItem.newSearch ? 'Ny sökning' : (paramsDescription.length > 15 ? paramsDescription.substr(0, 15)+'...' : paramsDescription)}<span className="close-button" data-index={index} onClick={this.tabCloseButtonClickHandler}></span></a>
+		}.bind(this)) : [
+			<a key="0" onClick={this.searchTabClickHandler} data-index="0" className="tab selected">Sökning</a>
+		];
+
 		return (
 			<div className={'advanced-search-form fixed'+(this.state.expanded ? ' expanded' : '')+(this.state.hasFocus || !this.state.lastSearchParams ? ' has-focus' : '')}
 				onMouseEnter={this.mouseEnterHandler} 
@@ -453,11 +521,11 @@ export default class SearchForm extends React.Component {
 				<div className="container">
 
 					<div className="main-menu">
-						<DropdownMenu>
+						<DropdownMenu ref="appMenu">
 							<nav className="app-nav">
 								<Link to="/">Hem</Link>
-								<Link to="/search">Sök</Link>
-								<Link to="/network">Topic terms nätverk</Link>
+								<Link onClick={this.appMenuItemClickHandler} to="/search/analyse">Sök</Link>
+								<Link onClick={this.appMenuItemClickHandler} to="/search/network">Topic terms nätverk</Link>
 							</nav>
 						</DropdownMenu>
 					</div>
@@ -468,6 +536,16 @@ export default class SearchForm extends React.Component {
 
 						<div className="ten columns">
 							<div className={'search-input-wrapper'+(this.state.hasFocus ? ' focused' : '')}>
+
+								<div className="search-tabs tabs-control">
+
+									<div className="tabs">
+										{searchTabs}
+										<a className="tab" onClick={this.addSearchClickHandler}>+</a>
+									</div>
+
+								</div>
+
 								<div className="search-label" dangerouslySetInnerHTML={{__html: paramsHelper.describeParams(this.state.lastSearchParams)}}></div>
 								<input name="searchInput" 
 									placeholder="Söksträng" 
@@ -539,6 +617,7 @@ export default class SearchForm extends React.Component {
 								<CheckBoxList values={sagenkartaCategories.categories} 
 									valueField="letter" 
 									labelField="label" 
+									labelFunction={function(item) {return item.letter.toUpperCase()+': '+item.label}}
 									selectedItems={this.state.selectedCategories} 
 									onChange={this.categoryListChangeHandler} />
 

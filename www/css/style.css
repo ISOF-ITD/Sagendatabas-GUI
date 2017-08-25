@@ -476,6 +476,9 @@ there.
 /* Larger than tablet */
 /* Larger than desktop */
 /* Larger than Desktop HD */
+.u-cursor-pointer {
+  cursor: pointer;
+}
 /* required styles */
 .leaflet-pane,
 .leaflet-tile,
@@ -1067,13 +1070,16 @@ there.
   border-right-color: #fff;
 }
 .marker-cluster-small div {
-  background-color: #F5AB0F;
+  /*	background-color: #F5AB0F;*/
+  background-color: #6bb1f5;
 }
 .marker-cluster-medium div {
-  background-color: #F87A18;
+  /*	background-color: #F87A18;*/
+  background-color: #2084e6;
 }
 .marker-cluster-large div {
-  background-color: #A82800;
+  /*	background-color: #A82800;*/
+  background-color: #0055a8;
 }
 /* IE 6-8 fallback colors */
 .leaflet-oldie .marker-cluster-small {
@@ -1097,22 +1103,22 @@ there.
 .marker-cluster {
   background-clip: padding-box;
   border-radius: 20px;
-  background-color: rgba(75, 75, 75, 0.44);
+  background-color: rgba(75, 75, 75, 0.8);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 .marker-cluster div {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   margin-left: 1px;
   margin-top: 1px;
   text-align: center;
   border-radius: 11px;
-  font: 10px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-size: 12px;
   font-weight: bold;
   color: #FFF;
-  text-shadow: #000 0px 1px 1px;
 }
 .marker-cluster span {
-  line-height: 24px;
+  line-height: 26px;
 }
 .leaflet-draw-section {
   position: relative;
@@ -1600,6 +1606,11 @@ table th {
   background-repeat: no-repeat;
   background-position: center 85px;
 }
+@media print {
+  .table-wrapper {
+    padding: 5px 0;
+  }
+}
 @media (max-width: 750px) {
   .table-wrapper {
     margin-bottom: 0.5rem;
@@ -1743,19 +1754,31 @@ td .play-button {
   -webkit-transition: all 300ms ease-in-out;
   -o-transition: all 300ms ease-in-out;
   transition: all 300ms ease-in-out;
-  -webkit-transform: translateY(80px);
-  -moz-transform: translateY(80px);
-  -ms-transform: translateY(80px);
-  transform: translateY(80px);
+  opacity: 0;
+  -webkit-transform: translateY(50px);
+  -moz-transform: translateY(50px);
+  -ms-transform: translateY(50px);
+  transform: translateY(50px);
+  -webkit-transition: all 400ms ease-in-out;
+  -o-transition: all 400ms ease-in-out;
+  transition: all 400ms ease-in-out;
 }
-.popup-wrapper .popup-open-button:hover {
-  text-decoration: underline;
-}
-.popup-wrapper .popup-open-button.visible {
+.app-initialized .popup-wrapper .popup-open-button {
+  opacity: 1;
   -webkit-transform: translateY(0);
   -moz-transform: translateY(0);
   -ms-transform: translateY(0);
   transform: translateY(0);
+  -webkit-transition-delay: 500ms;
+  transition-delay: 500ms;
+}
+.popup-wrapper .popup-open-button:hover {
+  text-decoration: underline;
+}
+@media print {
+  .popup-wrapper .popup-open-button {
+    display: none;
+  }
 }
 @media (max-width: 550px) {
   .popup-wrapper .popup-open-button {
@@ -1783,6 +1806,17 @@ td .play-button {
 .visible.popup-wrapper .popup-content-wrapper {
   opacity: 1;
   pointer-events: all;
+}
+@media print {
+  .popup-wrapper .popup-content-wrapper {
+    position: initial;
+    overflow: visible;
+  }
+  .popup-wrapper .popup-content-wrapper .container {
+    width: 100%;
+    max-width: initial !important;
+    padding: 0 !important;
+  }
 }
 .has-docked-control .popup-wrapper .popup-content-wrapper {
   top: 60px;
@@ -1818,6 +1852,13 @@ td .play-button {
   -o-transition: all 300ms ease-in-out;
   transition: all 300ms ease-in-out;
   overflow-x: hidden;
+}
+@media print {
+  .popup-wrapper .popup-content-wrapper .page-content {
+    max-width: initial !important;
+    margin: 0;
+    padding: 0;
+  }
 }
 @media (max-width: 1300px) {
   .popup-wrapper .popup-content-wrapper .page-content {
@@ -1864,8 +1905,18 @@ td .play-button {
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
+@media print {
+  .popup-wrapper .popup-content-wrapper .page-content .archive-image {
+    max-width: 50%;
+  }
+}
 .popup-wrapper .popup-content-wrapper .page-content .fb-share-button {
   margin-top: 20px;
+}
+@media print {
+  .popup-wrapper .popup-content-wrapper .page-content .fb-share-button {
+    display: none;
+  }
 }
 .popup-wrapper .popup-content-wrapper .page-content .row {
   margin-left: 0;
@@ -1878,8 +1929,21 @@ td .play-button {
   background-image: url('../img/header-back.gif');
   background-position: center;
 }
+@media print {
+  .popup-wrapper .popup-content-wrapper .page-content .container-header {
+    margin: 55px 0 30px 0;
+    padding: 0;
+    color: #000;
+    background: none;
+  }
+  .popup-wrapper .popup-content-wrapper .page-content .container-header h2,
+  .popup-wrapper .popup-content-wrapper .page-content .container-header a {
+    color: #000 !important;
+  }
+}
 .popup-wrapper .popup-content-wrapper .page-content .container-header h2 {
   color: #fff;
+  margin-top: 0;
 }
 .popup-wrapper .popup-content-wrapper .page-content .container-header a {
   color: #fff;
@@ -1906,6 +1970,11 @@ td .play-button {
   -ms-transform: translateY(-5px);
   transform: translateY(-5px);
 }
+@media print {
+  .popup-wrapper .popup-content-wrapper .page-content .container-header .feedback-button {
+    display: none;
+  }
+}
 .popup-wrapper .popup-content-wrapper .page-content .container-header .feedback-button:hover {
   box-shadow: 0 1px 2px rgba(0, 0, 6, 0.61);
   background: rgba(255, 255, 255, 0.5);
@@ -1913,6 +1982,23 @@ td .play-button {
   -moz-transform: translateY(-2px);
   -ms-transform: translateY(-2px);
   transform: translateY(-2px);
+}
+@media (max-width: 550px) {
+  .popup-wrapper .popup-content-wrapper .page-content .container-header .feedback-button:hover {
+    background: #d4454c;
+  }
+}
+@media (max-width: 550px) {
+  .popup-wrapper .popup-content-wrapper .page-content .container-header .feedback-button {
+    position: fixed;
+    top: auto;
+    bottom: 10px;
+    right: 20px;
+    padding: 10px 15px;
+    background: #a6192e;
+    border-radius: 20px;
+    z-index: 600;
+  }
 }
 .popup-wrapper .popup-content-wrapper .page-content hr {
   margin: 20px -50px;
@@ -1946,6 +2032,7 @@ td .play-button {
 }
 .close-button {
   display: block;
+  position: relative;
   width: 20px;
   height: 20px;
   padding: 0;
@@ -2000,11 +2087,23 @@ td .play-button {
   height: 100vh;
   width: 100vw;
 }
+@media print {
+  .has-overlay .map-wrapper {
+    display: none;
+  }
+}
 .map-wrapper .map-view {
   position: absolute;
   top: 0;
   height: 100vh;
   width: 100vw;
+  opacity: 0;
+  -webkit-transition: opacity 300ms ease-in-out;
+  -o-transition: opacity 300ms ease-in-out;
+  transition: opacity 300ms ease-in-out;
+}
+.app-initialized .map-wrapper .map-view {
+  opacity: 1;
 }
 .map-wrapper .map-viewmode-menu {
   position: absolute;
@@ -2015,6 +2114,13 @@ td .play-button {
   background: #fff;
   overflow: hidden;
   z-index: 1000;
+  opacity: 0;
+  -webkit-transition: opacity 300ms ease-in-out;
+  -o-transition: opacity 300ms ease-in-out;
+  transition: opacity 300ms ease-in-out;
+}
+.app-initialized .map-wrapper .map-viewmode-menu {
+  opacity: 1;
 }
 @media (max-width: 550px) {
   .map-wrapper .map-viewmode-menu {
@@ -2042,7 +2148,8 @@ td .play-button {
   border-bottom: 1px solid #ccc;
 }
 .map-wrapper .map-viewmode-menu a.icon-marker {
-  background-image: url('../img/map-marker-orange.png');
+  background-image: url('../img/map-marker-blue-location.png');
+  background-size: 22px;
 }
 .map-wrapper .map-viewmode-menu a.icon-circles {
   background-image: url('../img/icon-circles.png');
@@ -2135,8 +2242,14 @@ td .play-button {
     right: 0%;
   }
 }
+@media print {
+  .leaflet-control {
+    display: none;
+  }
+}
 .tabs-control .tabs a {
   display: inline-block;
+  position: relative;
   padding: 10px 15px;
   margin-right: 5px;
   font-size: 0.8rem;
@@ -2152,12 +2265,33 @@ td .play-button {
   transition: all 300ms ease-in-out;
 }
 .tabs-control .tabs a:hover {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background: #e6e6e6;
+}
+.tabs-control .tabs a:hover .close-button {
+  display: block;
+  background: #e6e6e6;
+  border-color: #e6e6e6;
+}
+.tabs-control .tabs a .close-button {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 6px solid;
+  -webkit-transform: scale(0.6);
+  -moz-transform: scale(0.6);
+  -ms-transform: scale(0.6);
+  transform: scale(0.6);
 }
 .tabs-control .tabs a.selected {
   font-weight: bold;
   border-top-color: #a6192e;
   background: #fff;
+}
+.tabs-control .tabs a.selected:hover .close-button {
+  display: block;
+  background: #fff;
+  border-color: #fff;
 }
 .tabs-control .tab-container {
   width: 100%;
@@ -2291,6 +2425,7 @@ td .play-button {
 }
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item {
   display: block;
+  position: relative;
   padding: 10px 15px;
   color: #333;
   text-decoration: none;
@@ -2299,6 +2434,9 @@ td .play-button {
 }
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item:hover {
   text-decoration: underline;
+}
+.dropdown-wrapper .dropdown-container.dropdown-list .list-container .item:hover .close-button {
+  opacity: 1;
 }
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item.selected {
   color: #fff;
@@ -2310,6 +2448,15 @@ td .play-button {
 }
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item label {
   margin-bottom: 0;
+}
+.dropdown-wrapper .dropdown-container.dropdown-list .list-container .item .close-button {
+  float: right;
+  margin-left: 10px;
+  opacity: 0.4;
+  -webkit-transform: scale(0.8);
+  -moz-transform: scale(0.8);
+  -ms-transform: scale(0.8);
+  transform: scale(0.8);
 }
 .overlay-container {
   position: fixed;
@@ -2976,6 +3123,19 @@ td .play-button {
 .advanced-search-form .search-input-wrapper.focused {
   border-color: #a66e77;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.advanced-search-form .search-input-wrapper .search-tabs {
+  position: absolute;
+  top: -32px;
+  right: 34px;
+}
+.advanced-search-form .search-input-wrapper .search-tabs a {
+  height: 30px;
+  padding: 0 15px;
+  line-height: 30px;
+}
+.advanced-search-form .search-input-wrapper .search-tabs a.selected {
+  height: 31px;
 }
 .advanced-search-form .search-input-wrapper .search-input,
 .advanced-search-form .search-input-wrapper .search-button {
