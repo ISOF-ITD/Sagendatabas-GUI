@@ -49,7 +49,7 @@ export default class DocumentListItem extends React.Component {
 							{this.state.data._source.year}
 							<span className="prop">{this.state.data._source.materialtype}</span>
 							{
-								this.state.data._source.taxonomy.category && 
+								this.state.data._source.taxonomy && this.state.data._source.taxonomy.category && 
 								<span className="prop">{this.state.data._source.taxonomy.category+': '+this.state.data._source.taxonomy.name}</span>
 							}
 							{

@@ -50,6 +50,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 			popup
 		} = this.props;
 
+		var popupVisible = Boolean(popup);
+
 		return (
 			<div className={'app-container'}>
 
@@ -111,7 +113,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 				</div>
 
-				<PopupWindow onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
+				<PopupWindow windowOpen={popupVisible} onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
 					{popup}
 				</PopupWindow>
 

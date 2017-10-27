@@ -606,7 +606,7 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Typ:</label>
 
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'inspelning']} 
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'inspelning', 'frågelista']} 
 									selectedItems={this.state.selectedTypes} 
 									onChange={this.typeListChangeHandler} />
 							</div>
@@ -614,7 +614,7 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Kategorier:</label>
 
-								<CheckBoxList values={sagenkartaCategories.categories} 
+								<CheckBoxList values={sagenkartaCategories.categories_advanced} 
 									valueField="letter" 
 									labelField="label" 
 									labelFunction={function(item) {return item.letter.toUpperCase()+': '+item.label}}

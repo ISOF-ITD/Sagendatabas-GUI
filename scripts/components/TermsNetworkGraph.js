@@ -344,6 +344,10 @@ export default class TermsNetworkGraph extends React.Component {
 			this.label.style('visibility', 'visible');
 		}.bind(this));
 
+		this.node.on('click', function() {
+			console.log('node click')
+		});
+		console.log('here');
 		this.node.on('click', this.graphNodeClickHandler);
 		
 		this.simulation

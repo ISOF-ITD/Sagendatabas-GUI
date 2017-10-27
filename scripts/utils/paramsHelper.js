@@ -33,7 +33,7 @@ export default {
 
 				searchTerms.push(categories.length == 0 ? 'Kategori: ' : 'Kategorier: '+formatParam(
 					categories.map(function(category) {
-						return sagenkartaCategories.getCategoryName(category);
+						return sagenkartaCategories.getCategoryName(category, true);
 					}).join(', ')
 				));
 			}
