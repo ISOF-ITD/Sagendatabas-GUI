@@ -11,6 +11,8 @@ import chroma from 'chroma-js';
 
 import MapBase from './../../ISOF-React-modules/components/views/MapBase';
 import paramsHelper from './../utils/paramsHelper';
+import Slider from './../../ISOF-React-modules/components/controls/Slider';
+import CollectionYearsGraph from './CollectionYearsGraph';
 
 import ColorLegendsGraph from './ColorLegendsGraph';
 
@@ -33,11 +35,17 @@ export default class AdvancedMapView extends React.Component {
 		this.mapDrawLayerCreatedHandler = this.mapDrawLayerCreatedHandler.bind(this);
 
 		this.searchHandler = this.searchHandler.bind(this);
+		this.timerangeChangeHandler = this.timerangeChangeHandler.bind(this);
+		this.sliderGraphChangeHandler = this.sliderGraphChangeHandler.bind(this);
+
+		this.timerangeSliderSlideHandler = this.timerangeSliderSlideHandler.bind(this);
+		this.fullScreenButtonClickHandler = this.fullScreenButtonClickHandler.bind(this);
 
 		this.mapModes = [
 			{
 				label: 'Polygoner',
 				name: 'socken',
+				totalFieldName: 'socken',
 				idField: 'SnSt_Id',
 				endpoint: config.endpoints.socken,
 				type: 'vectorgrid',
@@ -55,6 +63,7 @@ export default class AdvancedMapView extends React.Component {
 			{
 				label: 'Heatmap',
 				name: 'heatmap',
+				totalFieldName: 'socken',
 				endpoint: config.endpoints.socken,
 				type: 'heatmap'
 			}
@@ -72,6 +81,9 @@ export default class AdvancedMapView extends React.Component {
 			viewMode: 'absolute',
 			mapMode: this.mapModes[0],
 			colorScale: null,
+			sliderStartYear: config.minYear,
+			sliderEndYear: config.maxYear,
+			fullScreen: false,
 			tooltip: {
 				title: '',
 				text: '',
@@ -88,6 +100,7 @@ export default class AdvancedMapView extends React.Component {
 
 		if (window.eventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
+			window.eventBus.addEventListener('collectionYears.timerangeChanged', this.timerangeChangeHandler);
 		}
 
 		L.Control.RemoveAll = L.Control.extend({
@@ -136,11 +149,46 @@ export default class AdvancedMapView extends React.Component {
 		this.refs.mapView.map.on(L.Draw.Event.DRAWSTART, function(event) {
 			this.drawLayer.clearLayers();
 		}.bind(this));
+
+		this.renderVectorGrid();
 	}
 
 	componentWillUnmount() {
 		if (window.eventBus) {
 			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+		}
+	}
+
+	fullScreenButtonClickHandler() {
+		this.setState({
+			fullScreen: !this.state.fullScreen
+		}, function() {
+			this.refs.mapView.map.invalidateSize();
+		}.bind(this));
+	}
+
+	sliderGraphChangeHandler(event) {
+		if (event == null) {
+			this.refs.timerangeSlider.slider.set([this.state.sliderStartYear, this.state.sliderEndYear]);
+		}
+		else {
+			this.refs.timerangeSlider.slider.set(event);
+		}
+	}
+
+	timerangeChangeHandler(event, data) {
+		console.log('timerangeChangeHandler');
+		console.log(data);
+
+		if (isFinite(data.min) && isFinite(data.max)) {
+			this.refs.timerangeSlider.slider.set([data.min, data.max]);
+
+			this.setState({
+				sliderStartYear: data.min,
+				sliderEndYear: data.max
+			});
+
+			this.refs.collectionYearsGraph.setTimeOverlay([data.min, data.max]);
 		}
 	}
 
@@ -174,6 +222,34 @@ export default class AdvancedMapView extends React.Component {
 		}, function() {
 			this.fetchData();
 		}.bind(this));
+	}
+
+	timerangeSliderSlideHandler(event) {
+		// Väntar tills vi har laddad data
+		if (this.waitingForSlider) {
+			return;
+		}
+
+		// Kopierar params object, annars kan det krocka med params i SearchSearch
+		var params = this.state.params ? JSON.parse(JSON.stringify(this.state.params)) : {};
+		params.collection_years = event.target.value.join(',');
+
+		this.waitingForSlider = true;
+
+		this.setState({
+			params: params
+		}, function() {
+			this.fetchData(false, function() {
+				this.waitingForSlider = false;
+			}.bind(this));
+		}.bind(this));
+
+		setTimeout(function() {
+			// Om inget händer om en sekund slutar vi vänta och fortsätter
+			this.waitingForSlider = false;
+		}.bind(this), 1000);
+
+		this.refs.collectionYearsGraph.setTimeOverlay(event.target.value);
 	}
 
 	viewModeSelectChangeHandler(event) {
@@ -224,11 +300,12 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	getTotal(dataType, id) {
-		return _.findWhere(this.total[dataType], {id: id}).doc_count;
+		var found = _.findWhere(this.total[dataType], {id: id});
+		return found ? found.doc_count : 0;
 	}
 
 	fetchTotal() {
-		fetch(config.apiUrl+config.endpoints.socken)
+		fetch(config.apiUrl+config.endpoints.socken+'?'+paramsHelper.buildParamString(config.requiredApiParams))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
@@ -239,14 +316,14 @@ export default class AdvancedMapView extends React.Component {
 		;
 	}
 
-	fetchData(forceFetch) {
+	fetchData(forceFetch, callBack) {
 		if (!this.state.params) {
 			return;
 		}
 
 		this.drawLayer.clearLayers();
 
-		var params = this.state.params;
+		var params = Object.assign({}, config.requiredApiParams, this.state.params);
 
 		var paramString = paramsHelper.buildParamString(params);
 
@@ -256,7 +333,7 @@ export default class AdvancedMapView extends React.Component {
 
 		this.setState({
 			paramString: paramString,
-			loading: true
+//			loading: true
 		});
 
 		fetch(config.apiUrl+this.state.mapMode.endpoint+'/?'+paramString)
@@ -266,16 +343,20 @@ export default class AdvancedMapView extends React.Component {
 				this.setState({
 					total: json.metadata.total,
 					data: json.data,
-					loading: false
+//					loading: false
 				}, function() {
 					if (this.state.mapMode.type == 'vectorgrid') {
-						this.renderVectorGrid();
+						this.updateVectorGrid();
 					}
 
 					if (this.state.mapMode.type == 'heatmap') {
 						this.renderHeatmap();
 					}
 				}.bind(this));
+
+				if (callBack) {
+					callBack();
+				}
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -298,6 +379,7 @@ export default class AdvancedMapView extends React.Component {
 
 		this.dataLayer = L.heatLayer([], {
 			minOpacity: 0.35,
+			maxZoom: 4,
 			radius: 18,
 			max: maxValue,
 			blur: 15
@@ -312,30 +394,24 @@ export default class AdvancedMapView extends React.Component {
 		this.dataLayer.setLatLngs(latLngs);
 	}
 
-	createVectorStyle(foundFeature, selected) {
+	createVectorStyle(feature, selected) {
 		return {
-			weight: foundFeature ? 0.1 : 0,
+			weight: feature ? 0.1 : 0,
 			color: '#000',
 			strokeOpacity: 0.5,
-			fill: Boolean(foundFeature),
+			fill: Boolean(feature),
 			fillOpacity: selected ? 1 : 0.9,
-			fillColor: selected ? '#1f77b4' : foundFeature ? this.state.colorScale(
+			fillColor: selected ? '#1f77b4' : feature ? this.state.colorScale(
 				(
 					this.state.viewMode == 'relative' ?
-					foundFeature.doc_count/this.getTotal(this.state.mapMode.name, foundFeature.id) :
-					foundFeature.doc_count
+					feature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, feature.id) :
+					feature.doc_count
 				)
 			).hex() : null
 		};
 	}
 
-	renderVectorGrid() {
-		this.selectedPolygon = null;
-
-		if (this.dataLayer) {
-			this.refs.mapView.map.removeLayer(this.dataLayer);
-		}
-
+	getColorScale() {
 		var minValue;
 		var maxValue;
 
@@ -345,7 +421,7 @@ export default class AdvancedMapView extends React.Component {
 		}
 		if (this.state.viewMode == 'relative') {
 			var values = this.state.data.map(function(item) {
-				return item.doc_count/this.getTotal(this.state.mapMode.name, item.id);
+				return item.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id);
 			}.bind(this));
 
 			minValue = _.min(values);
@@ -354,6 +430,37 @@ export default class AdvancedMapView extends React.Component {
 
 //		this.colorScale = chroma.scale(['#33f0c7', '#02ff00', '#f00']).domain([0, maxValue]);
 		var colorScale = chroma.scale('YlOrRd').domain([minValue, maxValue]);
+
+		return colorScale;
+	}
+
+	updateVectorGrid() {
+		if (!this.dataLayer.setFeatureStyle) {
+			this.renderVectorGrid();
+		}
+		else {		
+			this.selectedPolygon = null;
+
+			var colorScale = this.getColorScale();
+
+			this.setState({
+				colorScale: colorScale
+			}, function() {
+				_.each(this.total.socken, function(socken) {
+					this.dataLayer.setFeatureStyle(socken.lm_id, this.createVectorStyle(this.getFeatureData(socken.lm_id)));
+				}.bind(this));
+			}.bind(this));
+		}
+	}
+
+	renderVectorGrid() {
+		this.selectedPolygon = null;
+
+		if (this.dataLayer) {
+			this.refs.mapView.map.removeLayer(this.dataLayer);
+		}
+
+		var colorScale = this.getColorScale();
 
 		this.setState({
 			colorScale: colorScale
@@ -375,7 +482,7 @@ export default class AdvancedMapView extends React.Component {
 						strokeOpacity: 0.5,
 						fill: Boolean(foundFeature),
 						fillOpacity: 0.8,
-						fillColor: foundFeature ? colorScale(this.state.viewMode == 'relative' ? foundFeature.doc_count/this.getTotal(this.state.mapMode.name, item.id) : foundFeature.doc_count).hex() : null
+						fillColor: foundFeature ? colorScale(this.state.viewMode == 'relative' ? foundFeature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id) : foundFeature.doc_count).hex() : null
 					}
 				}.bind(this),
 				sverige_socken_wgs84: function(properties, zoom) {
@@ -429,7 +536,7 @@ export default class AdvancedMapView extends React.Component {
 		this.setState({
 			tooltip: {
 				title: featureName,
-				text: featureData ? featureData.doc_count+' (total '+this.getTotal(this.state.mapMode.name, featureData.id)+')' : '',
+				text: featureData ? featureData.doc_count+' (total '+this.getTotal(this.state.mapMode.totalFieldName, featureData.id)+')' : '',
 				x: event.originalEvent.x,
 				y: event.originalEvent.y
 			}
@@ -475,8 +582,9 @@ export default class AdvancedMapView extends React.Component {
 		var mapModeSelectElements = this.mapModes.map(function(item, index) {
 			return <option key={index} value={item.name}>{item.label}</option>;
 		})
+
 		return (
-			<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
+			<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
 
 				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" scrollWheelZoom="true" onBaseLayerChange={this.baseLayerChangeHandler} />
 
@@ -487,6 +595,8 @@ export default class AdvancedMapView extends React.Component {
 
 				<div className="map-controls">
 
+					<a onClick={this.fullScreenButtonClickHandler}>Fullskärm</a>
+
 					<select value={this.state.mapMode.name} onChange={this.mapModeSelectChangeHandler}>
 						{mapModeSelectElements}
 					</select>
@@ -496,6 +606,25 @@ export default class AdvancedMapView extends React.Component {
 						<option value="relative">relative</option>
 					</select>
 
+				</div>
+
+				<div className="map-timeline-container" style={{opacity: this.state.data == null ? 0.4 : 1}}>
+
+					<CollectionYearsGraph ref="collectionYearsGraph" 
+						graphHeight="100" 
+						simpleGraph={true} 
+						listenForTimerangeChange={true}
+						defaultRangeSelectAction="onChange"
+						onChange={this.sliderGraphChangeHandler} />
+
+					<Slider ref="timerangeSlider" 
+						inputName="collectionYears" 
+						enabled={this.state.data != null}
+						start={[this.state.sliderStartYear, this.state.sliderEndYear]} 
+						rangeMin={this.state.sliderStartYear} 
+						rangeMax={this.state.sliderEndYear}
+						onChange={this.timerangeSliderSlideHandler} 
+						onSlide={this.timerangeSliderSlideHandler} />
 				</div>
 
 				<div className="loading-overlay"></div>

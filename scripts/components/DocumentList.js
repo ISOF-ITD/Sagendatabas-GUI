@@ -14,10 +14,14 @@ export default class DocumentList extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.pageSize = 100;
+
 		this.filters = {};
 
 		this.graphFilterHandler = this.graphFilterHandler.bind(this);
 		this.searchHandler = this.searchHandler.bind(this);
+		this.prevPage = this.prevPage.bind(this);
+		this.nextPage = this.nextPage.bind(this);
 
 		this.state = {
 			total: null,
@@ -25,7 +29,8 @@ export default class DocumentList extends React.Component {
 			loading: false,
 			params: null,
 			sort: '_score',
-			sortOrder: 'asc'
+			sortOrder: 'asc',
+			currentPage: 1
 		};
 
 		if (window.eventBus) {
@@ -43,6 +48,11 @@ export default class DocumentList extends React.Component {
 		if (this.props.similarDocs) {
 			this.fetchData({
 				similar: this.props.similarDocs
+			});
+		}
+		if (this.props.person) {
+			this.fetchData({
+				person_id: this.props.person
 			});
 		}
 	}
@@ -78,6 +88,7 @@ export default class DocumentList extends React.Component {
 	}
 
 	graphFilterHandler(event, data) {
+		var currentFilters = JSON.stringify(this.filters);
 		this.filters[data.filter] = typeof data.value == 'array' ? data.value.join(',') : data.value;
 
 		for (var key in this.filters) {
@@ -86,14 +97,36 @@ export default class DocumentList extends React.Component {
 			}
 		}
 
-		this.fetchData();
+		if (currentFilters != JSON.stringify(this.filters)) {
+			this.fetchData();
+		}
 	}
 
 	searchHandler(event, data) {
 		this.filters = {};
 		
 		this.setState({
-			params: data.params
+			params: data.params,
+			currentPage: 1
+		}, function() {
+			this.fetchData();
+		}.bind(this));
+	}
+
+	nextPage() {
+		this.setState({
+			currentPage: this.state.currentPage+1
+		}, function() {
+			this.fetchData();
+		}.bind(this));
+	}
+	
+	prevPage() {
+		if (this.state.currentPage == 1) {
+			return;
+		}
+		this.setState({
+			currentPage: this.state.currentPage-1
 		}, function() {
 			this.fetchData();
 		}.bind(this));
@@ -105,11 +138,15 @@ export default class DocumentList extends React.Component {
 		params = params ? JSON.parse(JSON.stringify(params)) : {};
 
 		params = Object.assign(params, this.filters);
+		params = Object.assign({}, config.requiredApiParams, params);
 
 		if (!this.props.similarDocs) {
 			params.sort = this.state.sort;
 			params.order = this.state.sortOrder;
 		}
+
+		params.from = (this.state.currentPage-1)*this.pageSize;
+		params.size = this.pageSize;
 
 		var paramString = paramsHelper.buildParamString(params);
 
@@ -164,6 +201,16 @@ export default class DocumentList extends React.Component {
 					<div className="items">
 						{documentItems}
 					</div>
+
+					{
+						this.state.total && this.state.total > 0 &&
+						<div className="list-footer">
+							<div className="page-info u-pull-right">{'Visar '+((this.state.currentPage*this.pageSize)-(this.pageSize-1))+'-'+(this.state.currentPage*this.pageSize > this.state.total ? this.state.total : this.state.currentPage*this.pageSize)+' av '+this.state.total}</div>
+							<button className="button prev-button" disabled={this.state.currentPage == 1} onClick={this.prevPage}>Föregående</button>
+							<span> </span>
+							<button className="button next-button" disabled={this.state.total <= this.state.currentPage*50} onClick={this.nextPage}>Nästa</button>
+						</div>
+					}
 
 					<div className="loading-overlay"></div>
 

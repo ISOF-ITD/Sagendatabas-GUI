@@ -61,7 +61,7 @@ export default class GenderGraphDisplay extends React.Component {
 	}
 
 	fetchTotalByGender() {
-		fetch(config.apiUrl+config.endpoints.gender)
+		fetch(config.apiUrl+config.endpoints.gender+'?'+paramsHelper.buildParamString(config.requiredApiParams))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
@@ -79,7 +79,9 @@ export default class GenderGraphDisplay extends React.Component {
 	}
 
 	fetchData(params) {
-		var paramString = paramsHelper.buildParamString(params);
+		var queryParams = Object.assign({}, config.requiredApiParams, params);
+
+		var paramString = paramsHelper.buildParamString(queryParams);
 
 		if (paramString == this.state.paramString) {
 			return;

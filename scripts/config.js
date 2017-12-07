@@ -2,6 +2,8 @@ export default {
 	apiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/',
 //	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
 
+	restApiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/',
+
 	appUrl: 'http://www4.sprakochfolkminnen.se/sagner/avancerad/',
 
 	geoserverUrl: 'https://oden-test.sprakochfolkminnen.se/geoserver',
@@ -20,10 +22,12 @@ export default {
 		collectors: 'collectors/',
 		gender: 'gender/',
 		types: 'types/',
+		texts: 'texts/',
 
 		document: 'document/',
 
-		terms_graph: 'graph/',
+		terms_graph: 'terms_graph/',
+		persons_graph: 'persons_graph/',
 
 		county: 'county/',
 		landskap: 'landskap/',
@@ -36,6 +40,10 @@ export default {
 		socken_autocomplete: 'autocomplete/socken/'
 	},
 
+	requiredApiParams: {
+		country: 'sweden'
+	},
+
 	minYear: 1750,
-	maxYear: 1960
+	maxYear: 2017
 };

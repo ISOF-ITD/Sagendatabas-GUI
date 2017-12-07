@@ -105,10 +105,10 @@ export default class TermsGraph extends React.Component {
 	fetchData() {
 		this.selectedBar = null;
 
-		var params = this.state.params;
+		var params = Object.assign({}, config.requiredApiParams, this.state.params);
 		params.sort = this.state.sort;
 
-		var paramString = paramsHelper.buildParamString(this.state.params);
+		var paramString = paramsHelper.buildParamString(params);
 
 		this.setState({
 			paramString: paramString,

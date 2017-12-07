@@ -62,7 +62,6 @@ export default class PersonList extends React.Component {
 
 		for (var key in this.filters) {
 			if (this.filters[key] == null) {
-				console.log('delete filters['+key+']');
 				delete this.filters[key];
 			}
 		}
@@ -91,6 +90,7 @@ export default class PersonList extends React.Component {
 		params.count = 100;
 
 		params = Object.assign(params, this.filters);
+		params = Object.assign({}, config.requiredApiParams, params);
 
 		var paramString = paramsHelper.buildParamString(params);
 

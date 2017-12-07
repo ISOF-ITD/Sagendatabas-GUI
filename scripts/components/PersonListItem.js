@@ -58,7 +58,7 @@ export default class PersonListItem extends React.Component {
 				</div>
 
 				<div className="content">
-					<a className="button" href={'#/person/'+this.state.data.id}>Visa</a>
+					<a className="button" href={'#/'+(this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/person/'+this.state.data.id}>Visa</a>
 				</div>
 
 			</div>

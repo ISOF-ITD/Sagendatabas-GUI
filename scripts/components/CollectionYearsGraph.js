@@ -14,16 +14,20 @@ export default class CollectionYearsGraph extends React.Component {
 		super(props);
 
 		this.graphMargins = {
-			left: 40,
-			right: 10,
+			left: this.props.simpleGraph ? 0 : 40,
+			right: this.props.simpleGraph ? 0 : 10,
 			top: 10,
 			bottom: 30
 		};
 
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
+		this.timerangeChangeHandler = this.timerangeChangeHandler.bind(this);
 
 		this.searchHandler = this.searchHandler.bind(this);
+
+		this.minYear = config.minYear;
+		this.maxYear = config.maxYear;
 
 		this.state = {
 			paramString: null,
@@ -39,6 +43,10 @@ export default class CollectionYearsGraph extends React.Component {
 
 			graphId: 'Graph'+Math.round((new Date()).valueOf()*Math.random())
 		};
+
+		if (window.eventBus && this.props.listenForTimerangeChange) {
+			window.eventBus.addEventListener('collectionYears.timerangeChanged', this.timerangeChangeHandler);
+		}
 
 		this.fetchTotalByYear();
 	}
@@ -63,8 +71,14 @@ export default class CollectionYearsGraph extends React.Component {
 		}
 	}
 
+	timerangeChangeHandler(event, data) {
+		this.minYear = data.min;
+		this.maxYear = data.max;
+
+		this.renderGraph();
+	}
+
 	windowResizeHandler() {
-		console.log('windowResizeHandler');
 		this.setState({
 			graphContainerWidth: this.refs.container.clientWidth
 		}, function() {
@@ -100,7 +114,7 @@ export default class CollectionYearsGraph extends React.Component {
 	}
 
 	fetchTotalByYear() {
-		fetch(config.apiUrl+config.endpoints.collection_years)
+		fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramsHelper.buildParamString(config.requiredApiParams))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
@@ -112,7 +126,9 @@ export default class CollectionYearsGraph extends React.Component {
 	}
 
 	fetchData(params) {
-		var paramString = paramsHelper.buildParamString(params);
+		var queryParams = Object.assign({}, config.requiredApiParams, params);
+
+		var paramString = paramsHelper.buildParamString(queryParams);
 
 		if (paramString == this.state.paramString) {
 			return;
@@ -131,7 +147,7 @@ export default class CollectionYearsGraph extends React.Component {
 			}).then(function(json) {
 				var data = [];
 
-				for (var i = config.minYear; i<config.maxYear; i++) {
+				for (var i = this.minYear; i<this.maxYear; i++) {
 					var dataItem = _.find(json.data, function(item) {
 						return item.year == i;
 					});
@@ -139,6 +155,17 @@ export default class CollectionYearsGraph extends React.Component {
 					data.push(dataItem ? dataItem : {
 						year: i,
 						doc_count: 0
+					});
+				}
+
+				// Skickar minYear och maxYear via eventBus, kart tid-slider kommer lyssna på detta och uppdateras
+				if (this.props.dispatchTimerange && window.eventBus) {
+					var dataMinYear = Number(_.min(_.pluck(json.data, 'year')));
+					var dataMaxYear = Number(_.max(_.pluck(json.data, 'year')));
+
+					window.eventBus.dispatch('collectionYears.timerangeChanged', this, {
+						min: dataMinYear-1,
+						max: dataMaxYear+2
 					});
 				}
 
@@ -162,11 +189,17 @@ export default class CollectionYearsGraph extends React.Component {
 	}
 
 	updateGraph() {
-		this.updateYAxis();
-		this.updateLines();
+		if (this.vis) {
+			this.updateYAxis();
+			this.updateLines();
+		}
 	}
 
 	updateYAxis() {
+		if (this.props.simpleGraph) {
+			return;
+		}
+
 		var y = this.createYRange();
 		this.vis.selectAll('g.y.axis')
 			.call(d3.axisLeft(y)
@@ -211,10 +244,14 @@ export default class CollectionYearsGraph extends React.Component {
 	createXRange() {
 		var x = d3.scaleTime().range([0,this.graphWidth]);
 
-		x.domain(d3.extent(this.state.data, function(d) {
+		x.domain(d3.extent([this.minYear, this.maxYear]));
+/*
+		x.domain(d3.extent(_.filter(this.state.data, function(item) {
+			return (item.year >= this.minYear) && (item.year <= this.maxYear);
+		}.bind(this)), function(d) {
 			return d.year;
 		}));
-
+*/
 		return x;
 	}
 
@@ -264,20 +301,22 @@ export default class CollectionYearsGraph extends React.Component {
 				.tickFormat(d3.format(5, '+%'))
 			);
 
-		this.vis.append('g')
-			.attr('class', 'y axis')
-			.call(d3.axisLeft(this.yRange)
-				.ticks(5)
-				.tickFormat(function(d) {
-					if (this.state.viewMode == 'absolute') {
-						return d;
-					}
-					else if (this.state.viewMode == 'relative') {
-						return d*100 < 1 ? d*100 : Math.round(d*100);
-					}
-				}.bind(this))
-				.tickSizeInner([-this.graphWidth])
-			);
+		if (!this.props.simpleGraph) {
+			this.vis.append('g')
+				.attr('class', 'y axis')
+				.call(d3.axisLeft(this.yRange)
+					.ticks(5)
+					.tickFormat(function(d) {
+						if (this.state.viewMode == 'absolute') {
+							return d;
+						}
+						else if (this.state.viewMode == 'relative') {
+							return d*100 < 1 ? d*100 : Math.round(d*100);
+						}
+					}.bind(this))
+					.tickSizeInner([-this.graphWidth])
+				);
+		}
 
 		this.axisMarker = this.vis.append('line')
 			.attr('class', 'x axis-marker')
@@ -377,10 +416,17 @@ export default class CollectionYearsGraph extends React.Component {
 			if (view.dragStart) {
 				var year = getTotalYearData(d3.mouse(this)[0]).year;
 
-				if (window.eventBus) {
+				var selectedRange = !view.dragStarted || view.dragStart == year ? null : [view.dragStart < year ? view.dragStart : year, view.dragStart > year ? view.dragStart : year];
+
+				if (view.props.defaultRangeSelectAction == 'onChange') {
+					if (view.props.onChange) {
+						view.props.onChange(selectedRange);
+					}
+				}
+				else if (window.eventBus) {
 					window.eventBus.dispatch('graph.filter', this, {
 						filter: 'collection_years',
-						value: !view.dragStarted || view.dragStart == year ? null : [view.dragStart < year ? view.dragStart : year, view.dragStart > year ? view.dragStart : year]
+						value: selectedRange
 					});
 				}
 
@@ -410,7 +456,9 @@ export default class CollectionYearsGraph extends React.Component {
 					'Total: '+view.getTotalByYear(yearData.year)
 				);
 
-			view.axisMarker.attr('transform', 'translate('+d3.mouse(this)[0]+', 0)');
+			if (view.axisMarker) {
+				view.axisMarker.attr('transform', 'translate('+d3.mouse(this)[0]+', 0)');
+			}
 
 			if (view.dragStart) {
 				view.dragStarted = true;
@@ -421,9 +469,11 @@ export default class CollectionYearsGraph extends React.Component {
 	}
 
 	setTimeOverlay(values) {
+		console.log(values);
+		console.log('minYear: '+this.minYear+', maxYear: '+this.maxYear);
 		this.timeOverlay = values;
 
-		if (this.timeOverlay[0] == this.startYear && this.timeOverlay[1] == this.endYear) {
+		if (this.timeOverlay[0] == this.minYear && this.timeOverlay[1] == this.maxYear) {
 			this.vis.select('rect.time-overlay')
 				.transition()
 				.duration(100)
@@ -448,14 +498,17 @@ export default class CollectionYearsGraph extends React.Component {
 					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
 				</div>
 
-				<div className="graph-controls">
-					<h3>{this.props.title}</h3>
+				{
+					!this.props.simpleGraph &&
+					<div className="graph-controls">
+						<h3>{this.props.title}</h3>
 
-					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
-						<option value="absolute">absolute</option>
-						<option value="relative">relative</option>
-					</select>
-				</div>
+						<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
+							<option value="absolute">absolute</option>
+							<option value="relative">relative</option>
+						</select>
+					</div>
+				}
 
 				<div className="loading-overlay"></div>
 

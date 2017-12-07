@@ -12,11 +12,16 @@ import PersonList from './PersonList';
 import AdvancedMapView from './AdvancedMapView';
 import GenderGraphDisplay from './GenderGraphDisplay';
 import TypesGraph from './TypesGraph';
+import NetworkGraph from './NetworkGraph';
+
+import TextHighlightList from './TextHighlightList';
 import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverlay';
 
-import {TabsContainer, Tab} from './TabControl';
+import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls/TabControl';
 
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+
+import config from './../config';
 
 export default class AnalyticalApplicationWrapper extends React.Component {
 	constructor(props) {
@@ -55,7 +60,17 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		return (
 			<div className={'app-container'}>
 
-				<AdvancedMapView mapHeight="500" />
+				<TabsContainer className="content-width">
+					<AdvancedMapView mapHeight="700" tabName="Karta" />
+					<NetworkGraph graphHeight="800" 
+						hideControls={true}
+						min_doc_count="1" 
+						vertices_size="800" 
+						sample_size="50000" 
+						url={config.apiUrl+config.endpoints.persons_graph} 
+						hideLabels={true}
+						tabName="Person nätverk" />
+				</TabsContainer>
 
 				<div className="container">
 
@@ -87,7 +102,9 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="twelve columns">
 
 							<div className="graph-wrapper no-header">
-								<CollectionYearsGraph title="Uppteckningsår" graphHeight="250" />
+								<CollectionYearsGraph title="Uppteckningsår" 
+									graphHeight="250"
+									dispatchTimerange={true} />
 								<BirthYearsGraph title="Födelseår" graphHeight="250" />	
 							</div>
 
@@ -107,6 +124,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 					<TabsContainer>
 
 						<DocumentList tabName="Dokumenter" />
+						<TextHighlightList tabName="Markerade meningar" />
 						<PersonList tabName="Personer" />
 
 					</TabsContainer>

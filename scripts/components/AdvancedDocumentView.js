@@ -73,11 +73,11 @@ export default class AdvancedDocumentView extends React.Component {
 
 		var personItems = this.state.doc && this.state.doc.persons && this.state.doc.persons.length > 0 ? this.state.doc.persons.map(function(person, index) {
 			return <tr key={index}>
-				<td><a href={'#person/'+person.id}>{person.name}</a></td>
+				<td><a href={'#'+(this.props.baseRoute ? this.props.baseRoute : 'search/analyse/')+'person/'+person.id}>{person.name}</a></td>
 				<th>{person.birth_year ? person.birth_year : ''}</th>
-				<th>{person.relation == 'collector' ? 'Upptecknare' : person.relation == 'informant' ? 'Informant' : ''}</th>
+				<th>{person.relation == 'c' ? 'Upptecknare' : person.relation == 'i' ? 'Informant' : ''}</th>
 			</tr>;
-		}) : [];
+		}.bind(this)) : [];
 
 		return this.state.doc ? 
 			<div className="document-view">
@@ -128,8 +128,8 @@ export default class AdvancedDocumentView extends React.Component {
 
 							<div className="six columns">
 								{
-									this.state.doc.places && this.state.doc.places.length > 0 && this.state.doc.places[0].lat && this.state.doc.places[0].lng &&
-									<SimpleMap marker={{lat: this.state.doc.places[0].lat, lng: this.state.doc.places[0].lng, label: this.state.doc.places[0].name}} />
+									this.state.doc.places && this.state.doc.places.length > 0 &&
+									<SimpleMap marker={{lat: this.state.doc.places[0].location.lat, lng: this.state.doc.places[0].location.lon, label: this.state.doc.places[0].name}} />
 								}
 							</div>
 

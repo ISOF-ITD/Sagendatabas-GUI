@@ -7,6 +7,7 @@ import 'leaflet-draw';
 import EventBus from 'eventbusjs';
 
 import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBoxList';
+import PopulatedCheckBoxList from './../../ISOF-React-modules/components/controls/PopulatedCheckBoxList';
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
 import AutocompleteInput from './../../ISOF-React-modules/components/controls/AutocompleteInput';
 import PopulatedSelect from './../../ISOF-React-modules/components/controls/PopulatedSelect';
@@ -606,20 +607,20 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Typ:</label>
 
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'inspelning', 'frågelista']} 
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista']} 
 									selectedItems={this.state.selectedTypes} 
-									onChange={this.typeListChangeHandler} />
+									onSelectionChange={this.typeListChangeHandler} />
 							</div>
 
 							<div className="four columns">
 								<label>Kategorier:</label>
 
-								<CheckBoxList values={sagenkartaCategories.categories_advanced} 
-									valueField="letter" 
-									labelField="label" 
-									labelFunction={function(item) {return item.letter.toUpperCase()+': '+item.label}}
+								<PopulatedCheckBoxList dataUrl={config.restApiUrl+'categories/'}
+									valueField="category" 
+									labelField="name" 
+									labelFunction={function(item) {return item.category.toUpperCase()+': '+item.name+' ('+item.type+')'}}
 									selectedItems={this.state.selectedCategories} 
-									onChange={this.categoryListChangeHandler} />
+									onSelectionChange={this.categoryListChangeHandler} />
 
 							</div>
 
@@ -638,7 +639,8 @@ export default class SearchForm extends React.Component {
 								<Slider inputName="collectionYears" 
 									start={[this.sliderStartYear, this.sliderEndYear]} 
 									enabled={this.state.collectionYearsEnabled} 
-									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
+									rangeMin={this.sliderStartYear}
+									rangeMax={this.sliderEndYear} 
 									onChange={this.inputChangeHandler} />
 							</div>
 
@@ -696,7 +698,7 @@ export default class SearchForm extends React.Component {
 									<div className="eight columns">
 										<label>Upptecknare:</label>
 										<AutocompleteInput inputName="collectorNameInput" 
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=collector'} 
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c'} 
 											valueField="name"
 											inputClassName="u-full-width" 
 											onChange={this.inputChangeHandler} 
@@ -728,7 +730,8 @@ export default class SearchForm extends React.Component {
 								<Slider inputName="collectorsBirthYears" 
 									start={[this.sliderStartYear, this.sliderEndYear]} 
 									enabled={this.state.collectorsBirthYearsEnabled} 
-									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
+									rangeMin={this.sliderStartYear}
+									rangeMax={this.sliderEndYear} 
 									onChange={this.inputChangeHandler} />
 
 							</div>
@@ -740,7 +743,7 @@ export default class SearchForm extends React.Component {
 									<div className="eight columns">
 										<label>Informant:</label>
 										<AutocompleteInput inputName="informantNameInput" 
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=informant'} 
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=i'} 
 											valueField="name"
 											inputClassName="u-full-width" 
 											onChange={this.inputChangeHandler} 
@@ -772,7 +775,8 @@ export default class SearchForm extends React.Component {
 								<Slider inputName="informantsBirthYears" 
 									start={[this.sliderStartYear, this.sliderEndYear]} 
 									enabled={this.state.informantsBirthYearsEnabled} 
-									range={{min: this.sliderStartYear, max: this.sliderEndYear}} 
+									rangeMin={this.sliderStartYear}
+									rangeMax={this.sliderEndYear} 
 									onChange={this.inputChangeHandler} />
 
 							</div>

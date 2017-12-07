@@ -210,10 +210,6 @@ export default class GenderGraph extends React.Component {
 				}
 				else if (this.state.viewMode == 'relative') {
 					var total = this.getTotalByGender(d.gender);
-
-					console.log(d);
-					console.log(d.person_count);
-					console.log('Total: '+total);
 					return y(d.person_count/total);
 				}
 			}.bind(this))

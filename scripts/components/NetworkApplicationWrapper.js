@@ -1,12 +1,11 @@
-
 import React from 'react';
 import { hashHistory } from 'react-router';
 
 import EventBus from 'eventbusjs';
 
 import DocumentList from './DocumentList';
-import TermsNetworkGraph from './TermsNetworkGraph';
-import {TabsContainer, Tab} from './TabControl';
+import NetworkGraph from './NetworkGraph';
+import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls/TabControl';
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
 
 import config from './../config';
@@ -59,6 +58,8 @@ export default class NetworkApplicationWrapper extends React.Component {
 			popup
 		} = this.props;
 
+		var popupVisible = Boolean(popup);
+
 		return (
 			<div className={'app-container'}>
 
@@ -66,9 +67,9 @@ export default class NetworkApplicationWrapper extends React.Component {
 					<DocumentList baseRoute="search/network" hideAttributes="true" />
 				</div>
 
-				<TermsNetworkGraph />
+				<NetworkGraph url={config.apiUrl+config.endpoints.terms_graph} />
 
-				<PopupWindow onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
+				<PopupWindow windowOpen={popupVisible} onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
 					{popup}
 				</PopupWindow>
 

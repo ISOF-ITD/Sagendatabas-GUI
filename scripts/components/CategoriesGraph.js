@@ -99,7 +99,7 @@ export default class CategoriesGraph extends React.Component {
 	}
 
 	fetchTotalCategories() {
-		fetch(config.apiUrl+config.endpoints.categories)
+		fetch(config.apiUrl+config.endpoints.categories+'?'+paramsHelper.buildParamString(config.requiredApiParams))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
@@ -113,7 +113,8 @@ export default class CategoriesGraph extends React.Component {
 	fetchData(params) {
 		this.selectedBar = null;
 
-		var paramString = paramsHelper.buildParamString(params);
+		var queryParams = Object.assign({}, config.requiredApiParams, params);
+		var paramString = paramsHelper.buildParamString(queryParams);
 
 		if (paramString == this.state.paramString) {
 			return;
