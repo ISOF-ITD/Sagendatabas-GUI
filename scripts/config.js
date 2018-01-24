@@ -1,8 +1,8 @@
 export default {
-	apiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/',
-//	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
+//	apiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/',
+	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
 
-	restApiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/',
+	restApiUrl: 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/',
 
 	appUrl: 'http://www4.sprakochfolkminnen.se/sagner/avancerad/',
 
@@ -23,6 +23,7 @@ export default {
 		gender: 'gender/',
 		types: 'types/',
 		texts: 'texts/',
+		letters: 'letters/',
 
 		document: 'document/',
 

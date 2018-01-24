@@ -507,7 +507,7 @@ export default class SearchForm extends React.Component {
 
 	render() {
 		var searchTabs = this.state.savedSearches.length > 0 ? this.state.savedSearches.map(function(searchItem, index) {
-			var paramsDescription = searchItem.newSearch ? 'Ny sökning' : paramsHelper.describeParams(this.buildParams(searchItem), true);
+			var paramsDescription = searchItem.newSearch ? 'Ny sökning' : paramsHelper.describeParams(this.buildParams(searchItem), true, this.refs.categoryList ? this.refs.categoryList.state.data : null);
 
 			return <a key={index} onClick={this.searchTabClickHandler} data-index={index} className={'tab'+(index == this.state.searchIndex ? ' selected' : '')} title={paramsDescription}>{searchItem.newSearch ? 'Ny sökning' : (paramsDescription.length > 15 ? paramsDescription.substr(0, 15)+'...' : paramsDescription)}<span className="close-button" data-index={index} onClick={this.tabCloseButtonClickHandler}></span></a>
 		}.bind(this)) : [
@@ -547,7 +547,7 @@ export default class SearchForm extends React.Component {
 
 								</div>
 
-								<div className="search-label" dangerouslySetInnerHTML={{__html: paramsHelper.describeParams(this.state.lastSearchParams)}}></div>
+								<div className="search-label" title={paramsHelper.describeParams(this.state.lastSearchParams, true, this.refs.categoryList ? this.refs.categoryList.state.data : null)} dangerouslySetInnerHTML={{__html: paramsHelper.describeParams(this.state.lastSearchParams, false, this.refs.categoryList ? this.refs.categoryList.state.data : null)}}></div>
 								<input name="searchInput" 
 									placeholder="Söksträng" 
 									className="search-input u-full-width" 
@@ -607,7 +607,7 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Typ:</label>
 
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista']} 
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista']} 
 									selectedItems={this.state.selectedTypes} 
 									onSelectionChange={this.typeListChangeHandler} />
 							</div>
@@ -615,7 +615,8 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Kategorier:</label>
 
-								<PopulatedCheckBoxList dataUrl={config.restApiUrl+'categories/'}
+								<PopulatedCheckBoxList ref="categoryList" dataUrl={config.restApiUrl+'categories/'} 
+									filteredBy="type" 
 									valueField="category" 
 									labelField="name" 
 									labelFunction={function(item) {return item.category.toUpperCase()+': '+item.name+' ('+item.type+')'}}

@@ -13,6 +13,14 @@ export default class BirthYearsGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.roleLabels = {
+			i: 'Informanter',
+			c: 'Upptecknare',
+			sender: 'Avsändare',
+			receiver: 'Mottagare',
+			all: 'Alla'
+		};
+
 		this.graphMargins = {
 			left: 40,
 			right: 10,
@@ -20,11 +28,7 @@ export default class BirthYearsGraph extends React.Component {
 			bottom: 30
 		};
 
-		this.lineColors = [
-			'#9ecae1',
-			'#ff7f0e',
-			'#2ca02c'
-		];
+		this.lineColors = d3ScaleChromatic.schemePaired;
 
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
@@ -35,6 +39,7 @@ export default class BirthYearsGraph extends React.Component {
 			paramString: null,
 			data: [],
 			total: null,
+			legendsData: [],
 
 			loading: false,
 
@@ -45,8 +50,6 @@ export default class BirthYearsGraph extends React.Component {
 
 			graphId: 'Graph'+Math.round((new Date()).valueOf()*Math.random())
 		};
-
-		this.fetchTotalCategories();
 	}
 
 	componentDidMount() {
@@ -95,7 +98,14 @@ export default class BirthYearsGraph extends React.Component {
 	}
 
 	searchHandler(event, data) {
-		this.fetchData(data.params);
+		var totalParams = {};
+		if (data.params.type) {
+			totalParams.type = data.params.type;
+		}
+
+		this.fetchTotalByYear(totalParams, function() {
+			this.fetchData(data.params);
+		}.bind(this));
 	}
 
 	getTotalByYear(year) {
@@ -104,12 +114,16 @@ export default class BirthYearsGraph extends React.Component {
 		return found ? found.person_count : 0;
 	}
 
-	fetchTotalCategories() {
-		fetch(config.apiUrl+config.endpoints.birth_years+'?'+paramsHelper.buildParamString(config.requiredApiParams))
+	fetchTotalByYear(typeParams, callBack) {
+		fetch(config.apiUrl+config.endpoints.birth_years+'?'+paramsHelper.buildParamString(typeParams))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
 				this.totalByYearArray = json.data.all;
+
+				if (callBack) {
+					callBack();
+				}
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -149,39 +163,32 @@ export default class BirthYearsGraph extends React.Component {
 					});
 				}
 
-				var informantsData = [];
+				var data = {};
 
-				for (var i = config.minYear; i<config.maxYear; i++) {
-					var dataItem = _.find(json.data.informants, function(item) {
-						return item.year == i;
-					});
+				for (var item in json.data) {
+					var dataItems = json.data[item];
 
-					informantsData.push(dataItem ? dataItem : {
-						year: i,
-						doc_count: 0,
-						person_count: 0
-					});
+					for (var i = config.minYear; i<config.maxYear; i++) {
+						var dataItem = _.find(json.data[item], function(item) {
+							return item.year == i;
+						});
+
+						dataItems.push(dataItem ? dataItem : {
+							year: i,
+							doc_count: 0,
+							person_count: 0
+						});
+					}
+
+					data[item] = dataItems;
 				}
 
-				var collectorsData = [];
-
-				for (var i = config.minYear; i<config.maxYear; i++) {
-					var dataItem = _.find(json.data.collectors, function(item) {
-						return item.year == i;
-					});
-
-					collectorsData.push(dataItem ? dataItem : {
-						year: i,
-						doc_count: 0,
-						person_count: 0
-					});
-				}
+				delete data.all;
 
 				this.setState({
 					total: json.metadata.total,
-					data: allData,
-					informantsData: informantsData,
-					collectorsData: collectorsData,
+					all: allData,
+					data: data,
 					loading: false
 				}, function() {
 					this.renderGraph();
@@ -249,13 +256,7 @@ export default class BirthYearsGraph extends React.Component {
 		var x = d3.scaleTime().range([0,this.graphWidth]);
 
 		var xRangeValues = _.union(
-			this.state.data.map(function(item) {
-				return item.year;
-			}),
-			this.state.informantsData.map(function(item) {
-				return item.year;
-			}),
-			this.state.collectorsData.map(function(item) {
+			this.state.all.map(function(item) {
 				return item.year;
 			})
 		);
@@ -269,27 +270,7 @@ export default class BirthYearsGraph extends React.Component {
 
 	createYRange() {
 		var yRangeValues = _.union(
-			this.state.data.map(function(item) {
-				if (this.state.viewMode == 'absolute') {
-					return item.person_count;
-				}
-				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByYear(item.year);
-
-					return item.person_count/total;
-				}
-			}.bind(this)),
-			this.state.informantsData.map(function(item) {
-				if (this.state.viewMode == 'absolute') {
-					return item.person_count;	
-				}
-				else if (this.state.viewMode == 'relative') {
-					var total = this.getTotalByYear(item.year);
-
-					return item.person_count/total;
-				}
-			}.bind(this)),
-			this.state.collectorsData.map(function(item) {
+			this.state.all.map(function(item) {
 				if (this.state.viewMode == 'absolute') {
 					return item.person_count;
 				}
@@ -375,7 +356,7 @@ export default class BirthYearsGraph extends React.Component {
 				.attr('class', 'line line-'+lineIndex)
 				.attr('d', flatLineValue)
 				.attr('stroke', function() {
-					return this.lineColors[lineIndex];
+					return this.lineColors[lineIndex-1];
 				}.bind(this))
 
 			this.vis.select('path.line-'+lineIndex)
@@ -393,8 +374,23 @@ export default class BirthYearsGraph extends React.Component {
 			.attr('y2', this.graphHeight)
 			.style('display', 'none');
 
-		addLine(this.state.informantsData, 1);
-		addLine(this.state.collectorsData, 2);
+		var legendsData = [];
+
+		var listCount = 1;
+		for (var dataList in this.state.data) {
+			addLine(this.state.data[dataList], listCount);
+
+			legendsData.push({
+				label: this.roleLabels[dataList],
+				color: this.lineColors[listCount-1]
+			});
+
+			listCount++;
+		}
+
+		this.setState({
+			legendsData: legendsData
+		});
 
 		this.vis.append('rect')
 			.attr('class', 'time-overlay')
@@ -430,9 +426,9 @@ export default class BirthYearsGraph extends React.Component {
 
 		function getTotalYearData(mousePos) {
 			var x0 = view.xRange.invert(Math.round(mousePos));
-			var i = bisectDate(view.state.data, x0, 1);
-			var d0 = view.state.data[i - 1];
-			var d1 = view.state.data[i];
+			var i = bisectDate(view.state.all, x0, 1);
+			var d0 = view.state.all[i - 1];
+			var d1 = view.state.all[i];
 			var d = x0 - d0.year > d1.year - x0 ? d1 : d0 || null;
 
 			return d;
@@ -472,19 +468,24 @@ export default class BirthYearsGraph extends React.Component {
 
 		function mouseMoveHandler() {
 			function getTotalByType(year, type) {
-				var found = _.findWhere(view.state[type], {year: year});
+				var found = _.findWhere(view.state.data[type], {year: year});
 				return found ? found.person_count : 0;
 			}
 
 			var yearData = getTotalYearData(d3.mouse(this)[0]);
+
+			var infoText = [];
+
+			for (var dataList in view.state.data) {
+				infoText.push(view.roleLabels[dataList]+': '+getTotalByType(yearData.year, dataList));
+			}
 
 			view.tooltip
 				.style('left', d3.event.pageX + 20 + 'px')
 				.style('top', d3.event.pageY + 'px')
 				.style('display', 'inline-block')
 				.html('<strong>'+yearData.year+'</strong><br/>'+
-					'Informanter: '+getTotalByType(yearData.year, 'informantsData')+'<br/>'+
-					'Upptecknare: '+getTotalByType(yearData.year, 'collectorsData')+'<br/>'+
+					infoText.join('<br/>')+'<br/>'+
 					'Total: '+yearData.person_count
 				);
 
@@ -539,8 +540,13 @@ export default class BirthYearsGraph extends React.Component {
 				<div className="loading-overlay"></div>
 
 				<div className="legends">
-					<div className="legend"><div className="color" style={{backgroundColor: 'rgb(255, 127, 14)'}}/> Informanter</div>
-					<div className="legend"><div className="color" style={{backgroundColor: 'rgb(44, 160, 44)'}}/> Upptecknare</div>
+					{
+						this.state.legendsData.map(function(legendItem) {
+							return <div key={legendItem.label} className="legend"><div className="color" style={{backgroundColor: legendItem.color}}/> {legendItem.label}</div>;
+						})
+					}
+
+					<div className="u-cf"></div>
 				</div>
 
 			</div>

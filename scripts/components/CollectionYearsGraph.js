@@ -47,8 +47,6 @@ export default class CollectionYearsGraph extends React.Component {
 		if (window.eventBus && this.props.listenForTimerangeChange) {
 			window.eventBus.addEventListener('collectionYears.timerangeChanged', this.timerangeChangeHandler);
 		}
-
-		this.fetchTotalByYear();
 	}
 
 	componentDidMount() {
@@ -113,12 +111,18 @@ export default class CollectionYearsGraph extends React.Component {
 		return found ? found.doc_count : 0;
 	}
 
-	fetchTotalByYear() {
-		fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramsHelper.buildParamString(config.requiredApiParams))
+	fetchTotalByYear(typeParams, callBack) {
+		var params = Object.assign({}, config.requiredApiParams, typeParams);
+
+		fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramsHelper.buildParamString(params))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
 				this.totalByYearArray = json.data;
+
+				if (callBack) {
+					callBack();
+				}
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -127,6 +131,10 @@ export default class CollectionYearsGraph extends React.Component {
 
 	fetchData(params) {
 		var queryParams = Object.assign({}, config.requiredApiParams, params);
+
+		if (this.props.onlyGeography) {
+			queryParams.only_geography = 'true';
+		}
 
 		var paramString = paramsHelper.buildParamString(queryParams);
 
@@ -141,45 +149,54 @@ export default class CollectionYearsGraph extends React.Component {
 			loading: true
 		});
 
-		fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramString)
-			.then(function(response) {
-				return response.json()
-			}).then(function(json) {
-				var data = [];
+		var totalParams = {};
+		if (params.type) {
+			totalParams.type = params.type;
+		}
 
-				for (var i = this.minYear; i<this.maxYear; i++) {
-					var dataItem = _.find(json.data, function(item) {
-						return item.year == i;
-					});
+		this.fetchTotalByYear(totalParams, function() {
+			fetch(config.apiUrl+config.endpoints.collection_years+'?'+paramString)
+				.then(function(response) {
+					return response.json()
+				}).then(function(json) {
+					var data = [];
 
-					data.push(dataItem ? dataItem : {
-						year: i,
-						doc_count: 0
-					});
-				}
+					for (var i = this.minYear; i<this.maxYear; i++) {
+						var dataItem = _.find(json.data, function(item) {
+							return item.year == i;
+						});
 
-				// Skickar minYear och maxYear via eventBus, kart tid-slider kommer lyssna på detta och uppdateras
-				if (this.props.dispatchTimerange && window.eventBus) {
-					var dataMinYear = Number(_.min(_.pluck(json.data, 'year')));
-					var dataMaxYear = Number(_.max(_.pluck(json.data, 'year')));
+						data.push(dataItem ? dataItem : {
+							year: i,
+							doc_count: 0
+						});
+					}
 
-					window.eventBus.dispatch('collectionYears.timerangeChanged', this, {
-						min: dataMinYear-1,
-						max: dataMaxYear+2
-					});
-				}
+					data = json.data;
 
-				this.setState({
-					total: json.metadata.total,
-					data: data,
-					loading: false
-				}, function() {
-					this.renderGraph();
-				}.bind(this));
-			}.bind(this)).catch(function(ex) {
-				console.log('parsing failed', ex)
-			})
-		;
+					// Skickar minYear och maxYear via eventBus, kart tid-slider kommer lyssna på detta och uppdateras
+					if (this.props.dispatchTimerange && window.eventBus) {
+						var dataMinYear = Number(_.min(_.pluck(json.data, 'year')));
+						var dataMaxYear = Number(_.max(_.pluck(json.data, 'year')));
+
+						window.eventBus.dispatch('collectionYears.timerangeChanged', this, {
+							min: dataMinYear-1,
+							max: dataMaxYear+2
+						});
+					}
+
+					this.setState({
+						total: json.metadata.total,
+						data: data,
+						loading: false
+					}, function() {
+						this.renderGraph();
+					}.bind(this));
+				}.bind(this)).catch(function(ex) {
+					console.log('parsing failed', ex)
+				})
+			;
+		}.bind(this));
 	}
 
 	renderGraphBase() {
@@ -469,9 +486,11 @@ export default class CollectionYearsGraph extends React.Component {
 	}
 
 	setTimeOverlay(values) {
-		console.log(values);
-		console.log('minYear: '+this.minYear+', maxYear: '+this.maxYear);
 		this.timeOverlay = values;
+
+		if (!this.vis) {
+			return;
+		}
 
 		if (this.timeOverlay[0] == this.minYear && this.timeOverlay[1] == this.maxYear) {
 			this.vis.select('rect.time-overlay')

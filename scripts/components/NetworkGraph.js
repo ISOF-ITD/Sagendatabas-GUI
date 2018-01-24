@@ -1,4 +1,4 @@
-import React from 'react';
+	import React from 'react';
 import EventBus from 'eventbusjs';
 import _ from 'underscore';
 
@@ -52,7 +52,8 @@ export default class NetworkGraph extends React.Component {
 
 			vertices_size: this.props.vertices_size || 160,
 			sample_size: this.props.sample_size || 20000,
-			query_connections: false
+			query_connections: false,
+			title_terms: false
 		};
 	}
 
@@ -104,6 +105,10 @@ export default class NetworkGraph extends React.Component {
 		queryParams.min_doc_count = this.props.min_doc_count || 2;
 		queryParams.query_connections = this.state.query_connections;
 
+		if (this.state.title_terms) {
+			queryParams.terms_field = "title_topics_graph";
+		}
+
 		var paramString = paramsHelper.buildParamString(queryParams);
 
 		if (paramString == this.state.paramString) {
@@ -118,7 +123,7 @@ export default class NetworkGraph extends React.Component {
 		});
 
 		window.eventBus.dispatch('graph.filter', this, {
-			filter: 'terms',
+			filter: this.props.filterField || 'terms',
 			value: null
 		});
 
@@ -197,8 +202,10 @@ export default class NetworkGraph extends React.Component {
 		}, function() {
 			if (window.eventBus) {
 				window.eventBus.dispatch('graph.filter', this, {
-					filter: 'terms',
-					value: this.state.selectedNodes.length == 0 ? null : this.state.selectedNodes.join(',')
+					filter: this.props.filterField || 'terms',
+					value: this.state.selectedNodes.length == 0 ? null : this.props.filterField == 'person' ? _.map(this.state.selectedNodes, function(node) {
+						return node.split(': ')[1];
+					}).join(',') : this.state.selectedNodes.join(',')
 				});
 			}
 		}.bind(this));
@@ -227,7 +234,7 @@ export default class NetworkGraph extends React.Component {
 	renderGraph() {
 		d3.selectAll('svg#'+this.state.graphId+' > *').remove();
 
-		if (!this.state.data || this.state.data.length == 0) {
+		if (!this.state.data || !this.state.data.connections || !this.state.data.vertices) {
 			return;
 		}
 
@@ -240,7 +247,7 @@ export default class NetworkGraph extends React.Component {
 			.force('link', d3.forceLink().id(function(d) {
 				return d.index;
 			}))
-			.force('charge', d3.forceManyBody().strength(-100))
+			.force('charge', d3.forceManyBody().strength(this.props.strength || -100))
 			.force('center', d3.forceCenter(this.graphWidth / 2, this.graphHeight / 2));
 
 		var graph = this.svg.append("g");
@@ -468,6 +475,7 @@ export default class NetworkGraph extends React.Component {
 							</div>
 						}
 
+						<label><input name="title_terms" onChange={this.graphControlChangeHandler} type="checkbox" checked={this.state.title_terms} />Titel terms</label>
 						<label><input name="query_connections" onChange={this.graphControlChangeHandler} type="checkbox" checked={this.state.query_connections} />query_connections</label>
 
 						<label>vertices_size:</label>

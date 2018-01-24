@@ -67,6 +67,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						min_doc_count="1" 
 						vertices_size="800" 
 						sample_size="50000" 
+						strength="-10" 
+						filterField="person" 
 						url={config.apiUrl+config.endpoints.persons_graph} 
 						hideLabels={true}
 						tabName="Person nätverk" />

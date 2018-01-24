@@ -1,4 +1,5 @@
 import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCategories';
+import _ from 'underscore';
 
 export default {
 	buildParamString(p) {
@@ -14,11 +15,15 @@ export default {
 		return paramStrings.join('&');
 	},
 
-	describeParams(params, disableHtml) {
+	describeParams(params, disableHtml, allCategories) {
 		var params = JSON.parse(JSON.stringify(params));
 
 		var formatParam = function(s) {
 			return (disableHtml ? '' : '<strong>')+s+(disableHtml ? '' : '</strong>');
+		}
+
+		var getCategoryName = function(category) {
+			return category+': '+_.findWhere(allCategories, {category: category}).name;
 		}
 
 		if (params) {
@@ -33,7 +38,7 @@ export default {
 
 				searchTerms.push(categories.length == 0 ? 'Kategori: ' : 'Kategorier: '+formatParam(
 					categories.map(function(category) {
-						return sagenkartaCategories.getCategoryName(category, true);
+						return getCategoryName(category);
 					}).join(', ')
 				));
 			}

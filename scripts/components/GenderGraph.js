@@ -56,6 +56,25 @@ export default class GenderGraph extends React.Component {
 		}.bind(this));
 
 		window.addEventListener('resize', this.windowResizeHandler);
+
+		if (this.props.data || (this.props.total && this.props.total.length > 0)) {
+			var stateObj = {
+				data: this.props.data,
+				viewMode: this.props.viewMode
+			};
+
+			console.log(this.props);
+
+			if (this.props.total && this.props.total.length > 0) {
+				stateObj.total = this.props.total;
+			}
+
+			console.log(stateObj);
+
+			this.setState(stateObj, function() {
+				this.renderGraph();
+			}.bind(this));
+		}
 	}
 
 	componentWillReceiveProps(props) {
@@ -65,7 +84,7 @@ export default class GenderGraph extends React.Component {
 				viewMode: props.viewMode
 			}, function() {
 				this.renderGraph();
-			}.bind(this))
+			}.bind(this));
 		}
 
 		if (props.total && props.total.length > 0) {
@@ -85,6 +104,7 @@ export default class GenderGraph extends React.Component {
 	}
 
 	getTotalByGender(gender) {
+		console.log(this.state.total);
 		return _.findWhere(this.state.total, {gender: gender}).person_count;
 	}
 

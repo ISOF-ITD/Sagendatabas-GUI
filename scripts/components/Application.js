@@ -3,8 +3,6 @@ import { hashHistory } from 'react-router';
 
 import EventBus from 'eventbusjs';
 
-import SearchForm from './SearchForm';
-
 export default class AnalyticalApplicationWrapper extends React.Component {
 	constructor(props) {
 		super(props);
@@ -14,13 +12,14 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	render() {
 		const {
-			main
+			main,
+			searchForm
 		} = this.props;
 
 		return (
 			<div className={'app-container'}>
 
-				<SearchForm />
+				<div className="search-form-container-yeaaah">{searchForm}</div>
 
 				{main}
 

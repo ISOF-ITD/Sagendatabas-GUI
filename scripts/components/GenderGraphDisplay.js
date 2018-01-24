@@ -15,16 +15,21 @@ export default class GenderGraphDisplay extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.roleLabels = {
+			i: 'Informanter',
+			c: 'Upptecknare',
+			sender: 'Avsändare',
+			receiver: 'Mottagare',
+			all: 'Alla'
+		};
+
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 
 		this.searchHandler = this.searchHandler.bind(this);
 
-		this.fetchTotalByGender();
-
 		this.state = {
 			paramString: null,
 			data: [],
-			total: null,
 			viewMode: 'absolute',
 			total: {
 				all: [],
@@ -60,18 +65,18 @@ export default class GenderGraphDisplay extends React.Component {
 		this.fetchData(data.params);
 	}
 
-	fetchTotalByGender() {
+	fetchTotalByGender(typeParams, callBack) {
 		fetch(config.apiUrl+config.endpoints.gender+'?'+paramsHelper.buildParamString(config.requiredApiParams))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: {
-						all: json.data.all,
-						informants: json.data.informants,
-						collectors: json.data.collectors
+					total: json.data
+				}, function() {
+					if (callBack) {
+						callBack();
 					}
-				});
+				}.bind(this));
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -92,22 +97,45 @@ export default class GenderGraphDisplay extends React.Component {
 			loading: true
 		});
 
-		fetch(config.apiUrl+config.endpoints.gender+'?'+paramString)
-			.then(function(response) {
-				return response.json()
-			}).then(function(json) {
-				this.setState({
-					total: json.metadata.total,
-					data: json.data,
-					loading: false
-				});
-			}.bind(this)).catch(function(ex) {
-				console.log('parsing failed', ex)
-			})
-		;
+		var totalParams = {};
+		if (params.type) {
+			totalParams.type = params.type;
+		}
+
+		this.fetchTotalByGender(totalParams, function() {
+			fetch(config.apiUrl+config.endpoints.gender+'?'+paramString)
+				.then(function(response) {
+					return response.json()
+				}).then(function(json) {
+					this.setState({
+						totalRecords: json.metadata.total,
+						data: json.data,
+						loading: false
+					});
+				}.bind(this)).catch(function(ex) {
+					console.log('parsing failed', ex)
+				})
+			;
+		}.bind(this));
 	}
 
 	render() {
+		var graphElements = [];
+
+		console.log('this.state.total:');
+		console.log(this.state.total);
+
+		for (var item in this.state.data) {
+			console.log('Total:');
+			console.log(this.state.total[item]);
+			console.log('Data:')
+			console.log(this.state.data[item]);
+
+			graphElements.push(<div key={item} className="four columns">
+				<GenderGraph label={this.roleLabels[item]} total={this.state.total[item]} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data[item] || []} />
+			</div>);
+		}
+
 		return (
 			<div className="graph-wrapper">
 
@@ -122,17 +150,7 @@ export default class GenderGraphDisplay extends React.Component {
 
 				<div className="row">
 
-					<div className="four columns">
-						<GenderGraph label="Alla" total={this.state.total.all} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data.all || []} />
-					</div>
-
-					<div className="four columns">
-						<GenderGraph label="Informanter" total={this.state.total.informants} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data.informants || []} />
-					</div>
-
-					<div className="four columns">
-						<GenderGraph label="Upptecknare" total={this.state.total.collectors} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data.collectors || []} />
-					</div>
+					{graphElements}
 
 				</div>
 	

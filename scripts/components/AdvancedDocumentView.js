@@ -3,6 +3,7 @@ import { hashHistory } from 'react-router';
 
 import DocumentList from './DocumentList';
 import SimpleMap from './../../ISOF-React-modules/components/views/SimpleMap';
+import Slider from './../../ISOF-React-modules/components/controls/Slider';
 
 import config from './../config';
 
@@ -11,12 +12,26 @@ export default class AdvancedDocumentView extends React.Component {
 		super(props);
 
 		this.mediaImageClickHandler = this.mediaImageClickHandler.bind(this);
+		this.inputChangeHandler = this.inputChangeHandler.bind(this);
 
 		this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
 
 		this.state = {
-			doc: null
+			doc: null,
+			min_word_length:  5,
+			min_term_freq: 1,
+			max_query_terms: 25
 		};
+	}
+
+	inputChangeHandler(event) {
+		var value = event.target.type && event.target.type == 'checkbox' ? event.target.checked : event.target.value;
+
+		this.setState({
+			[event.target.name]: event.target.name == 'minimum_should_match' ? value+'%' : value
+		}, function() {
+			console.log(this.state);
+		}.bind(this));
 	}
 
 	mediaImageClickHandler(event) {
@@ -140,44 +155,34 @@ export default class AdvancedDocumentView extends React.Component {
 					</div>
 				}
 
-				{
-					personItems.length > 0 &&
-					<div>
-
-						<div className="row">
-
-							<div className="eight columns">
-								<h3>Personer</h3>
-
-								<div className="table-wrapper">
-									<table width="100%">
-
-										<thead>
-											<tr>
-												<th>Namn</th>
-												<th>Födelseår</th>
-												<th>Roll</th>
-											</tr>
-										</thead>
-
-										<tbody>
-											{personItems}
-										</tbody>
-
-									</table>
-								</div>
-							</div>
-
-						</div>
-
-						<hr/>
-
-					</div>
-				}
-
 				<div className="row">
 
-					<div className="four columns">
+					{
+						personItems.length > 0 &&
+						<div className="six columns">
+							<h3>Personer</h3>
+
+							<div className="table-wrapper">
+								<table width="100%">
+
+									<thead>
+										<tr>
+											<th>Namn</th>
+											<th>Födelseår</th>
+											<th>Roll</th>
+										</tr>
+									</thead>
+
+									<tbody>
+										{personItems}
+									</tbody>
+
+								</table>
+							</div>
+						</div>
+					}
+
+					<div className="three columns">
 						{
 							this.state.doc.taxonomy && this.state.doc.taxonomy.category && 
 							<p><strong>Kategori:</strong><br/>
@@ -188,7 +193,7 @@ export default class AdvancedDocumentView extends React.Component {
 						{this.state.doc.materialtype}</p>
 					</div>
 
-					<div className="four columns">
+					<div className="three columns">
 						{
 							this.state.doc.archive.archive &&
 							<p><strong>Arkiv:</strong><br/>
@@ -210,13 +215,85 @@ export default class AdvancedDocumentView extends React.Component {
 
 				</div>
 
-				<hr/>
+				{
+					this.state.doc.metadata && this.state.doc.metadata.length > 0 &&
+					<hr/>
+				}
 
-				<br/><br/>
+				{
+					this.state.doc.metadata && this.state.doc.metadata.length > 0 &&
+					<div className="row">
+						<h3>Metadata</h3>
+
+						{
+							this.state.doc.metadata.map(function(item) {
+								return <div className="table-wrapper">
+									<p><strong>{item.type}</strong><br/>
+									<span dangerouslySetInnerHTML={{__html: item.value}} /></p>
+								</div>;
+							})
+						}
+					</div>
+				}
+
+				<hr/>
 
 				<h3>Liknande sägner</h3>
 
-				<DocumentList baseRoute={this.baseRoute} disableEventBus="true" disableSorting="true" similarDocs={this.state.id} displayScore="true" />
+				<div className="row table-wrapper">
+
+					<div className="three columns">
+						<br/>
+						<label>min_word_length</label>
+						<Slider inputName="min_word_length" 
+							start={4} 
+							rangeMin={0} 
+							rangeMax={10} 
+							onChange={this.inputChangeHandler} />
+					</div>
+
+					<div className="three columns">
+						<br/>
+						<label>min_term_freq</label>
+						<Slider inputName="min_term_freq" 
+							start={1} 
+							rangeMin={0} 
+							rangeMax={10} 
+							onChange={this.inputChangeHandler} />
+					</div>
+
+					<div className="three columns">
+						<br/>
+						<label>max_query_terms</label>
+						<Slider inputName="max_query_terms" 
+							start={25} 
+							rangeMin={0} 
+							rangeMax={50} 
+							onChange={this.inputChangeHandler} />
+					</div>
+
+					<div className="three columns">
+						<br/>
+						<label>minimum_should_match</label>
+						<Slider inputName="minimum_should_match" 
+							start={30} 
+							rangeMin={0} 
+							rangeMax={100} 
+							onChange={this.inputChangeHandler} />
+					</div>
+
+				</div>
+
+				<DocumentList 
+					baseRoute={this.baseRoute} 
+					disableEventBus="true" 
+					disableSorting="true" 
+					similarDocs={this.state.id} 
+					min_word_length={this.state.min_word_length} 
+					min_term_freq={this.state.min_term_freq} 
+					max_query_terms={this.state.max_query_terms} 
+					minimum_should_match={this.state.minimum_should_match} 
+					displayScore="true" />
 			</div> : 
 		null;
 	}

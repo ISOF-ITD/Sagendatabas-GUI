@@ -2,6 +2,7 @@ import React from 'react';
 import { hashHistory } from 'react-router';
 
 import DocumentList from './DocumentList';
+import LettersMapView from './LettersMapView';
 import SimpleMap from './../../ISOF-React-modules/components/views/SimpleMap';
 
 import config from './../config';
@@ -83,7 +84,9 @@ export default class AdvancedPersonView extends React.Component {
 					</div>
 				}
 
-				<DocumentList baseRoute={this.baseRoute} disableEventBus="true" disableSorting="true" person={this.state.data.id} />
+				<LettersMapView person={this.state.data.id} disableEventBus={true} mapHeight={600} />
+
+				<DocumentList baseRoute={this.baseRoute} disableEventBus={true} disableSorting={true} person={this.state.data.id} />
 			</div> : 
 		null;
 	}

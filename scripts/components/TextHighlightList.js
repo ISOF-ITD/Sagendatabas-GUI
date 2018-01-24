@@ -130,9 +130,9 @@ export default class TextHighlightList extends React.Component {
 			return;
 		}
 
-		params.search_exclude_title = true;
-
 		params = params ? JSON.parse(JSON.stringify(params)) : {};
+
+		params.search_exclude_title = true;
 
 		params = Object.assign(params, this.filters);
 		params = Object.assign({}, config.requiredApiParams, params);

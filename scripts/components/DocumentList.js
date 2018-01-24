@@ -67,7 +67,11 @@ export default class DocumentList extends React.Component {
 	componentWillReceiveProps(props) {
 		if (props.similarDocs) {
 			this.fetchData({
-				similar: props.similarDocs
+				similar: props.similarDocs,
+				min_word_length: props.min_word_length ? props.min_word_length : 5,
+				min_term_freq: props.min_term_freq ? props.min_term_freq : 1,
+				max_query_terms: props.max_query_terms ? props.max_query_terms : 12,
+				minimum_should_match: props.max_query_terms ? props.minimum_should_match : '30%'
 			});
 		}
 	}

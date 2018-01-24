@@ -92,7 +92,7 @@ export default class AdvancedMapView extends React.Component {
 			}
 		}
 
-		this.fetchTotal();
+//		this.fetchTotal();
 	}
 
 	componentDidMount() {
@@ -304,12 +304,18 @@ export default class AdvancedMapView extends React.Component {
 		return found ? found.doc_count : 0;
 	}
 
-	fetchTotal() {
-		fetch(config.apiUrl+config.endpoints.socken+'?'+paramsHelper.buildParamString(config.requiredApiParams))
+	fetchTotal(typeParams, callBack) {
+		var params = Object.assign({}, config.requiredApiParams, typeParams);
+
+		fetch(config.apiUrl+config.endpoints.socken+'?'+paramsHelper.buildParamString(params))
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
 				this.total.socken = json.data;
+
+				if (callBack) {
+					callBack();
+				}
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
 			})
@@ -336,31 +342,38 @@ export default class AdvancedMapView extends React.Component {
 //			loading: true
 		});
 
-		fetch(config.apiUrl+this.state.mapMode.endpoint+'/?'+paramString)
-			.then(function(response) {
-				return response.json()
-			}).then(function(json) {
-				this.setState({
-					total: json.metadata.total,
-					data: json.data,
-//					loading: false
-				}, function() {
-					if (this.state.mapMode.type == 'vectorgrid') {
-						this.updateVectorGrid();
-					}
+		var totalParams = {};
+		if (params.type) {
+			totalParams.type = params.type;
+		}
 
-					if (this.state.mapMode.type == 'heatmap') {
-						this.renderHeatmap();
-					}
-				}.bind(this));
+		this.fetchTotal(totalParams, function() {
+			fetch(config.apiUrl+this.state.mapMode.endpoint+'/?'+paramString)
+				.then(function(response) {
+					return response.json()
+				}).then(function(json) {
+					this.setState({
+						total: json.metadata.total,
+						data: json.data,
+	//					loading: false
+					}, function() {
+						if (this.state.mapMode.type == 'vectorgrid') {
+							this.updateVectorGrid();
+						}
 
-				if (callBack) {
-					callBack();
-				}
-			}.bind(this)).catch(function(ex) {
-				console.log('parsing failed', ex)
-			})
-		;
+						if (this.state.mapMode.type == 'heatmap') {
+							this.renderHeatmap();
+						}
+					}.bind(this));
+
+					if (callBack) {
+						callBack();
+					}
+				}.bind(this)).catch(function(ex) {
+					console.log('parsing failed', ex)
+				})
+			;
+		}.bind(this));
 	}
 
 	getFeatureData(id) {
@@ -370,16 +383,24 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	renderHeatmap() {
+		console.log('renderHeatmap');
+
 		if (this.dataLayer) {
 			this.refs.mapView.map.removeLayer(this.dataLayer);
 		}
 
 		var minValue = _.min(_.pluck(this.state.data, 'doc_count'));
-		var maxValue = _.max(_.pluck(this.state.data, 'doc_count'));
+		var maxValue = this.state.viewMode == 'relative' ? 
+				_.max(_.map(this.state.data, function(item) {
+					return item.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id);
+				}.bind(this))) :
+				this.state.viewMode == 'page_count' ?
+				_.max(_.pluck(this.state.data, 'page_count')) :
+				_.max(_.pluck(this.state.data, 'doc_count'));
 
 		this.dataLayer = L.heatLayer([], {
 			minOpacity: 0.35,
-			maxZoom: 4,
+			maxZoom: 0,
 			radius: 18,
 			max: maxValue,
 			blur: 15
@@ -388,7 +409,13 @@ export default class AdvancedMapView extends React.Component {
 		this.dataLayer.addTo(this.refs.mapView.map);
 
 		var latLngs = _.map(this.state.data, function(mapItem) {
-			return [mapItem.location[0], mapItem.location[1], Number(mapItem.doc_count)];
+			var intensity = this.state.viewMode == 'relative' ?
+				mapItem.doc_count/this.getTotal(this.state.mapMode.totalFieldName, mapItem.id) :
+				this.state.viewMode == 'page_count' ?
+				mapItem.page_count :
+				mapItem.doc_count;
+
+			return [mapItem.location[0], mapItem.location[1], Number(intensity)];
 		}.bind(this));
 
 		this.dataLayer.setLatLngs(latLngs);
@@ -405,6 +432,8 @@ export default class AdvancedMapView extends React.Component {
 				(
 					this.state.viewMode == 'relative' ?
 					feature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, feature.id) :
+					this.state.viewMode == 'page_count' ?
+					feature.page_count :
 					feature.doc_count
 				)
 			).hex() : null
@@ -427,8 +456,13 @@ export default class AdvancedMapView extends React.Component {
 			minValue = _.min(values);
 			maxValue = _.max(values);
 		}
+		if (this.state.viewMode == 'page_count') {
+			minValue = _.min(_.pluck(this.state.data, 'page_count'));
+			maxValue = _.max(_.pluck(this.state.data, 'page_count'));
+		}
 
-//		this.colorScale = chroma.scale(['#33f0c7', '#02ff00', '#f00']).domain([0, maxValue]);
+//		var colorScale = chroma.scale(['#02ff00', '#f00']).domain([0, maxValue]);
+//		var colorScale = chroma.scale('Spectral').domain([minValue, maxValue]);
 		var colorScale = chroma.scale('YlOrRd').domain([minValue, maxValue]);
 
 		return colorScale;
@@ -476,13 +510,19 @@ export default class AdvancedMapView extends React.Component {
 				an_riks: function(properties, zoom) {
 					var foundFeature = this.getFeatureData(properties.LANSNAMN);
 
+					var value = this.state.viewMode == 'relative' ? 
+						foundFeature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id) : 
+						this.state.viewMode == 'page_count' ?
+						foundFeature.page_count :
+						foundFeature.doc_count;
+
 					return {
 						weight: foundFeature ? 0.2 : 0,
 						color: '#000',
 						strokeOpacity: 0.5,
 						fill: Boolean(foundFeature),
 						fillOpacity: 0.8,
-						fillColor: foundFeature ? colorScale(this.state.viewMode == 'relative' ? foundFeature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id) : foundFeature.doc_count).hex() : null
+						fillColor: foundFeature ? colorScale(value).hex() : null
 					}
 				}.bind(this),
 				sverige_socken_wgs84: function(properties, zoom) {
@@ -536,7 +576,7 @@ export default class AdvancedMapView extends React.Component {
 		this.setState({
 			tooltip: {
 				title: featureName,
-				text: featureData ? featureData.doc_count+' (total '+this.getTotal(this.state.mapMode.totalFieldName, featureData.id)+')' : '',
+				text: featureData ? featureData.doc_count+' (total '+this.getTotal(this.state.mapMode.totalFieldName, featureData.id)+')' : '0',
 				x: event.originalEvent.x,
 				y: event.originalEvent.y
 			}
@@ -586,7 +626,7 @@ export default class AdvancedMapView extends React.Component {
 		return (
 			<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
 
-				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" scrollWheelZoom="true" onBaseLayerChange={this.baseLayerChangeHandler} />
+				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" scrollWheelZoom={false} onBaseLayerChange={this.baseLayerChangeHandler} />
 
 				{
 					this.state.mapMode.type == 'vectorgrid' &&
@@ -602,19 +642,21 @@ export default class AdvancedMapView extends React.Component {
 					</select>
 
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
-						<option value="absolute">absolute</option>
-						<option value="relative">relative</option>
+						<option value="absolute">Antal documenter</option>
+						<option value="relative">Antal documenter relativt till total documenter</option>
+						<option value="page_count">Antal sidor</option>
 					</select>
 
 				</div>
 
 				<div className="map-timeline-container" style={{opacity: this.state.data == null ? 0.4 : 1}}>
 
-					<CollectionYearsGraph ref="collectionYearsGraph" 
+					<CollectionYearsGraph name="mapCollectionGraph" ref="collectionYearsGraph" 
 						graphHeight="100" 
 						simpleGraph={true} 
 						listenForTimerangeChange={true}
-						defaultRangeSelectAction="onChange"
+						defaultRangeSelectAction="onChange" 
+						onlyGeography={true}
 						onChange={this.sliderGraphChangeHandler} />
 
 					<Slider ref="timerangeSlider" 
