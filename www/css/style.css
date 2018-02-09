@@ -224,7 +224,7 @@ input[type="submit"].button-primary:focus,
 input[type="reset"].button-primary:focus,
 input[type="button"].button-primary:focus {
   color: #FFF;
-  background-color: #d4454c;
+  background-color: #7a1222;
 }
 .button.button-gray,
 button.button-gray,
@@ -1912,8 +1912,6 @@ td .play-button {
   }
 }
 .popup-wrapper .popup-content-wrapper .page-content h2 {
-  padding-bottom: 30px;
-  border-bottom: 1px solid #d6d6d6;
   font-weight: normal;
 }
 .popup-wrapper .popup-content-wrapper .page-content h3 {
@@ -1970,7 +1968,7 @@ td .play-button {
   max-width: 150px;
 }
 .popup-wrapper .popup-content-wrapper .page-content .fb-share-button {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 @media print {
   .popup-wrapper .popup-content-wrapper .page-content .fb-share-button {
@@ -2797,6 +2795,9 @@ td .play-button {
   font-size: 0.9rem;
   color: #737373;
 }
+.graph-wrapper .graph-container.horizontal-scroll {
+  overflow-x: scroll;
+}
 .graph-wrapper .axis {
   font: 1.4rem;
 }
@@ -2834,15 +2835,17 @@ td .play-button {
 .graph-wrapper .arc path {
   stroke: #fff;
 }
-.graph-wrapper .graph-controls select {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-.graph-wrapper .graph-controls h3 {
+.graph-wrapper .graph-controls {
   position: absolute;
   top: 10px;
   left: 10px;
+  right: 10px;
+}
+.graph-wrapper .graph-controls select {
+  float: right;
+  margin-left: 10px;
+}
+.graph-wrapper .graph-controls h3 {
   margin: 10px 5px;
   color: #333;
   font-size: 1rem;
@@ -3232,6 +3235,7 @@ path.letter-path {
   position: absolute;
   padding: 15px;
   font-weight: bold;
+  white-space: nowrap;
 }
 .documents-list .item .header .highlight-content {
   position: absolute;
@@ -3338,15 +3342,14 @@ path.letter-path {
   border-bottom: none;
   white-space: nowrap;
 }
-.documents-list .highlight-table tr td.highlight-cell {
-  text-align: center;
+.documents-list .highlight-table tr td .highlight {
   font-weight: bold;
 }
 .documents-list .highlight-table tr td:first-child {
   text-align: right;
 }
-.documents-list .highlight-table tr td:nth-child(n+4) {
-  display: none;
+.documents-list .highlight-table tr td::nth-child(2) .highlight {
+  display: block;
 }
 .documents-list .loading-overlay {
   position: absolute;

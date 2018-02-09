@@ -21,7 +21,11 @@ export default class CategoriesGraph extends React.Component {
 			bottom: 30
 		};
 
+		this.barWidth = 30;
+
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
+		this.categoryTypeSelectChangeHandler = this.categoryTypeSelectChangeHandler.bind(this);
+
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 		this.barClickHandler = this.barClickHandler.bind(this);
 
@@ -31,6 +35,8 @@ export default class CategoriesGraph extends React.Component {
 			paramString: null,
 			data: [],
 			total: null,
+			originalData: [],
+			categoryTypes: [],
 
 			loading: false,
 
@@ -49,8 +55,8 @@ export default class CategoriesGraph extends React.Component {
 		this.setState({
 			graphContainerWidth: this.refs.container.clientWidth
 		}, function() {
-			this.renderGraphBase();
 		}.bind(this));
+		this.renderGraphBase();
 
 		if (window.eventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
@@ -98,6 +104,10 @@ export default class CategoriesGraph extends React.Component {
 		return _.findWhere(this.totalByCategoryArray, {key: category}).doc_count;
 	}
 
+	getCategoryName(category) {
+		return window.allCategories && _.findWhere(window.allCategories, {key: category}) ? _.findWhere(window.allCategories, {key: category}).name+' ('+_.findWhere(window.allCategories, {key: category}).type+')' : category;
+	}
+
 	fetchTotalCategories() {
 		fetch(config.apiUrl+config.endpoints.categories+'?'+paramsHelper.buildParamString(config.requiredApiParams))
 			.then(function(response) {
@@ -129,8 +139,12 @@ export default class CategoriesGraph extends React.Component {
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
+				var categoryTypes = json.data.length > 0 ? ['Alla'].concat(_.compact(_.uniq(_.pluck(json.data, 'type')))) : [];
+
 				this.setState({
+					categoryTypes: categoryTypes,
 					total: json.metadata.total,
+					originalData: json.data,
 					data: json.data,
 					loading: false
 				}, function() {
@@ -140,6 +154,22 @@ export default class CategoriesGraph extends React.Component {
 				console.log('parsing failed', ex)
 			})
 		;
+	}
+
+	categoryTypeSelectChangeHandler(event) {
+		if (this.state.originalData.length == 0) {
+			return;
+		}
+
+		var data = event.currentTarget.value == 'Alla' ? this.state.originalData : _.filter(this.state.originalData, function(item) {
+			return item.type == event.currentTarget.value;
+		});
+
+		this.setState({
+			data: data
+		}, function() {
+			this.renderGraph();
+		}.bind(this))
 	}
 
 	renderGraphBase() {
@@ -213,7 +243,7 @@ export default class CategoriesGraph extends React.Component {
 		var y = d3.scaleLinear()
 			.range([this.graphHeight, 0]);
 
-		
+
 		y.domain([0, d3.max(yRangeValues)]);
 
 		return y;
@@ -226,8 +256,10 @@ export default class CategoriesGraph extends React.Component {
 			return;
 		}
 
-		this.graphWidth = this.state.graphContainerWidth-this.graphMargins.left-this.graphMargins.right;
+		this.graphWidth = (this.state.data.length * this.barWidth < this.state.graphContainerWidth ? this.state.graphContainerWidth : this.state.data.length * this.barWidth)-this.graphMargins.left-this.graphMargins.right;
 		this.graphHeight = this.state.graphContainerHeight-this.graphMargins.top-this.graphMargins.bottom;
+
+		console.log('graphWidth: '+this.graphWidth);
 
 		var x = d3.scaleBand()
 			.rangeRound([0, this.graphWidth])
@@ -288,13 +320,15 @@ export default class CategoriesGraph extends React.Component {
 				return this.selectedBar && this.selectedBar != d.key ? 0.2 : 1;
 			}.bind(this))
 			.on('mousemove', function(d) {
+				console.log(d.key);
+
 				var total = this.getTotalByCategory(d.key);
 
 				this.tooltip
 					.style('left', d3.event.pageX + 20 + 'px')
 					.style('top', d3.event.pageY + 'px')
 					.style('display', 'inline-block')
-					.html((d.key != ' ' ? '<strong>'+d.key+'</strong>: ' : '')+categories.getCategoryName(d.key)+'<br/>'+d.doc_count+' (total '+total+')');
+					.html('<strong>'+this.getCategoryName(d.key)+'</strong>'+(d.key != ' ' ? ' ('+d.key+')' : '')+'<br/>'+d.doc_count+' (total '+total+')');
 			}.bind(this))
 			.on('mouseout', function(d) {
 				this.tooltip.style('display', 'none');
@@ -336,14 +370,14 @@ export default class CategoriesGraph extends React.Component {
 			this.selectedBar = null;
 		}
 		else {
-			this.selectedBar = event.key;	
+			this.selectedBar = event.key;
 
 			var bar = this.vis.select('.bar[data-key="'+event.key+'"]');
 
 			this.vis.selectAll('.bar:not([data-key="'+event.key+'"])')
 				.transition()
 				.duration(200)
-				.attr('opacity', 0.2);			
+				.attr('opacity', 0.2);
 
 			bar.transition()
 				.duration(200)
@@ -359,6 +393,10 @@ export default class CategoriesGraph extends React.Component {
 	}
 
 	render() {
+		var categoryTypeOptions = _.map(this.state.categoryTypes, function(type) {
+			return <option key={type} value={type}>{type}</option>;
+		})
+
 		return (
 			<div className={'graph-wrapper'+(this.state.loading ? ' loading' : '')} ref="container">
 
@@ -367,15 +405,24 @@ export default class CategoriesGraph extends React.Component {
 					<div className="total-number">Total: {this.state.total}</div>
 				}
 
-				<div className="graph-container">
-					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
+				<div className="graph-container horizontal-scroll">
+					<svg id={this.state.graphId} width={this.state.data.length > 0 ? (this.state.data.length * this.barWidth < this.state.graphContainerWidth ? this.state.graphContainerWidth : this.state.data.length * this.barWidth) : this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
 				</div>
 
 				<div className="graph-controls">
+
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
 						<option value="absolute">absolute</option>
 						<option value="relative">relative</option>
 					</select>
+
+					{
+						categoryTypeOptions.length > 0 &&
+						<select onChange={this.categoryTypeSelectChangeHandler}>
+							{categoryTypeOptions}
+						</select>
+					}
+
 				</div>
 
 				<div className="loading-overlay"></div>

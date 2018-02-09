@@ -54,7 +54,7 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
-			selectedTypes: ['arkiv', 'tryckt'],
+			selectedTypes: [],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
 			collectionYears: [this.sliderStartYear, this.sliderEndYear],
@@ -70,7 +70,8 @@ export default class SearchForm extends React.Component {
 			landskapInput: '',
 			geoBoundingBox: null,
 
-			searchOptions: '',
+			phraseSearchOptions: '',
+			rawTextSearch: false,
 
 			searchIndex: 0,
 			savedSearches: [],
@@ -246,7 +247,7 @@ export default class SearchForm extends React.Component {
 
 	componentDidMount() {
 		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
-		
+
 		L.Control.RemoveAll = L.Control.extend({
 			options: {
 				position: 'topleft',
@@ -455,9 +456,11 @@ export default class SearchForm extends React.Component {
 			params.geo_box = searchParams.geoBoundingBox.topLeft.lat+','+searchParams.geoBoundingBox.topLeft.lng+','+searchParams.geoBoundingBox.bottomRight.lat+','+searchParams.geoBoundingBox.bottomRight.lng;
 		}
 
-		if (searchParams.searchOptions != '') {
-			params.search_options = searchParams.searchOptions;
+		if (searchParams.rawTextSearch != '') {
+			params.search_raw = true;
 		}
+
+		params.phrase_options = this.state.phraseSearchOptions;
 
 		return params;
 	}
@@ -516,7 +519,7 @@ export default class SearchForm extends React.Component {
 
 		return (
 			<div className={'advanced-search-form fixed'+(this.state.expanded ? ' expanded' : '')+(this.state.hasFocus || !this.state.lastSearchParams ? ' has-focus' : '')}
-				onMouseEnter={this.mouseEnterHandler} 
+				onMouseEnter={this.mouseEnterHandler}
 				onMouseLeave={this.mouseLeaveHandler}>
 
 				<div className="container">
@@ -548,14 +551,14 @@ export default class SearchForm extends React.Component {
 								</div>
 
 								<div className="search-label" title={paramsHelper.describeParams(this.state.lastSearchParams, true, this.refs.categoryList ? this.refs.categoryList.state.data : null)} dangerouslySetInnerHTML={{__html: paramsHelper.describeParams(this.state.lastSearchParams, false, this.refs.categoryList ? this.refs.categoryList.state.data : null)}}></div>
-								<input name="searchInput" 
-									placeholder="Söksträng" 
-									className="search-input u-full-width" 
-									type="text" 
-									onChange={this.inputChangeHandler} 
-									onFocus={this.searchInputFocusHandler} 
-									onBlur={this.searchInputBlurHandler} 
-									onKeyPress={this.searchInputKeypressHandler} 
+								<input name="searchInput"
+									placeholder="Söksträng"
+									className="search-input u-full-width"
+									type="text"
+									onChange={this.inputChangeHandler}
+									onFocus={this.searchInputFocusHandler}
+									onBlur={this.searchInputBlurHandler}
+									onKeyPress={this.searchInputKeypressHandler}
 									value={this.state.searchInput} />
 
 								<button className="expand-button" onClick={this.expandButtonClickHandler}><span>...</span></button>
@@ -570,11 +573,19 @@ export default class SearchForm extends React.Component {
 
 					<div className="expanded-content">
 
+						<div className="radio-list-inline" style={{float: 'left'}}>
+							<label><input type="checked"
+								type="checkbox"
+								name="rawTextSearch"
+								checked={this.state.rawTextSearch}
+								onChange={this.inputChangeHandler} /> Raw text sökning</label>
+						</div>
+
 						<div className="radio-list-inline">
 							<div className="list-heading">Fras-sökning inställningar: </div>
-							<label><input type="radio" checked={this.state.searchOptions == ''} name="searchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
-							<label><input type="radio" checked={this.state.searchOptions == 'nearer'} name="searchOptions" onChange={this.inputChangeHandler} value="nearer" /> Närmare</label>
-							<label><input type="radio" checked={this.state.searchOptions == 'near'} name="searchOptions" onChange={this.inputChangeHandler} value="near" /> Nära</label>
+							<label><input type="radio" checked={this.state.phraseSearchOptions == ''} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
+							<label><input type="radio" checked={this.state.phraseSearchOptions == 'nearer'} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="nearer" /> Närmare</label>
+							<label><input type="radio" checked={this.state.phraseSearchOptions == 'near'} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="near" /> Nära</label>
 						</div>
 
 						<hr />
@@ -583,23 +594,23 @@ export default class SearchForm extends React.Component {
 
 							<div className="four columns">
 								<label>Terms:</label>
-								<AutocompleteInput inputName="termsInput" 
-									searchUrl={config.apiUrl+config.endpoints.terms_autocomplete+'?search=$s'} 
+								<AutocompleteInput inputName="termsInput"
+									searchUrl={config.apiUrl+config.endpoints.terms_autocomplete+'?search=$s'}
 									valueField="term"
-									inputClassName="u-full-width" 
-									onChange={this.inputChangeHandler} 
-									value={this.state.termsInput} 
+									inputClassName="u-full-width"
+									onChange={this.inputChangeHandler}
+									value={this.state.termsInput}
 									onEnter={this.triggerSearch}
 									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
 								<label>Titel terms:</label>
-								<AutocompleteInput inputName="titleTermsInput" 
-									searchUrl={config.apiUrl+config.endpoints.title_terms_autocomplete+'?search=$s'} 
-									valueField="term" 
-									inputClassName="u-full-width" 
-									onChange={this.inputChangeHandler} 
-									value={this.state.titleTermsInput} 
-									onEnter={this.triggerSearch} 
+								<AutocompleteInput inputName="titleTermsInput"
+									searchUrl={config.apiUrl+config.endpoints.title_terms_autocomplete+'?search=$s'}
+									valueField="term"
+									inputClassName="u-full-width"
+									onChange={this.inputChangeHandler}
+									value={this.state.titleTermsInput}
+									onEnter={this.triggerSearch}
 									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
 							</div>
@@ -607,21 +618,23 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Typ:</label>
 
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista']} 
-									selectedItems={this.state.selectedTypes} 
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista']}
+									selectedItems={this.state.selectedTypes}
 									onSelectionChange={this.typeListChangeHandler} />
 							</div>
 
 							<div className="four columns">
 								<label>Kategorier:</label>
 
-								<PopulatedCheckBoxList ref="categoryList" dataUrl={config.restApiUrl+'categories/'} 
-									filteredBy="type" 
-									valueField="category" 
-									labelField="name" 
-									labelFunction={function(item) {return item.category.toUpperCase()+': '+item.name+' ('+item.type+')'}}
-									selectedItems={this.state.selectedCategories} 
-									onSelectionChange={this.categoryListChangeHandler} />
+								<PopulatedCheckBoxList ref="categoryList" dataUrl={config.apiUrl+config.endpoints.categories}
+									filteredBy="type"
+									valueField="key"
+									labelField="name"
+									labelFunction={function(item) {return item.key.toUpperCase()+': '+item.name+' ('+item.type+')'}}
+									selectedItems={this.state.selectedCategories}
+									onSelectionChange={this.categoryListChangeHandler} onFetch={function(data) {
+										window.allCategories = data;
+									}.bind(this)} />
 
 							</div>
 
@@ -632,16 +645,16 @@ export default class SearchForm extends React.Component {
 						<div className="row">
 
 							<div className="six columns">
-								<label><input name="collectionYearsEnabled" 
-									onChange={this.inputChangeHandler} 
-									className="bottom-margin-0" 
-									type="checkbox" 
+								<label><input name="collectionYearsEnabled"
+									onChange={this.inputChangeHandler}
+									className="bottom-margin-0"
+									type="checkbox"
 									checked={this.state.collectionYearsEnabled} /> Uppteckningsår:</label>
-								<Slider inputName="collectionYears" 
-									start={[this.sliderStartYear, this.sliderEndYear]} 
-									enabled={this.state.collectionYearsEnabled} 
+								<Slider inputName="collectionYears"
+									start={[this.sliderStartYear, this.sliderEndYear]}
+									enabled={this.state.collectionYearsEnabled}
 									rangeMin={this.sliderStartYear}
-									rangeMax={this.sliderEndYear} 
+									rangeMax={this.sliderEndYear}
 									onChange={this.inputChangeHandler} />
 							</div>
 
@@ -659,33 +672,33 @@ export default class SearchForm extends React.Component {
 
 									<div className="six columns">
 										<label>Socken:</label>
-										<PopulatedSelect inputName="sockenInput" 
-											dataUrl={config.apiUrl+config.endpoints.socken} 
+										<PopulatedSelect inputName="sockenInput"
+											dataUrl={config.apiUrl+config.endpoints.socken}
 											valueField="name"
 											sortOptions="true"
-											inputClassName="u-full-width" 
-											onChange={this.inputChangeHandler} 
-											value={this.state.sockenInput} 
+											inputClassName="u-full-width"
+											onChange={this.inputChangeHandler}
+											value={this.state.sockenInput}
 											onEnter={this.triggerSearch}
 											listLabelFormatFunc={this.sockenAutocompleteFormatListLabel} />
 									</div>
 
 									<div className="six columns">
 										<label>Landskap:</label>
-										<PopulatedSelect inputName="landskapInput" 
-											dataUrl={config.apiUrl+config.endpoints.landskap} 
+										<PopulatedSelect inputName="landskapInput"
+											dataUrl={config.apiUrl+config.endpoints.landskap}
 											valueField="name"
 											sortOptions="true"
-											inputClassName="u-full-width" 
-											onChange={this.inputChangeHandler} 
-											value={this.state.landskapInput} 
+											inputClassName="u-full-width"
+											onChange={this.inputChangeHandler}
+											value={this.state.landskapInput}
 											onEnter={this.triggerSearch}
 											listLabelFormatFunc={this.landskapSelectFormatListLabel} />
 									</div>
 								</div>
 
 							</div>
-							
+
 						</div>
 
 						<hr />
@@ -698,12 +711,12 @@ export default class SearchForm extends React.Component {
 
 									<div className="eight columns">
 										<label>Upptecknare:</label>
-										<AutocompleteInput inputName="collectorNameInput" 
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c'} 
+										<AutocompleteInput inputName="collectorNameInput"
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c'}
 											valueField="name"
-											inputClassName="u-full-width" 
-											onChange={this.inputChangeHandler} 
-											value={this.state.collectorNameInput} 
+											inputClassName="u-full-width"
+											onChange={this.inputChangeHandler}
+											value={this.state.collectorNameInput}
 											onEnter={this.triggerSearch}
 											listLabelFormatFunc={this.personsAutocompleteFormatListLabel} />
 									</div>
@@ -722,17 +735,17 @@ export default class SearchForm extends React.Component {
 									</div>
 
 								</div>
-										
-								<label><input name="collectorsBirthYearsEnabled" 
-									onChange={this.inputChangeHandler} 
-									className="bottom-margin-0" 
-									type="checkbox" 
+
+								<label><input name="collectorsBirthYearsEnabled"
+									onChange={this.inputChangeHandler}
+									className="bottom-margin-0"
+									type="checkbox"
 									checked={this.state.collectorsBirthYearsEnabled} /> Födelseår, upptecknare:</label>
-								<Slider inputName="collectorsBirthYears" 
-									start={[this.sliderStartYear, this.sliderEndYear]} 
-									enabled={this.state.collectorsBirthYearsEnabled} 
+								<Slider inputName="collectorsBirthYears"
+									start={[this.sliderStartYear, this.sliderEndYear]}
+									enabled={this.state.collectorsBirthYearsEnabled}
 									rangeMin={this.sliderStartYear}
-									rangeMax={this.sliderEndYear} 
+									rangeMax={this.sliderEndYear}
 									onChange={this.inputChangeHandler} />
 
 							</div>
@@ -743,12 +756,12 @@ export default class SearchForm extends React.Component {
 
 									<div className="eight columns">
 										<label>Informant:</label>
-										<AutocompleteInput inputName="informantNameInput" 
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=i'} 
+										<AutocompleteInput inputName="informantNameInput"
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=i'}
 											valueField="name"
-											inputClassName="u-full-width" 
-											onChange={this.inputChangeHandler} 
-											value={this.state.informantNameInput} 
+											inputClassName="u-full-width"
+											onChange={this.inputChangeHandler}
+											value={this.state.informantNameInput}
 											onEnter={this.triggerSearch}
 											listLabelFormatFunc={this.personsAutocompleteFormatListLabel} />
 									</div>
@@ -768,20 +781,20 @@ export default class SearchForm extends React.Component {
 
 								</div>
 
-								<label><input name="informantsBirthYearsEnabled" 
-									onChange={this.inputChangeHandler} 
-									className="bottom-margin-0" 
-									type="checkbox" 
+								<label><input name="informantsBirthYearsEnabled"
+									onChange={this.inputChangeHandler}
+									className="bottom-margin-0"
+									type="checkbox"
 									checked={this.state.informantsBirthYearsEnabled} /> Födelseår, informant:</label>
-								<Slider inputName="informantsBirthYears" 
-									start={[this.sliderStartYear, this.sliderEndYear]} 
-									enabled={this.state.informantsBirthYearsEnabled} 
+								<Slider inputName="informantsBirthYears"
+									start={[this.sliderStartYear, this.sliderEndYear]}
+									enabled={this.state.informantsBirthYearsEnabled}
 									rangeMin={this.sliderStartYear}
-									rangeMax={this.sliderEndYear} 
+									rangeMax={this.sliderEndYear}
 									onChange={this.inputChangeHandler} />
 
 							</div>
-						
+
 						</div>
 
 					</div>

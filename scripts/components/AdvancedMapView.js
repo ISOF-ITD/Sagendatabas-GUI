@@ -177,9 +177,6 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	timerangeChangeHandler(event, data) {
-		console.log('timerangeChangeHandler');
-		console.log(data);
-
 		if (isFinite(data.min) && isFinite(data.max)) {
 			this.refs.timerangeSlider.slider.set([data.min, data.max]);
 
@@ -383,14 +380,12 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	renderHeatmap() {
-		console.log('renderHeatmap');
-
 		if (this.dataLayer) {
 			this.refs.mapView.map.removeLayer(this.dataLayer);
 		}
 
 		var minValue = _.min(_.pluck(this.state.data, 'doc_count'));
-		var maxValue = this.state.viewMode == 'relative' ? 
+		var maxValue = this.state.viewMode == 'relative' ?
 				_.max(_.map(this.state.data, function(item) {
 					return item.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id);
 				}.bind(this))) :
@@ -472,7 +467,7 @@ export default class AdvancedMapView extends React.Component {
 		if (!this.dataLayer.setFeatureStyle) {
 			this.renderVectorGrid();
 		}
-		else {		
+		else {
 			this.selectedPolygon = null;
 
 			var colorScale = this.getColorScale();
@@ -510,8 +505,8 @@ export default class AdvancedMapView extends React.Component {
 				an_riks: function(properties, zoom) {
 					var foundFeature = this.getFeatureData(properties.LANSNAMN);
 
-					var value = this.state.viewMode == 'relative' ? 
-						foundFeature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id) : 
+					var value = this.state.viewMode == 'relative' ?
+						foundFeature.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id) :
 						this.state.viewMode == 'page_count' ?
 						foundFeature.page_count :
 						foundFeature.doc_count;
@@ -567,7 +562,7 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	vectorGridMouseMove(event) {
-		var featureName = this.state.mapMode.name == 'county' ? event.layer.properties.LANSNAMN : 
+		var featureName = this.state.mapMode.name == 'county' ? event.layer.properties.LANSNAMN :
 			this.state.mapMode.name == 'socken' ? event.layer.properties.SnSt_Namn : '';
 		var featureId = event.layer.properties[this.state.mapMode.idField];
 
@@ -651,21 +646,21 @@ export default class AdvancedMapView extends React.Component {
 
 				<div className="map-timeline-container" style={{opacity: this.state.data == null ? 0.4 : 1}}>
 
-					<CollectionYearsGraph name="mapCollectionGraph" ref="collectionYearsGraph" 
-						graphHeight="100" 
-						simpleGraph={true} 
+					<CollectionYearsGraph name="mapCollectionGraph" ref="collectionYearsGraph"
+						graphHeight="100"
+						simpleGraph={true}
 						listenForTimerangeChange={true}
-						defaultRangeSelectAction="onChange" 
+						defaultRangeSelectAction="onChange"
 						onlyGeography={true}
 						onChange={this.sliderGraphChangeHandler} />
 
-					<Slider ref="timerangeSlider" 
-						inputName="collectionYears" 
+					<Slider ref="timerangeSlider"
+						inputName="collectionYears"
 						enabled={this.state.data != null}
-						start={[this.state.sliderStartYear, this.state.sliderEndYear]} 
-						rangeMin={this.state.sliderStartYear} 
+						start={[this.state.sliderStartYear, this.state.sliderEndYear]}
+						rangeMin={this.state.sliderStartYear}
 						rangeMax={this.state.sliderEndYear}
-						onChange={this.timerangeSliderSlideHandler} 
+						onChange={this.timerangeSliderSlideHandler}
 						onSlide={this.timerangeSliderSlideHandler} />
 				</div>
 

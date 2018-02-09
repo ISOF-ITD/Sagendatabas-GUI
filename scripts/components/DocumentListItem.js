@@ -49,11 +49,11 @@ export default class DocumentListItem extends React.Component {
 							{this.state.data._source.year}
 							<span className="prop">{this.state.data._source.materialtype}</span>
 							{
-								this.state.data._source.taxonomy && this.state.data._source.taxonomy.category && 
+								this.state.data._source.taxonomy && this.state.data._source.taxonomy.category &&
 								<span className="prop">{this.state.data._source.taxonomy.category+': '+this.state.data._source.taxonomy.name}</span>
 							}
 							{
-								this.props.displayScore && 
+								this.props.displayScore &&
 								<span className="prop"><div className="score-view">&nbsp;<span className="score" style={{width: this.state.data._score+'%'}}></span></div></span>
 							}
 						</span>
@@ -65,7 +65,9 @@ export default class DocumentListItem extends React.Component {
 				<div className="content">
 					{
 						this.state.data &&
-						<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html: this.state.data.highlight ? this.state.data.highlight.text[0] : this.state.data._source.text}}></p>
+						<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html:
+								this.state.data.highlight ? (this.state.data.highlight['text.raw'] ? this.state.data.highlight['text.raw'][0] : this.state.data.highlight.text[0]) : this.state.data._source.text
+						}}></p>
 					}
 					<a className="button" href={'#/'+(this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/document/'+this.state.data._id}>Visa</a>
 				</div>

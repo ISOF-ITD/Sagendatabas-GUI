@@ -23,7 +23,7 @@ export default {
 		}
 
 		var getCategoryName = function(category) {
-			return category+': '+_.findWhere(allCategories, {category: category}).name;
+			return allCategories ? category+': '+_.findWhere(allCategories, {category: category}).name : category;
 		}
 
 		if (params) {
@@ -94,7 +94,7 @@ export default {
 			if (params.informant && params.informant != '') {
 				searchTerms.push('Informant: '+formatParam(params.informant));
 			}
-			
+
 			if (params.gender && params.gender != '') {
 				searchTerms.push('Kön: '+formatParam((params.gender == 'female' ? 'kvinnor' : params.gender == 'male' ? 'män' : params.gender == 'unknown' ? 'okänt' : '')));
 			}

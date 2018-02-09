@@ -13,6 +13,8 @@ export default class BirthYearsGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
+		window.birthYearsGraph = this;
+
 		this.roleLabels = {
 			i: 'Informanter',
 			c: 'Upptecknare',
@@ -166,11 +168,11 @@ export default class BirthYearsGraph extends React.Component {
 				var data = {};
 
 				for (var item in json.data) {
-					var dataItems = json.data[item];
+					var dataItems = [];
 
 					for (var i = config.minYear; i<config.maxYear; i++) {
-						var dataItem = _.find(json.data[item], function(item) {
-							return item.year == i;
+						var dataItem = _.find(json.data[item], function(jsonItem) {
+							return jsonItem.year == i;
 						});
 
 						dataItems.push(dataItem ? dataItem : {
@@ -363,7 +365,7 @@ export default class BirthYearsGraph extends React.Component {
 				.transition()
 				.duration(disableAnimation ? 0 : 1000)
 				.attr('d', lineValue);
-			
+
 		}.bind(this);
 
 		this.axisMarker = this.vis.append('line')
@@ -515,7 +517,7 @@ export default class BirthYearsGraph extends React.Component {
 				.attr('width', this.xRange(Number(values[1])-0.2)-this.xRange(Number(values[0])+0.2))
 				.transition()
 				.duration(100)
-				.style('opacity', 0.1);			
+				.style('opacity', 0.1);
 		}
 	}
 

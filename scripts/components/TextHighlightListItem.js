@@ -36,9 +36,36 @@ export default class TextHighlightListItem extends React.Component {
 		hashHistory.push((this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/document/'+this.state.data._id)
 	}
 
+	formatHtml(html) {
+		var el = document.createElement('tr');
+		el.innerHTML = html;
+
+		var maxFirstLineLength = 80;
+
+		var cells = [];
+		var lastCell = '';
+
+		_.each(el.children, function(child, index) {
+			if (index < 2) {
+				cells.push('<td>'+(index == 0 && child.innerHTML.length > maxFirstLineLength ? '...'+child.innerHTML.substr(0, maxFirstLineLength) : child.innerHTML)+'</td>');
+			}
+			else {
+				lastCell += child.innerHTML;
+			}
+		});
+
+		cells.push('<td>'+lastCell+'</td>');
+
+		return cells.join('');
+	}
+
 	render() {
+		if (this.state.data) {
+			var html = this.formatHtml(this.state.data.highlight);
+		}
+
 		return this.state.data ? (
-			<tr onClick={this.itemClickHandler} dangerouslySetInnerHTML={{__html: this.state.data.highlight}} />
+			<tr onClick={this.itemClickHandler} dangerouslySetInnerHTML={{__html: html}} />
 		) : null;
 	}
 }

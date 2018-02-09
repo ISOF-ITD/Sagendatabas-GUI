@@ -192,7 +192,7 @@ export default class TermsGraph extends React.Component {
 		var y = d3.scaleLinear()
 			.range([this.graphHeight, 0]);
 
-		
+
 		y.domain([0, d3.max(yRangeValues)]);
 
 		return y;
@@ -307,14 +307,14 @@ export default class TermsGraph extends React.Component {
 			this.selectedBar = null;
 		}
 		else {
-			this.selectedBar = event.term;	
+			this.selectedBar = event.term;
 
 			var bar = this.vis.select('.bar[data-key="'+event.term+'"]');
 
 			this.vis.selectAll('.bar:not([data-key="'+event.term+'"])')
 				.transition()
 				.duration(200)
-				.attr('opacity', 0.2);			
+				.attr('opacity', 0.2);
 
 			bar.transition()
 				.duration(200)

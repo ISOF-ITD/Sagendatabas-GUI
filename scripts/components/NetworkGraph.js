@@ -37,6 +37,7 @@ export default class NetworkGraph extends React.Component {
 
 		this.state = {
 			paramString: null,
+			params: {},
 			data: null,
 			total: null,
 			selectedNodes: [],
@@ -53,7 +54,7 @@ export default class NetworkGraph extends React.Component {
 			vertices_size: this.props.vertices_size || 160,
 			sample_size: this.props.sample_size || 20000,
 			query_connections: false,
-			title_terms: false
+			terms_field: 'topics_10_10_graph'
 		};
 	}
 
@@ -94,7 +95,11 @@ export default class NetworkGraph extends React.Component {
 	}
 
 	searchHandler(event, data) {
-		this.fetchData(data.params);
+		this.setState({
+			params: data.params
+		}, function() {
+			this.fetchData(data.params);
+		}.bind(this))
 	}
 
 	fetchData(params) {
@@ -105,9 +110,7 @@ export default class NetworkGraph extends React.Component {
 		queryParams.min_doc_count = this.props.min_doc_count || 2;
 		queryParams.query_connections = this.state.query_connections;
 
-		if (this.state.title_terms) {
-			queryParams.terms_field = "title_topics_graph";
-		}
+		queryParams.terms_field = this.state.terms_field;
 
 		var paramString = paramsHelper.buildParamString(queryParams);
 
@@ -123,7 +126,7 @@ export default class NetworkGraph extends React.Component {
 		});
 
 		window.eventBus.dispatch('graph.filter', this, {
-			filter: this.props.filterField || 'terms',
+			filter: this.props.filterField || 'search',
 			value: null
 		});
 
@@ -202,10 +205,12 @@ export default class NetworkGraph extends React.Component {
 		}, function() {
 			if (window.eventBus) {
 				window.eventBus.dispatch('graph.filter', this, {
-					filter: this.props.filterField || 'terms',
-					value: this.state.selectedNodes.length == 0 ? null : this.props.filterField == 'person' ? _.map(this.state.selectedNodes, function(node) {
-						return node.split(': ')[1];
-					}).join(',') : this.state.selectedNodes.join(',')
+					filter: this.props.filterField || 'search',
+					value: this.state.selectedNodes.length == 0 ? null :
+						this.props.filterField == 'person' ? _.map(this.state.selectedNodes, function(node) {
+							return node.split(': ')[1];
+						}).join(',') :
+						(this.state.params.search ? this.state.params.search+' ' : '')+this.state.selectedNodes.join(' ')
 				});
 			}
 		}.bind(this));
@@ -381,7 +386,7 @@ export default class NetworkGraph extends React.Component {
 		}.bind(this));
 
 		this.node.on('click', this.graphNodeClickHandler);
-		
+
 		this.simulation
 			.nodes(this.state.data.vertices)
 			.on('tick', ticked.bind(this));
@@ -456,8 +461,8 @@ export default class NetworkGraph extends React.Component {
 
 	render() {
 		return (
-			<div className={'network-graph-wrapper'+(this.state.loading ? ' loading' : '')+(!this.state.data ? ' empty' : '')+(this.props.graphHeight ? ' static' : '')} 
-				style={this.props.graphHeight ? {height: Number(this.props.graphHeight)} : {}} 
+			<div className={'network-graph-wrapper'+(this.state.loading ? ' loading' : '')+(!this.state.data ? ' empty' : '')+(this.props.graphHeight ? ' static' : '')}
+				style={this.props.graphHeight ? {height: Number(this.props.graphHeight)} : {}}
 				ref="container">
 
 				<div className="graph-container">
@@ -475,23 +480,30 @@ export default class NetworkGraph extends React.Component {
 							</div>
 						}
 
-						<label><input name="title_terms" onChange={this.graphControlChangeHandler} type="checkbox" checked={this.state.title_terms} />Titel terms</label>
+						<label>Terms fält<br/>
+							<select name="terms_field" onChange={this.graphControlChangeHandler}>
+								<option>topics_10_10_graph</option>
+								<option>title_topics_10_10_graph</option>
+								<option>topics_2_5_graph</option>
+								<option>title_topics_2_5_graph</option>
+							</select>
+						</label>
 						<label><input name="query_connections" onChange={this.graphControlChangeHandler} type="checkbox" checked={this.state.query_connections} />query_connections</label>
 
 						<label>vertices_size:</label>
-						<Slider inputName="vertices_size" 
+						<Slider inputName="vertices_size"
 							rangeMin={5}
 							rangeMax={800}
 							start={[this.state.vertices_size]}
-							onChange={this.graphControlChangeHandler} 
+							onChange={this.graphControlChangeHandler}
 							enabled={true} />
 
 						<label>sample_size:</label>
-						<Slider inputName="sample_size" 
+						<Slider inputName="sample_size"
 							rangeMin={50}
 							rangeMax={50000}
 							start={[this.state.sample_size]}
-							onChange={this.graphControlChangeHandler} 
+							onChange={this.graphControlChangeHandler}
 							enabled={true} />
 					</div>
 				}

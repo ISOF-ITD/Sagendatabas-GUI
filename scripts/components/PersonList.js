@@ -72,7 +72,7 @@ export default class PersonList extends React.Component {
 
 	searchHandler(event, data) {
 		this.filters = {};
-		
+
 		this.setState({
 			params: data.params
 		}, function() {
@@ -93,10 +93,6 @@ export default class PersonList extends React.Component {
 		params = Object.assign({}, config.requiredApiParams, params);
 
 		var paramString = paramsHelper.buildParamString(params);
-
-		if (paramString == this.state.paramString && !force) {
-			return;
-		}
 
 		this.setState({
 			paramString: paramString,

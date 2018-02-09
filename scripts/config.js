@@ -1,6 +1,6 @@
 export default {
-//	apiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/',
-	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
+	apiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/',
+//	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
 
 	restApiUrl: 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/',
 
@@ -14,6 +14,7 @@ export default {
 		terms: 'terms/',
 		title_terms: 'title_terms/',
 		categories: 'categories/',
+		category_types: 'category_types/',
 		collection_years: 'collection_years/',
 		birth_years: 'birth_years/',
 		documents: 'documents/',

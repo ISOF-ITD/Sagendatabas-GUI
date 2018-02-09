@@ -19,7 +19,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		return (
 			<div className={'app-container'}>
 
-				<div className="search-form-container-yeaaah">{searchForm}</div>
+				<div className="search-form-container">{searchForm}</div>
 
 				{main}
 

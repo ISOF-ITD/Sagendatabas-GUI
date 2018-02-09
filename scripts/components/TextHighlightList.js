@@ -95,7 +95,7 @@ export default class TextHighlightList extends React.Component {
 
 	searchHandler(event, data) {
 		this.filters = {};
-		
+
 		this.setState({
 			params: data.params,
 			currentPage: 1
@@ -111,7 +111,7 @@ export default class TextHighlightList extends React.Component {
 			this.fetchData();
 		}.bind(this));
 	}
-	
+
 	prevPage() {
 		if (this.state.currentPage == 1) {
 			return;
@@ -193,11 +193,13 @@ export default class TextHighlightList extends React.Component {
 						</div>
 					}
 
-					<table className="highlight-table">
-						<tbody>
-							{documentItems}
-						</tbody>
-					</table>
+					<div style={{overflowX: 'scroll'}}>
+						<table className="highlight-table">
+							<tbody>
+								{documentItems}
+							</tbody>
+						</table>
+					</div>
 
 					{
 						this.state.total && this.state.total > 0 &&

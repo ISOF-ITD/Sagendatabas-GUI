@@ -108,7 +108,7 @@ export default class DocumentList extends React.Component {
 
 	searchHandler(event, data) {
 		this.filters = {};
-		
+
 		this.setState({
 			params: data.params,
 			currentPage: 1
@@ -124,7 +124,7 @@ export default class DocumentList extends React.Component {
 			this.fetchData();
 		}.bind(this));
 	}
-	
+
 	prevPage() {
 		if (this.state.currentPage == 1) {
 			return;
@@ -196,8 +196,8 @@ export default class DocumentList extends React.Component {
 							</DropdownMenu>
 
 							{
-								paramsHelper.describeParams(this.filters) != '' &&
-								<div className="heading-info" dangerouslySetInnerHTML={{__html: 'Filtrering: '+paramsHelper.describeParams(this.filters) }} />
+								paramsHelper.describeParams(this.filters, null, window.allCategories) != '' &&
+								<div className="heading-info" dangerouslySetInnerHTML={{__html: 'Filtrering: '+paramsHelper.describeParams(this.filters, null, window.allCategories) }} />
 							}
 						</div>
 					}

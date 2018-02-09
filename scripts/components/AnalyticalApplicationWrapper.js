@@ -6,6 +6,7 @@ import EventBus from 'eventbusjs';
 import TermsGraph from './TermsGraph';
 import CollectionYearsGraph from './CollectionYearsGraph';
 import CategoriesGraph from './CategoriesGraph';
+import CategoryTypesGraph from './CategoryTypesGraph';
 import BirthYearsGraph from './BirthYearsGraph';
 import DocumentList from './DocumentList';
 import PersonList from './PersonList';
@@ -81,6 +82,9 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="twelve columns">
 
 							<TabsContainer>
+								<Tab tabName="Huvudkategorier">
+									<CategoryTypesGraph graphHeight="300" />
+								</Tab>
 								<Tab tabName="Kategorier">
 									<CategoriesGraph graphHeight="300" />
 								</Tab>

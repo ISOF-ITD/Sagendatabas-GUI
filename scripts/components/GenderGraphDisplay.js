@@ -122,15 +122,7 @@ export default class GenderGraphDisplay extends React.Component {
 	render() {
 		var graphElements = [];
 
-		console.log('this.state.total:');
-		console.log(this.state.total);
-
 		for (var item in this.state.data) {
-			console.log('Total:');
-			console.log(this.state.total[item]);
-			console.log('Data:')
-			console.log(this.state.data[item]);
-
 			graphElements.push(<div key={item} className="four columns">
 				<GenderGraph label={this.roleLabels[item]} total={this.state.total[item]} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data[item] || []} />
 			</div>);
@@ -141,7 +133,7 @@ export default class GenderGraphDisplay extends React.Component {
 
 				<div className="graph-controls">
 					<h3>{this.props.title}</h3>
-					
+
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
 						<option value="absolute">absolute</option>
 						<option value="relative">relative</option>
@@ -153,7 +145,7 @@ export default class GenderGraphDisplay extends React.Component {
 					{graphElements}
 
 				</div>
-	
+
 			</div>
 		);
 	}

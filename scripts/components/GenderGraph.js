@@ -63,13 +63,9 @@ export default class GenderGraph extends React.Component {
 				viewMode: this.props.viewMode
 			};
 
-			console.log(this.props);
-
 			if (this.props.total && this.props.total.length > 0) {
 				stateObj.total = this.props.total;
 			}
-
-			console.log(stateObj);
 
 			this.setState(stateObj, function() {
 				this.renderGraph();
@@ -104,7 +100,6 @@ export default class GenderGraph extends React.Component {
 	}
 
 	getTotalByGender(gender) {
-		console.log(this.state.total);
 		return _.findWhere(this.state.total, {gender: gender}).person_count;
 	}
 
@@ -129,7 +124,7 @@ export default class GenderGraph extends React.Component {
 		var y = d3.scaleLinear()
 			.range([this.graphHeight, 0]);
 
-		
+
 		y.domain([0, d3.max(yRangeValues)]);
 
 		return y;
@@ -255,14 +250,14 @@ export default class GenderGraph extends React.Component {
 			this.selectedBar = null;
 		}
 		else {
-			this.selectedBar = event.gender;	
+			this.selectedBar = event.gender;
 
 			var bar = this.vis.select('.bar[data-key="'+event.gender+'"]');
 
 			this.vis.selectAll('.bar:not([data-key="'+event.gender+'"])')
 				.transition()
 				.duration(200)
-				.attr('opacity', 0.2);			
+				.attr('opacity', 0.2);
 
 			bar.transition()
 				.duration(200)
