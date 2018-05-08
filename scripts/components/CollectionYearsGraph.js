@@ -23,6 +23,7 @@ export default class CollectionYearsGraph extends React.Component {
 		this.viewModeSelectChangeHandler = this.viewModeSelectChangeHandler.bind(this);
 		this.windowResizeHandler = this.windowResizeHandler.bind(this);
 		this.timerangeChangeHandler = this.timerangeChangeHandler.bind(this);
+		this.fullScreenButtonClickHandler = this.fullScreenButtonClickHandler.bind(this);
 
 		this.searchHandler = this.searchHandler.bind(this);
 
@@ -37,6 +38,7 @@ export default class CollectionYearsGraph extends React.Component {
 			loading: false,
 
 			viewMode: 'absolute',
+			fullScreen: false,
 
 			graphContainerWidth: 800,
 			graphContainerHeight: this.props.graphHeight || 400,
@@ -61,6 +63,12 @@ export default class CollectionYearsGraph extends React.Component {
 		}
 
 		window.addEventListener('resize', this.windowResizeHandler);
+	}
+
+	fullScreenButtonClickHandler() {
+		this.setState({
+			fullScreen: !this.state.fullScreen
+		});
 	}
 
 	componentWillUnmount() {
@@ -511,7 +519,7 @@ export default class CollectionYearsGraph extends React.Component {
 
 	render() {
 		return (
-			<div className={'graph-wrapper disable-component-frame'+(this.state.loading ? ' loading' : '')} ref="container">
+			<div className={'graph-wrapper disable-component-frame'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} ref="container">
 
 				<div className="graph-container">
 					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
@@ -521,6 +529,8 @@ export default class CollectionYearsGraph extends React.Component {
 					!this.props.simpleGraph &&
 					<div className="graph-controls">
 						<h3>{this.props.title}</h3>
+
+						<a onClick={this.fullScreenButtonClickHandler}>Fullskärm</a>
 
 						<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
 							<option value="absolute">absolute</option>

@@ -39,12 +39,15 @@ export default class AdvancedMapView extends React.Component {
 		this.sliderGraphChangeHandler = this.sliderGraphChangeHandler.bind(this);
 
 		this.timerangeSliderSlideHandler = this.timerangeSliderSlideHandler.bind(this);
+		this.inputChangeHandler = this.inputChangeHandler.bind(this);
+
 		this.fullScreenButtonClickHandler = this.fullScreenButtonClickHandler.bind(this);
 
 		this.mapModes = [
 			{
 				label: 'Polygoner',
 				name: 'socken',
+				filterField: 'socken',
 				totalFieldName: 'socken',
 				idField: 'SnSt_Id',
 				endpoint: config.endpoints.socken,
@@ -63,9 +66,18 @@ export default class AdvancedMapView extends React.Component {
 			{
 				label: 'Heatmap',
 				name: 'heatmap',
+				filterField: 'socken',
 				totalFieldName: 'socken',
 				endpoint: config.endpoints.socken,
 				type: 'heatmap'
+			},
+			{
+				label: 'Cirklar',
+				name: 'circles',
+				filterField: 'socken',
+				totalFieldName: 'socken',
+				endpoint: config.endpoints.socken,
+				type: 'circles'
 			}
 		];
 
@@ -84,6 +96,7 @@ export default class AdvancedMapView extends React.Component {
 			sliderStartYear: config.minYear,
 			sliderEndYear: config.maxYear,
 			fullScreen: false,
+			limitMapToPeriod: false,
 			tooltip: {
 				title: '',
 				text: '',
@@ -189,6 +202,19 @@ export default class AdvancedMapView extends React.Component {
 		}
 	}
 
+	inputChangeHandler(event) {
+		var targetName = event.target.name;
+		var value = event.target.type && event.target.type == 'checkbox' ? event.target.checked : event.target.value;
+
+		this.setState({
+			[targetName]: value
+		}, function() {
+			if (targetName == 'limitMapToPeriod') {
+				this.limitMapToPeriodChange();
+			}
+		});
+	}
+
 	mapDrawLayerCreatedHandler(event) {
 		var layer = event.layer;
 
@@ -221,6 +247,10 @@ export default class AdvancedMapView extends React.Component {
 		}.bind(this));
 	}
 
+	limitMapToPeriodChange() {
+		this.fetchData(true);
+	}
+
 	timerangeSliderSlideHandler(event) {
 		// Väntar tills vi har laddad data
 		if (this.waitingForSlider) {
@@ -236,9 +266,11 @@ export default class AdvancedMapView extends React.Component {
 		this.setState({
 			params: params
 		}, function() {
-			this.fetchData(false, function() {
-				this.waitingForSlider = false;
-			}.bind(this));
+			if (this.state.limitMapToPeriod) {
+				this.fetchData(false, function() {
+					this.waitingForSlider = false;
+				}.bind(this));
+			}
 		}.bind(this));
 
 		setTimeout(function() {
@@ -268,6 +300,9 @@ export default class AdvancedMapView extends React.Component {
 			}
 			if (this.state.mapMode.type == 'heatmap') {
 				this.renderHeatmap();
+			}
+			if (this.state.mapMode.type == 'circles') {
+				this.renderCircleLayer();
 			}
 		}.bind(this));
 
@@ -324,9 +359,15 @@ export default class AdvancedMapView extends React.Component {
 			return;
 		}
 
+		var params = JSON.parse(JSON.stringify(this.state.params));
+
+		if (!this.state.limitMapToPeriod && params.collection_years) {
+			delete params.collection_years;
+		}
+
 		this.drawLayer.clearLayers();
 
-		var params = Object.assign({}, config.requiredApiParams, this.state.params);
+		params = Object.assign({}, config.requiredApiParams, params);
 
 		var paramString = paramsHelper.buildParamString(params);
 
@@ -352,7 +393,6 @@ export default class AdvancedMapView extends React.Component {
 					this.setState({
 						total: json.metadata.total,
 						data: json.data,
-	//					loading: false
 					}, function() {
 						if (this.state.mapMode.type == 'vectorgrid') {
 							this.updateVectorGrid();
@@ -360,6 +400,10 @@ export default class AdvancedMapView extends React.Component {
 
 						if (this.state.mapMode.type == 'heatmap') {
 							this.renderHeatmap();
+						}
+
+						if (this.state.mapMode.type == 'circles') {
+							this.renderCircleLayer();
 						}
 					}.bind(this));
 
@@ -414,6 +458,54 @@ export default class AdvancedMapView extends React.Component {
 		}.bind(this));
 
 		this.dataLayer.setLatLngs(latLngs);
+	}
+
+	renderCircleLayer() {
+		if (this.dataLayer) {
+			this.refs.mapView.map.removeLayer(this.dataLayer);
+		}
+
+		var minValue = _.min(_.pluck(this.state.data, 'doc_count'));
+		var maxValue = this.state.viewMode == 'relative' ?
+				_.max(_.map(this.state.data, function(item) {
+					return item.doc_count/this.getTotal(this.state.mapMode.totalFieldName, item.id);
+				}.bind(this))) :
+				this.state.viewMode == 'page_count' ?
+				_.max(_.pluck(this.state.data, 'page_count')) :
+				_.max(_.pluck(this.state.data, 'doc_count'));
+
+		this.dataLayer = L.featureGroup();
+
+		this.dataLayer.addTo(this.refs.mapView.map);
+
+		_.each(this.state.data, function(mapItem) {
+			if (mapItem.location.length > 0) {
+				var sizeValue = this.state.viewMode == 'relative' ?
+					mapItem.doc_count/this.getTotal(this.state.mapMode.totalFieldName, mapItem.id) :
+					this.state.viewMode == 'page_count' ?
+					mapItem.page_count :
+					mapItem.doc_count;
+
+				var marker = L.circleMarker(mapItem.location, {
+					radius: ((sizeValue/maxValue)*20)+2,
+					fillColor: "#047bff",
+					fillOpacity: 0.4,
+					color: '#000',
+					weight: 0.8,
+					sockenObj: mapItem
+				});
+
+				marker.on('click', function(event) {
+					console.log(event);
+					window.eventBus.dispatch('graph.filter', this, {
+						filter: this.state.mapMode.filterField,
+						value: event.target.options.sockenObj.name
+					});
+				}.bind(this));
+
+				this.dataLayer.addLayer(marker);
+			}
+		}.bind(this));
 	}
 
 	createVectorStyle(feature, selected) {
@@ -608,7 +700,7 @@ export default class AdvancedMapView extends React.Component {
 		}
 
 		window.eventBus.dispatch('graph.filter', this, {
-			filter: this.state.mapMode.name,
+			filter: this.state.mapMode.filterField,
 			value: this.selectedPolygon
 		});
 	}
@@ -621,14 +713,14 @@ export default class AdvancedMapView extends React.Component {
 		return (
 			<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
 
-				<MapBase ref="mapView" className="map-container" disableSwedenMap="true" scrollWheelZoom={false} onBaseLayerChange={this.baseLayerChangeHandler} />
+				<MapBase ref="mapView" className="map-container" disableLocateControl={true} disableSwedenMap={true} scrollWheelZoom={false} onBaseLayerChange={this.baseLayerChangeHandler} />
 
 				{
 					this.state.mapMode.type == 'vectorgrid' &&
 					<ColorLegendsGraph colorScale={this.state.colorScale} />
 				}
 
-				<div className="map-controls">
+				<div className="map-controls graph-controls">
 
 					<a onClick={this.fullScreenButtonClickHandler}>Fullskärm</a>
 
@@ -646,6 +738,10 @@ export default class AdvancedMapView extends React.Component {
 
 				<div className="map-timeline-container" style={{opacity: this.state.data == null ? 0.4 : 1}}>
 
+					<div style={{position: 'relative', float: 'right', marginTop: 10, marginRight: 10, zIndex: 10}}>
+						<label><input type="checkbox" name="limitMapToPeriod" checked={this.state.limitMapToPeriod} onChange={this.inputChangeHandler} /> Begränsa kartvy till en period</label>
+					</div>
+
 					<CollectionYearsGraph name="mapCollectionGraph" ref="collectionYearsGraph"
 						graphHeight="100"
 						simpleGraph={true}
@@ -656,7 +752,7 @@ export default class AdvancedMapView extends React.Component {
 
 					<Slider ref="timerangeSlider"
 						inputName="collectionYears"
-						enabled={this.state.data != null}
+						enabled={this.state.data != null && this.state.limitMapToPeriod}
 						start={[this.state.sliderStartYear, this.state.sliderEndYear]}
 						rangeMin={this.state.sliderStartYear}
 						rangeMax={this.state.sliderEndYear}
@@ -667,8 +763,10 @@ export default class AdvancedMapView extends React.Component {
 				<div className="loading-overlay"></div>
 
 				<div style={{top: this.state.tooltip.y+20, left: this.state.tooltip.x+20}} className={'graph-tooltip position-fixed'+(this.state.tooltip.title != '' && this.state.tooltip.text ? ' visible' : '')}>
+
 					<strong>{this.state.tooltip.title}</strong><br/>
 					<span dangerouslySetInnerHTML={{__html: this.state.tooltip.text}}></span>
+
 				</div>
 
 			</div>

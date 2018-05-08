@@ -61,6 +61,7 @@ export default class TextHighlightListItem extends React.Component {
 
 	render() {
 		if (this.state.data) {
+			// Formatera html så att <table> elementet ser bra ut, vi vill att första markerade orden syns i samma kolumn
 			var html = this.formatHtml(this.state.data.highlight);
 		}
 

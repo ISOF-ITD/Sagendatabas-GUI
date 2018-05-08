@@ -23,7 +23,7 @@ export default {
 		}
 
 		var getCategoryName = function(category) {
-			return allCategories ? category+': '+_.findWhere(allCategories, {category: category}).name : category;
+			return allCategories && _.findWhere(allCategories, {category: category}) ? category+': '+_.findWhere(allCategories, {category: category}).name : category;
 		}
 
 		if (params) {

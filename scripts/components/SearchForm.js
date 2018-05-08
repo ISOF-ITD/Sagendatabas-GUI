@@ -28,7 +28,6 @@ export default class SearchForm extends React.Component {
 		this.inputChangeHandler = this.inputChangeHandler.bind(this);
 		this.typeListChangeHandler = this.typeListChangeHandler.bind(this);
 		this.categoryListChangeHandler = this.categoryListChangeHandler.bind(this);
-		this.collectionYearSliderChangeHandler = this.collectionYearSliderChangeHandler.bind(this);
 
 		this.expandButtonClickHandler = this.expandButtonClickHandler.bind(this);
 		this.mouseEnterHandler = this.mouseEnterHandler.bind(this);
@@ -50,6 +49,7 @@ export default class SearchForm extends React.Component {
 		this.sliderStartYear = config.minYear;
 		this.sliderEndYear = config.maxYear;
 
+		// Förberedar state objectet som innehåller alla sökparams
 		this.state = {
 			searchInput: '',
 			termsInput: '',
@@ -84,7 +84,8 @@ export default class SearchForm extends React.Component {
 		};
 	}
 
-	getCurrentSearch() {
+	// Get nuvarande sökparams, använder JSON.parse(JSON.stringify()) för att klona objektet
+ 	getCurrentSearch() {
 		return JSON.parse(JSON.stringify({
 			searchInput: this.state.searchInput || '',
 			termsInput: this.state.termsInput || '',
@@ -110,18 +111,25 @@ export default class SearchForm extends React.Component {
 	}
 
 	setSearch(index, discardCurrentSearch) {
+		// Byter till en sparade sökning
+
+		// Hämtar nuvarande sökparams
 		var currentSearch = this.getCurrentSearch();
 
+		// Hämtar sparade sökningar
 		var savedSearches = this.state.savedSearches;
 
+		// Uppdaterar nuvarande sökning till savedSearches
 		if (savedSearches[this.state.searchIndex] && !discardCurrentSearch) {
 			savedSearches[this.state.searchIndex] = currentSearch;
 		}
 
+		// Hämtar sparade sökning utifrån index (index av savedSearches)
 		if (savedSearches[index]) {
 			currentSearch = savedSearches[index];
 		}
 
+		// Uppdaterar state objektet med hämtade sökningen
 		this.setState({
 			searchInput: currentSearch.searchInput,
 			termsInput: currentSearch.termsInput,
@@ -150,10 +158,15 @@ export default class SearchForm extends React.Component {
 	}
 
 	addSearch() {
+		// Lägger till en ny sökning som visas som en tabb ovanför sökfältet
+
+		// Sparar nuvarande sökning till ett objekt
 		var currentSearch = this.getCurrentSearch();
 
+		// Hämtar alla sparade sökningar
 		var savedSearches = this.state.savedSearches;
 
+		// Lägger nuvarande sökning (currentSearch) till savedSearches
 		if (savedSearches[this.state.searchIndex]) {
 			savedSearches[this.state.searchIndex] = currentSearch;
 		}
@@ -161,6 +174,7 @@ export default class SearchForm extends React.Component {
 			savedSearches.push(currentSearch);
 		}
 
+		// Lägger till en ny 'tom' sökning till savedSearches
 		savedSearches.push({
 			searchInput: '',
 			termsInput: '',
@@ -184,6 +198,7 @@ export default class SearchForm extends React.Component {
 			newSearch: true
 		});
 
+		// Sparar state objected med ny 'tom' sökning samt uppdaterad savedSearches objekt
 		this.setState({
 			searchInput: '',
 			termsInput: '',
@@ -212,31 +227,40 @@ export default class SearchForm extends React.Component {
 	}
 
 	addSearchClickHandler() {
+		// Lägger till ny sökning som en tabb ovanför sökfältet
 		this.addSearch();
 	}
 
 	searchTabClickHandler(event) {
+		// Byter till en annan sökning med att klicka på en tabb
 		if (event.currentTarget.dataset.index != this.state.searchIndex) {
 			this.setSearch(event.currentTarget.dataset.index);
 		}
 	}
 
 	tabCloseButtonClickHandler(event) {
+		// Stänger ner en sökning och raderar den från savedSearches
+
 		event.stopPropagation();
 
+		// Hämtar tabIndex = vilken tabb man klickade på
 		var tabIndex = event.currentTarget.dataset.index;
 
 		var savedSearches = this.state.savedSearches;
 		var searchIndex = this.state.searchIndex;
 
+		// Raderar sökningen från savedSearches
 		savedSearches.splice(tabIndex, 1);
 
+		// Uppdaterar searchIndex
 		searchIndex = searchIndex == 0 ? searchIndex : searchIndex >= tabIndex ? searchIndex-1 : searchIndex;
 
+		// Sparar state objektet
 		this.setState({
 			savedSearches: savedSearches,
 			searchIndex: searchIndex
 		}, function() {
+			// När state har sparas, hämtar ny sökning från searchIndex utifrån ny searchIndex
 			this.setSearch(searchIndex, true);
 		}.bind(this));
 	}
@@ -246,8 +270,14 @@ export default class SearchForm extends React.Component {
 	}
 
 	componentDidMount() {
-		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
+		// Förberedar gränsnittet när komponentet är redo i DOM
 
+		/*
+		Gränsnitt för kartan i sökformuläret
+		Kartan gör att man kan rita en reklangel för att söka bara inom det området
+		Här lägger vi till ny controls till Leaflet för att kunna rita och ta bort ritad reklangle
+		*/
+		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
 		L.Control.RemoveAll = L.Control.extend({
 			options: {
 				position: 'topleft',
@@ -272,7 +302,6 @@ export default class SearchForm extends React.Component {
 				return controlDiv;
 			}.bind(this)
 		});
-
 		var removeAllControl = new L.Control.RemoveAll();
 
 		this.drawLayer = new L.FeatureGroup();
@@ -290,6 +319,7 @@ export default class SearchForm extends React.Component {
 		this.refs.mapView.map.addControl(drawControl);
 		this.refs.mapView.map.addControl(removeAllControl);
 
+		// Anropar mapDrawLayerCreatedHandler när vi har ritat en rektangle
 		this.refs.mapView.map.on(L.Draw.Event.CREATED, this.mapDrawLayerCreatedHandler);
 
 		this.refs.mapView.map.on(L.Draw.Event.DRAWSTART, function(event) {
@@ -298,6 +328,7 @@ export default class SearchForm extends React.Component {
 	}
 
 	mapDrawLayerCreatedHandler(event) {
+		// Sparar geografiska gränser av rektangel som har ritas som sökparam i state objektet
 		var layer = event.layer;
 
 		this.drawLayer.addLayer(layer);
@@ -317,6 +348,11 @@ export default class SearchForm extends React.Component {
 	}
 
 	inputChangeHandler(event) {
+		/*
+		En input change handler för alla sökfält, sparar sökfältets värde till ett värde i state objektet
+		som har samma namn som sökfältet.
+		Exempel: <input type="text" name="search" /> sparas till 'state.search'
+		*/
 		var value = event.target.type && event.target.type == 'checkbox' ? event.target.checked : event.target.value;
 
 		this.setState({
@@ -325,6 +361,7 @@ export default class SearchForm extends React.Component {
 	}
 
 	searchInputFocusHandler() {
+		// Expanderar sökformuläret när searchInput fältet får fokus
 		this.setState({
 			hasFocus: true,
 			expanded: true
@@ -338,17 +375,16 @@ export default class SearchForm extends React.Component {
 	}
 
 	mouseEnterHandler() {
-/*
-		this.setState({
-			expanded: true
-		});
-*/
 		if (this.mouseIdleTimer) {
 			clearTimeout(this.mouseIdleTimer);
 		}
 	}
 
 	mouseLeaveHandler() {
+		/*
+		När musen lämnar sökformuläret vänter vi i en sekund, om musen inte kommer tillbaka förminskar vi
+		sökformuläret (mouseIdleHandler)
+		*/
 		if (!this.state.hasFocus) {
 			this.mouseIdleTimer = setTimeout(this.mouseIdleHandler.bind(this), 1000);
 		}
@@ -361,12 +397,14 @@ export default class SearchForm extends React.Component {
 	}
 
 	typeListChangeHandler(event) {
+		// Uppdaterar state objektet med ny materialtyp som man har valt i materialtyp fältet
 		this.setState({
 			selectedTypes: event
 		});
 	}
 
 	categoryListChangeHandler(event) {
+		// Uppdaterar state objektet med ny kategori som man har valt i kategori fältet
 		this.setState({
 			selectedCategories: event
 		});
@@ -379,19 +417,14 @@ export default class SearchForm extends React.Component {
 	}
 
 	searchInputKeypressHandler(event) {
+		// Utför sökning när man trycker på enter i sökfältet
 		if (event.key == 'Enter') {
 			this.triggerSearch();
 		}
 	}
 
-	collectionYearSliderChangeHandler(event) {
-		this.setState({
-			collectionYearFrom: Math.round(event[0]),
-			collectionYearTo: Math.round(event[1])
-		});
-	}
-
 	buildParams(searchParams) {
+		// Bygger upp och förberedar parametrar som ska skickas via eventBus till visualiserings komponenter
 		var params = {};
 
 		searchParams = searchParams || this.state;
@@ -466,10 +499,13 @@ export default class SearchForm extends React.Component {
 	}
 
 	triggerSearch() {
+		/*
+		Utför ny sökning
+		*/
+
+		// Hämtar nuvarande sökparams och sparar i savedSearches
 		var currentSearch = this.getCurrentSearch();
-
 		var savedSearches = this.state.savedSearches;
-
 		if (savedSearches[this.state.searchIndex]) {
 			savedSearches[this.state.searchIndex] = currentSearch;
 		}
@@ -479,19 +515,24 @@ export default class SearchForm extends React.Component {
 			savedSearches: savedSearches
 		});
 
+		// Checkar om eventBus finns
 		if (window.eventBus) {
+			// Förberedar parametrar som ska skickas
 			var params = this.buildParams();
 
+			// Skickar parametrar via eventBus till visualiserings komponenter
 			window.eventBus.dispatch('searchForm.search', this, {
 				params: params
 			});
 
+			// Sparar parametrarna till 'lastSearchParams' som används för att beskriva parametrara i gränsnittet som text
 			this.setState({
 				lastSearchParams: params
 			});
 		}
 	}
 
+	// Formatterings funktioner för Autocomplete och PopulatedSelect komponenterna
 	termsAutocompleteFormatListLabel(item) {
 		return item.term+' ('+item.doc_count+')';
 	}
@@ -509,7 +550,9 @@ export default class SearchForm extends React.Component {
 	}
 
 	render() {
+		// Bygger upp lista över html elements för söknings tabbarna
 		var searchTabs = this.state.savedSearches.length > 0 ? this.state.savedSearches.map(function(searchItem, index) {
+			// Beskriver sökparametrarna som text för visning i gränsnittet
 			var paramsDescription = searchItem.newSearch ? 'Ny sökning' : paramsHelper.describeParams(this.buildParams(searchItem), true, this.refs.categoryList ? this.refs.categoryList.state.data : null);
 
 			return <a key={index} onClick={this.searchTabClickHandler} data-index={index} className={'tab'+(index == this.state.searchIndex ? ' selected' : '')} title={paramsDescription}>{searchItem.newSearch ? 'Ny sökning' : (paramsDescription.length > 15 ? paramsDescription.substr(0, 15)+'...' : paramsDescription)}<span className="close-button" data-index={index} onClick={this.tabCloseButtonClickHandler}></span></a>
@@ -524,6 +567,7 @@ export default class SearchForm extends React.Component {
 
 				<div className="container">
 
+					{/* Meny för applicationen */}
 					<div className="main-menu">
 						<DropdownMenu ref="appMenu">
 							<nav className="app-nav">
@@ -543,6 +587,7 @@ export default class SearchForm extends React.Component {
 
 								<div className="search-tabs tabs-control">
 
+									{/* Tabbar för att byta mellan olika sökningar */}
 									<div className="tabs">
 										{searchTabs}
 										<a className="tab" onClick={this.addSearchClickHandler}>+</a>
@@ -550,6 +595,7 @@ export default class SearchForm extends React.Component {
 
 								</div>
 
+								{/* Sökfältet, först search-label som innehåller text beskrivning av sökningen */}
 								<div className="search-label" title={paramsHelper.describeParams(this.state.lastSearchParams, true, this.refs.categoryList ? this.refs.categoryList.state.data : null)} dangerouslySetInnerHTML={{__html: paramsHelper.describeParams(this.state.lastSearchParams, false, this.refs.categoryList ? this.refs.categoryList.state.data : null)}}></div>
 								<input name="searchInput"
 									placeholder="Söksträng"
@@ -561,11 +607,13 @@ export default class SearchForm extends React.Component {
 									onKeyPress={this.searchInputKeypressHandler}
 									value={this.state.searchInput} />
 
+								{/* Knapp som expanderar sökformuläret */}
 								<button className="expand-button" onClick={this.expandButtonClickHandler}><span>...</span></button>
 							</div>
 						</div>
 
 						<div className="two columns">
+							{/* Sökknappen */}
 							<button className="search-button button-primary u-pull-right u-full-width" onClick={this.triggerSearch}>Sök</button>
 						</div>
 
@@ -573,14 +621,15 @@ export default class SearchForm extends React.Component {
 
 					<div className="expanded-content">
 
+						{/* Inställningar för olika metoder av fritext sökning */}
 						<div className="radio-list-inline" style={{float: 'left'}}>
-							<label><input type="checked"
-								type="checkbox"
+							<label><input type="checkbox"
 								name="rawTextSearch"
 								checked={this.state.rawTextSearch}
 								onChange={this.inputChangeHandler} /> Raw text sökning</label>
 						</div>
 
+						{/* Inställningar för fras-sökning */}
 						<div className="radio-list-inline">
 							<div className="list-heading">Fras-sökning inställningar: </div>
 							<label><input type="radio" checked={this.state.phraseSearchOptions == ''} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
@@ -594,6 +643,7 @@ export default class SearchForm extends React.Component {
 
 							<div className="four columns">
 								<label>Terms:</label>
+								{/* AutocompleteInput för sökning av topic terms */}
 								<AutocompleteInput inputName="termsInput"
 									searchUrl={config.apiUrl+config.endpoints.terms_autocomplete+'?search=$s'}
 									valueField="term"
@@ -604,6 +654,7 @@ export default class SearchForm extends React.Component {
 									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
 								<label>Titel terms:</label>
+								{/* AutocompleteInput för sökning av titel topic terms */}
 								<AutocompleteInput inputName="titleTermsInput"
 									searchUrl={config.apiUrl+config.endpoints.title_terms_autocomplete+'?search=$s'}
 									valueField="term"
@@ -618,7 +669,8 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Typ:</label>
 
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista']}
+								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista', 'snd']}
 									selectedItems={this.state.selectedTypes}
 									onSelectionChange={this.typeListChangeHandler} />
 							</div>
@@ -626,6 +678,7 @@ export default class SearchForm extends React.Component {
 							<div className="four columns">
 								<label>Kategorier:</label>
 
+								{/* Filtrerad PopuplatedCheckBoxList som innehåller alla kategorier */}
 								<PopulatedCheckBoxList ref="categoryList" dataUrl={config.apiUrl+config.endpoints.categories}
 									filteredBy="type"
 									valueField="key"
@@ -650,6 +703,8 @@ export default class SearchForm extends React.Component {
 									className="bottom-margin-0"
 									type="checkbox"
 									checked={this.state.collectionYearsEnabled} /> Uppteckningsår:</label>
+
+								{/* Slider för uppteckningsår */}
 								<Slider inputName="collectionYears"
 									start={[this.sliderStartYear, this.sliderEndYear]}
 									enabled={this.state.collectionYearsEnabled}
@@ -660,6 +715,7 @@ export default class SearchForm extends React.Component {
 
 							<div className="six columns">
 								<label>Geografiskt område:</label>
+								{/* Karta var det är möjligt att rita en rektangel för att söka inom speciellt område */}
 								<DropdownMenu label="Välj område" dropdownHeight="350" dropdownWidth="400" onOpen={function() {
 									this.refs.mapView.invalidateSize();
 								}.bind(this)}>
@@ -672,6 +728,8 @@ export default class SearchForm extends React.Component {
 
 									<div className="six columns">
 										<label>Socken:</label>
+
+										{/* Select input för socken */}
 										<PopulatedSelect inputName="sockenInput"
 											dataUrl={config.apiUrl+config.endpoints.socken}
 											valueField="name"
@@ -685,6 +743,8 @@ export default class SearchForm extends React.Component {
 
 									<div className="six columns">
 										<label>Landskap:</label>
+	
+										{/* Select input för landskap */}
 										<PopulatedSelect inputName="landskapInput"
 											dataUrl={config.apiUrl+config.endpoints.landskap}
 											valueField="name"
@@ -711,6 +771,8 @@ export default class SearchForm extends React.Component {
 
 									<div className="eight columns">
 										<label>Upptecknare:</label>
+
+										{/* AutocompleteInput för sökning efter upptecknares namn */}
 										<AutocompleteInput inputName="collectorNameInput"
 											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c'}
 											valueField="name"
@@ -723,6 +785,8 @@ export default class SearchForm extends React.Component {
 
 									<div className="four columns">
 										<label>Upptecknare kön:</label>
+
+										{/* Upptecknare kön */}
 										<select name="collectorsGenderInput"
 											onChange={this.inputChangeHandler}
 											value={this.state.collectorsGenderInput}
@@ -741,6 +805,8 @@ export default class SearchForm extends React.Component {
 									className="bottom-margin-0"
 									type="checkbox"
 									checked={this.state.collectorsBirthYearsEnabled} /> Födelseår, upptecknare:</label>
+
+								{/* Upptecknare födelseår */}
 								<Slider inputName="collectorsBirthYears"
 									start={[this.sliderStartYear, this.sliderEndYear]}
 									enabled={this.state.collectorsBirthYearsEnabled}
@@ -756,6 +822,8 @@ export default class SearchForm extends React.Component {
 
 									<div className="eight columns">
 										<label>Informant:</label>
+
+										{/* AutocompleteInput för sökning efter upptecknares namn */}
 										<AutocompleteInput inputName="informantNameInput"
 											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=i'}
 											valueField="name"
@@ -768,6 +836,8 @@ export default class SearchForm extends React.Component {
 
 									<div className="four columns">
 										<label>Informant kön:</label>
+
+										{/* Informant kön */}
 										<select name="informantsGenderInput"
 											onChange={this.inputChangeHandler}
 											value={this.state.informantsGenderInput}
@@ -786,6 +856,9 @@ export default class SearchForm extends React.Component {
 									className="bottom-margin-0"
 									type="checkbox"
 									checked={this.state.informantsBirthYearsEnabled} /> Födelseår, informant:</label>
+
+
+								{/* Informant födelseår */}
 								<Slider inputName="informantsBirthYears"
 									start={[this.sliderStartYear, this.sliderEndYear]}
 									enabled={this.state.informantsBirthYearsEnabled}

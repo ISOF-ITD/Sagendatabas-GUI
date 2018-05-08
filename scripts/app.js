@@ -9,8 +9,6 @@ import NetworkApplicationWrapper from './components/NetworkApplicationWrapper';
 import AdvancedDocumentView from './components/AdvancedDocumentView';
 import AdvancedPersonView from './components/AdvancedPersonView';
 
-import SearchForm from './components/SearchForm';
-
 console.log('Digitalt kulturarv running React.js version '+React.version);
 
 /*
@@ -54,15 +52,22 @@ if (!window.Promise) {
 	window.Promise = Promise;
 }
 
+/*
+Här har vi bara två huvud routes, /search/analyse och /search/network
+För varje har vi sen rotues for visning av documents och personer, routern lägger till component i
+'main' delen av Application componentet och 'popup' delen av AnalyticalApplicationWrapper 
+och NetworkApplicationWrapper componenten
+*/
+
 ReactDOM.render(
 	<Router history={hashHistory}>
 		<Route path="/" component={IntroApplication} />
 		<Route path="/search" component={Application}>
-			<Route path="/search/analyse" components={{searchForm: SearchForm, main: AnalyticalApplicationWrapper}}>
+			<Route path="/search/analyse" components={{main: AnalyticalApplicationWrapper}}>
 				<Route path="/search/analyse/document/:id" components={{popup: AdvancedDocumentView}} />
 				<Route path="/search/analyse/person/:id" components={{popup: AdvancedPersonView}} />
 			</Route>
-			<Route path="/search/network" components={{searchForm: SearchForm, main: NetworkApplicationWrapper}}>
+			<Route path="/search/network" components={{main: NetworkApplicationWrapper}}>
 				<Route path="/search/network/document/:id" components={{popup: AdvancedDocumentView}} />
 				<Route path="/search/network/person/:id" components={{popup: AdvancedPersonView}} />
 			</Route>
