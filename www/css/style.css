@@ -1964,6 +1964,10 @@ td .play-button {
 }
 .popup-wrapper .popup-content-wrapper .page-content .pdf-viewer object {
   max-height: 90vh;
+  background-color: #f6f6f6;
+  background-image: url(../img/loader.gif);
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .popup-wrapper .popup-content-wrapper .page-content .columns.four .archive-image {
   display: block;
@@ -1992,6 +1996,15 @@ td .play-button {
   .popup-wrapper .popup-content-wrapper .page-content .fb-share-button {
     display: none;
   }
+}
+.popup-wrapper .popup-content-wrapper .page-content .copyright {
+  margin-top: 20px;
+  color: #ababab;
+  font-size: 0.9rem;
+  text-align: right;
+}
+.popup-wrapper .popup-content-wrapper .page-content .copyright a {
+  color: #ababab;
 }
 .popup-wrapper .popup-content-wrapper .page-content .row {
   margin-left: 0;
