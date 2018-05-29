@@ -736,7 +736,7 @@ export default class AdvancedMapView extends React.Component {
 
 				</div>
 
-				<div className="map-timeline-container" style={{opacity: this.state.data == null ? 0.4 : 1}}>
+				<div className={'map-timeline-container'+(!this.state.limitMapToPeriod ? ' minimized' : '')} style={{opacity: this.state.data == null ? 0.4 : 1}}>
 
 					<div style={{position: 'relative', float: 'right', marginTop: 10, marginRight: 10, zIndex: 10}}>
 						<label><input type="checkbox" name="limitMapToPeriod" checked={this.state.limitMapToPeriod} onChange={this.inputChangeHandler} /> Begränsa kartvy till en period</label>
