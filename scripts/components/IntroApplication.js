@@ -33,7 +33,7 @@ export default class IntroApplication extends React.Component {
 						<div className="eight columns">
 
 							<h2>Institutet för språk och folkminnen: Digitalt kulturarv</h2>
-							<p>Sökgränssnitt för institutets sägendatabas.</p>
+							<p>Sökgränssnitt för institutets databas.</p>
 
 						</div>
 

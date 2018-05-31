@@ -266,7 +266,7 @@ export default class CategoryTypesGraph extends React.Component {
 		this.vis.selectAll('.bar')
 			.data(this.state.data)
 			.enter().append('rect')
-			.attr('class', 'bar clickable')
+			.attr('class', 'bar')
 			.attr('data-key', function(d) {
 				return d.key;
 			})

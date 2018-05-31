@@ -127,6 +127,12 @@ export default class TextHighlightList extends React.Component {
 		var params = p || this.state.params;
 
 		if (!params || !params.search) {
+			this.setState({
+				total: 0,
+				data: [],
+				loading: false
+			});
+
 			return;
 		}
 

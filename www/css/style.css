@@ -3097,6 +3097,11 @@ td .play-button {
   vertical-align: middle;
   cursor: pointer;
 }
+.graph-controls a.selected {
+  color: #fff;
+  background-color: #a6192e;
+  border-color: #a6192e;
+}
 .graph-controls input:hover,
 .graph-controls select:hover,
 .graph-controls button:hover,
@@ -3220,6 +3225,10 @@ path.letter-path {
 }
 .map-timeline-container.minimized {
   max-height: 45px;
+}
+.map-timeline-container.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 .map-timeline-container .slider-container {
   margin: -10px 4px 40px 4px;

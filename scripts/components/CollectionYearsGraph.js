@@ -68,7 +68,9 @@ export default class CollectionYearsGraph extends React.Component {
 	fullScreenButtonClickHandler() {
 		this.setState({
 			fullScreen: !this.state.fullScreen
-		});
+		}, function() {
+			this.windowResizeHandler();
+		}.bind(this));
 	}
 
 	componentWillUnmount() {
@@ -86,7 +88,8 @@ export default class CollectionYearsGraph extends React.Component {
 
 	windowResizeHandler() {
 		this.setState({
-			graphContainerWidth: this.refs.container.clientWidth
+			graphContainerWidth: this.refs.container.clientWidth,
+			graphContainerHeight: this.state.fullScreen ? this.refs.container.clientHeight / 2 : (this.props.graphHeight || 400),
 		}, function() {
 			this.renderGraph(true);
 		}.bind(this));
@@ -530,7 +533,7 @@ export default class CollectionYearsGraph extends React.Component {
 					<div className="graph-controls">
 						<h3>{this.props.title}</h3>
 
-						<a onClick={this.fullScreenButtonClickHandler}>Fullskärm</a>
+						<a onClick={this.fullScreenButtonClickHandler} className={this.state.fullScreen ? 'selected' : ''}>Fullskärm</a>
 
 						<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
 							<option value="absolute">absolute</option>

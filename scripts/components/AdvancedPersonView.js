@@ -52,6 +52,11 @@ export default class AdvancedPersonView extends React.Component {
 				<h2>{this.state.data.name}</h2>
 
 				{
+					this.state.data.birth_year &&
+					<p>Föddes {this.state.data.birth_year}</p>
+				}
+
+				{
 					placeItems.length > 0 &&
 					<div className="row">
 
@@ -73,6 +78,7 @@ export default class AdvancedPersonView extends React.Component {
 
 								</table>
 							</div>
+
 						</div>
 
 						<div className="six columns">

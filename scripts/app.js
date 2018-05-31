@@ -53,10 +53,14 @@ if (!window.Promise) {
 }
 
 /*
+
 Här har vi bara två huvud routes, /search/analyse och /search/network
 För varje har vi sen rotues for visning av documents och personer, routern lägger till component i
 'main' delen av Application componentet och 'popup' delen av AnalyticalApplicationWrapper 
 och NetworkApplicationWrapper componenten
+
+I början öppnas IntroApplication modulen
+
 */
 
 ReactDOM.render(

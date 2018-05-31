@@ -47,6 +47,12 @@ export default class DocumentListItem extends React.Component {
 						!this.props.hideAttributes &&
 						<span className="props">
 							{this.state.data._source.year}
+							{
+								this.state.data._source.places && this.state.data._source.places.length > 0 &&
+								this.state.data._source.places.map(function(place) {
+									return <span className="prop">{place.name+', '+place.landskap}</span>
+								})
+							}
 							<span className="prop">{this.state.data._source.materialtype}</span>
 							{
 								this.state.data._source.taxonomy && this.state.data._source.taxonomy.category &&
@@ -62,14 +68,32 @@ export default class DocumentListItem extends React.Component {
 					<div className="u-cf"></div>
 				</div>
 
-				<div className="content">
-					{
-						this.state.data &&
-						<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html:
-								this.state.data.highlight ? (this.state.data.highlight['text.raw'] ? this.state.data.highlight['text.raw'][0] : this.state.data.highlight.text[0]) : this.state.data._source.text
-						}}></p>
-					}
-					<a className="button" href={'#/'+(this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/document/'+this.state.data._id}>Visa</a>
+				<div className="content row">
+
+					<div className="eight columns">
+						{
+							this.state.data &&
+							<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html:
+									this.state.data.highlight ? (this.state.data.highlight['text.raw'] ? this.state.data.highlight['text.raw'][0] : this.state.data.highlight.text[0]) : this.state.data._source.text
+							}}></p>
+						}
+						<a className="button" href={'#/'+(this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/document/'+this.state.data._id}>Visa</a>
+					</div>
+
+					<div className="four columns">
+						{
+							this.state.data._source.archive.archive &&
+							<p><strong>Arkiv:</strong><br/>
+							{this.state.data._source.archive.archive}</p>
+						}
+
+						{
+							this.state.data._source.archive.archive_id && 
+							<p><strong>Acc. nr.:</strong><br/>
+							{this.state.data._source.archive.archive_id}</p>
+						}
+					</div>
+
 				</div>
 
 			</div>

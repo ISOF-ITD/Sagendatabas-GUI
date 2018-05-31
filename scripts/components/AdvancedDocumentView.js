@@ -82,7 +82,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 		var placeItems = this.state.doc && this.state.doc.places && this.state.doc.places.length > 0 ? this.state.doc.places.map(function(place, index) {
 			return <tr key={index}>
-				<td><a href={'#place/'+place.id}>{place.name+', '+place.harad}</a></td>
+				<td><a href={'#place/'+place.id}>{place.name+', '+place.harad}</a> ({place.type})</td>
 			</tr>;
 		}) : [];
 
@@ -238,7 +238,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 				<hr/>
 
-				<h3>Liknande sägner</h3>
+				<h3>Liknande upptekningar</h3>
 
 				<div className="row table-wrapper">
 

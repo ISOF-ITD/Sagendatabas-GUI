@@ -24,6 +24,12 @@ import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWin
 
 import config from './../config';
 
+/*
+
+Wrapper component för hela applicationen
+
+*/
+
 export default class AnalyticalApplicationWrapper extends React.Component {
 	constructor(props) {
 		super(props);
@@ -85,17 +91,17 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="twelve columns">
 
 							<TabsContainer>
-								<Tab tabName="Huvudkategorier">
-									<CategoryTypesGraph graphHeight="300" />
-								</Tab>
-								<Tab tabName="Kategorier">
-									<CategoriesGraph graphHeight="300" />
-								</Tab>
 								<Tab tabName="Topic terms">
 									<TermsGraph count="15" graphHeight="300" />
 								</Tab>
 								<Tab tabName="Titel topic terms">
 									<TermsGraph count="15" type="titles" graphHeight="300" />
+								</Tab>
+								<Tab tabName="Huvudkategorier">
+									<CategoryTypesGraph graphHeight="300" />
+								</Tab>
+								<Tab tabName="Kategorier">
+									<CategoriesGraph graphHeight="300" />
 								</Tab>
 								<Tab tabName="Typ">
 									<TypesGraph graphHeight="300" />
