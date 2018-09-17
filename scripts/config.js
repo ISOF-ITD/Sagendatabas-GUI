@@ -2,10 +2,10 @@ export default {
 	// Namn på localStorage som lagrar sparade sägner
 	localLibraryName: 'digitalt_kulturarv',
 
-	apiUrl: 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/es-advanced/',
+	apiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es-advanced/',
 //	apiUrl: 'http://127.0.0.1:8000/sagenkarta/es/',
 
-	restApiUrl: 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/',
+	restApiUrl: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/',
 
 	appUrl: 'http://www4.sprakochfolkminnen.se/sagner/avancerad/',
 
