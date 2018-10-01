@@ -730,7 +730,7 @@ export default class AdvancedMapView extends React.Component {
 
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
 						<option value="absolute">Antal dokument</option>
-						<option value="relative">Antal dokument relativt det totala antalet dokument</option>
+						<option value="relative">Antal dokument relativt det totala antalet</option>
 						<option value="page_count">Antal sidor</option>
 					</select>
 
