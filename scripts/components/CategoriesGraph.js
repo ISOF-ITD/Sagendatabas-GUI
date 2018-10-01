@@ -271,7 +271,8 @@ export default class CategoriesGraph extends React.Component {
 
 		var y = this.createYRange();
 
-		var colorScale = d3.scaleOrdinal(d3.schemeCategory20)
+		//var colorScale = d3.scaleOrdinal(d3.schemeCategory20)
+		var colorScale = d3.scaleOrdinal(d3ScaleChromatic.schemeDark2)
 
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');
