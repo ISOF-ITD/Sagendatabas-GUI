@@ -54,7 +54,7 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
-			selectedTypes: [],
+			selectedTypes: ['arkiv', 'tryckt'], 
 			selectedCategories: [],
 			collectionYearsEnabled: false,
 			collectionYears: [this.sliderStartYear, this.sliderEndYear],
