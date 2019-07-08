@@ -1,14 +1,20 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
 
+import OverlayWindow from './../../ISOF-React-modules/components/controls/OverlayWindow';
+//import SitevisionContent from './../../ISOF-React-modules/components/controls/SitevisionContent';
+
 import EventBus from 'eventbusjs';
 
 export default class IntroApplication extends React.Component {
 	constructor(props) {
+		console.log('Introapplication.js constructor');
 		super(props);
 	}
 
 	render() {
+		console.log('Introapplication.js render');
+
 		return (
 			<div className={'app-container'}>
 
@@ -44,7 +50,7 @@ export default class IntroApplication extends React.Component {
 					</div>
 
 				</div>
-		
+
 			</div>
 		);
 	}

@@ -12,6 +12,7 @@ import config from './../config';
 
 export default class NetworkApplicationWrapper extends React.Component {
 	constructor(props) {
+		console.log('NetworkApplicationWrapper.js constructor');
 		super(props);
 
 		this.state = {

@@ -3,6 +3,8 @@ import { hashHistory } from 'react-router';
 
 import SearchForm from './SearchForm';
 
+import OverlayWindow from './../../ISOF-React-modules/components/controls/OverlayWindow';
+
 import EventBus from 'eventbusjs';
 
 /*
@@ -10,19 +12,62 @@ Wrapper för hela applicationen. Innehåller SearchForm och lägger till compone
 */
 export default class AnalyticalApplicationWrapper extends React.Component {
 	constructor(props) {
+		console.log('Application.js constructor');
 		super(props);
 
 		window.eventBus = EventBus;
+
+		this.state = {
+			overlayVisible: true
+		};
+
+		// Bind all event handlers to this (the actual component) to make component variables available inside the functions
+		this.introOverlayCloseButtonClickHandler = this.introOverlayCloseButtonClickHandler.bind(this);
+	}
+
+	introOverlayCloseButtonClickHandler() {
+		console.log('Introapplication.js introOverlayCloseButtonClickHandler');
+		let user = document.getElementById("user-field");
+		let losen = document.getElementById("losen-field");
+		console.log(user.value);
+
+		// Skickar overlay.hide via globala eventBus, OverlayWindow tar emot det
+		if (user.value.length > 0) {
+			if (losen.value.length > 0) {
+				let lose = 'kultur arv';
+				let los = lose.split(' ');
+				let splitString = los[0].split('');
+				let splitString1 = los[1].split('');
+				let reverseArray = splitString.reverse();
+				let reverseArray1 = splitString1.reverse();
+				let joinArray = reverseArray.join("");
+				let joinArray1 = reverseArray1.join("");
+				let use = joinArray + joinArray.length + joinArray1+ joinArray1.length;
+				// use = "1";
+				if (losen.value == use) {
+						eventBus.dispatch('overlay.hide');
+						console.log('Introapplication.js overlay.hide');
+				}
+			}
+		}
+		//Removed: Always show on start
+		// Registrerar till localStorage om användaren har valt att inte visa intro igen
+		//if (this.state.neverShowIntro) {
+			//localStorage.setItem('neverShowIntro', true);
+		//}
 	}
 
 	render() {
+		console.log('Application.js render');
+
 		// Hämtar main parameter från router som säger om vilket component skulle synas i 'main' (AnalyticalApplicationWrapper eller NetworkApplicationWrapper)
 		const {
 			main
 		} = this.props;
 
+			//<div className={'app-container'}>
 		return (
-			<div className={'app-container'}>
+			<div className={'app-container' +(this.state.overlayVisible ? ' has-overlay' : '')}>
 
 				<div className="search-form-container">
 
@@ -43,6 +88,19 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 				{main}
 
+				<OverlayWindow title="Välkommen till digitalt kulturarv">
+					<div>
+						<hr className="margin-bottom-35"/>
+						<div className="user-box">
+							<input id="user-field" placeholder="Användare" type="text"  />
+							<br/>
+							<input id="losen-field" placeholder="Lösen" type="text"  />
+						</div>
+						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
+						<label className="margin-top-10 margin-bottom-0 font-weight-normal u-pull-right"><input className="margin-bottom-0" onChange={function(event) {this.setState({neverShowIntro: event.currentTarget.checked})}.bind(this)} type="checkbox" /> {'Klicka här för att inte visa den rutan igen.'}</label>
+					</div>
+				</OverlayWindow>
+				{ console.log('application.js render /OverlayWindow') }
 			</div>
 		);
 	}

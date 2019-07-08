@@ -32,6 +32,7 @@ Wrapper component för hela applicationen
 
 export default class AnalyticalApplicationWrapper extends React.Component {
 	constructor(props) {
+		console.log('AnalyticalApplicationWrapper.js constructor');
 		super(props);
 
 		this.state = {
