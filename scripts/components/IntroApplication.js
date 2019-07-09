@@ -1,9 +1,6 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
 
-import OverlayWindow from './../../ISOF-React-modules/components/controls/OverlayWindow';
-//import SitevisionContent from './../../ISOF-React-modules/components/controls/SitevisionContent';
-
 import EventBus from 'eventbusjs';
 
 export default class IntroApplication extends React.Component {

@@ -25,8 +25,16 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		this.introOverlayCloseButtonClickHandler = this.introOverlayCloseButtonClickHandler.bind(this);
 	}
 
+	componentDidMount() {
+		console.log('application.js componentDidMount');
+		if (window.eventBus) {
+			eventBus.dispatch('overlay.intro');
+			console.log('Introapplication.js overlay.intro');
+		}
+	}
+
 	introOverlayCloseButtonClickHandler() {
-		console.log('Introapplication.js introOverlayCloseButtonClickHandler');
+		console.log('application.js introOverlayCloseButtonClickHandler');
 		let user = document.getElementById("user-field");
 		let losen = document.getElementById("losen-field");
 		console.log(user.value);
@@ -44,7 +52,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 				let joinArray1 = reverseArray1.join("");
 				let use = joinArray + joinArray.length + joinArray1+ joinArray1.length;
 				// use = "1";
-				if (losen.value == use) {
+				if ((user.value == 'forska') && (losen.value == use)) {
 						eventBus.dispatch('overlay.hide');
 						console.log('Introapplication.js overlay.hide');
 				}
@@ -97,7 +105,6 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 							<input id="losen-field" placeholder="Lösen" type="text"  />
 						</div>
 						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
-						<label className="margin-top-10 margin-bottom-0 font-weight-normal u-pull-right"><input className="margin-bottom-0" onChange={function(event) {this.setState({neverShowIntro: event.currentTarget.checked})}.bind(this)} type="checkbox" /> {'Klicka här för att inte visa den rutan igen.'}</label>
 					</div>
 				</OverlayWindow>
 				{ console.log('application.js render /OverlayWindow') }
