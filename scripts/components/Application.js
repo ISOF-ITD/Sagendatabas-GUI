@@ -96,7 +96,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 				{main}
 
-				<OverlayWindow title="Välkommen till digitalt kulturarv">
+				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
 					<div>
 						<hr className="margin-bottom-35"/>
 						<div className="user-box">
