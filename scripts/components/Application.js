@@ -18,7 +18,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		window.eventBus = EventBus;
 
 		this.state = {
-			overlayVisible: true
+			overlayVisible: true,
+			firsttime: true,
 		};
 
 		// Bind all event handlers to this (the actual component) to make component variables available inside the functions
@@ -28,8 +29,13 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 	componentDidMount() {
 		console.log('application.js componentDidMount');
 		if (window.eventBus) {
-			eventBus.dispatch('overlay.intro');
-			console.log('Introapplication.js overlay.intro');
+			if (this.state.firsttime) {
+				eventBus.dispatch('overlay.intro');
+				console.log('Introapplication.js overlay.intro');
+				this.state.firsttime = false;
+			} else {
+				console.log('Introapplication.js overlay.intro:');
+			}
 		}
 	}
 
@@ -102,7 +108,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="user-box">
 							<input id="user-field" placeholder="Användare" type="text"  />
 							<br/>
-							<input id="losen-field" placeholder="Lösen" type="text"  />
+							<input id="losen-field" placeholder="Lösen" type="password"  />
 						</div>
 						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
 					</div>
