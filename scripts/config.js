@@ -7,7 +7,8 @@ export default {
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
-	appUrl: 'https://www4.isof.se/sagner/avancerad/',
+	//Is it ever used in this app?:
+	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv',
 
 	geoserverUrl: 'https://oden-test.isof.se/geoserver',
 
