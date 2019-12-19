@@ -45,6 +45,14 @@ export default class AdvancedMapView extends React.Component {
 
 		this.mapModes = [
 			{
+				label: 'Heatmap',
+				name: 'heatmap',
+				filterField: 'socken',
+				totalFieldName: 'socken',
+				endpoint: config.endpoints.socken,
+				type: 'heatmap'
+			},
+			{
 				label: 'Polygoner',
 				name: 'socken',
 				filterField: 'socken',
@@ -63,14 +71,6 @@ export default class AdvancedMapView extends React.Component {
 				layer: 'sverige_lan:an_riks'
 			},
 			*/
-			{
-				label: 'Heatmap',
-				name: 'heatmap',
-				filterField: 'socken',
-				totalFieldName: 'socken',
-				endpoint: config.endpoints.socken,
-				type: 'heatmap'
-			},
 			{
 				label: 'Cirklar',
 				name: 'circles',
