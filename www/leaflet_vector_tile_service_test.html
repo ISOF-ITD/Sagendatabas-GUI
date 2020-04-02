@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>VectorGrid.Protobuf example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+
+</head>
+
+<body style='margin:0'>
+
+    <div id="map" style="width: 100vw; height: 100vh; background: white"></div>
+
+    <script type="text/javascript" src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/leaflet.vectorgrid@1.2.0"></script>
+    <!-- <script type="text/javascript" src="../dist/Leaflet.VectorGrid.bundled.js"></script> -->
+    <script>
+
+        var map = L.map('map');
+
+        var cartodbAttribution = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
+
+        var positron = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+            attribution: cartodbAttribution,
+            opacity: 0.5
+        }).addTo(map);
+
+        var layer = 'SockenStad_ExtGranskning-clipped:SockenStad_ExtGranskn_v1.0_clipped'
+
+        var isfotilesUrl = 'https://oden-test.sprakochfolkminnen.se/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=' + layer + '&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}'
+
+        var isofVectorTileOptions = {
+            rendererFactory: L.canvas.tile,
+            maxZoom: 14
+        };
+
+		var isofPbfLayer = L.vectorGrid.protobuf(isfotilesUrl, isofVectorTileOptions).addTo(map);
+		
+        map.setView({ lat: 62.000000000000000, lng: 14.000000000000000 }, 5);
+
+
+    </script>
+</body>
+
+</html>
