@@ -1,5 +1,5 @@
 import React from 'react';
-import { hashHistory } from 'react-router';
+import { Route, Switch } from 'react-router-dom';
 
 import EventBus from 'eventbusjs';
 

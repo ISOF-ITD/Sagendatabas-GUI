@@ -1,5 +1,5 @@
 import React from 'react';
-import { hashHistory, Link } from 'react-router';
+import { hashHistory, Link } from 'react-router-dom';
 
 import L from 'leaflet';
 import 'leaflet-draw';

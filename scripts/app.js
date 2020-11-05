@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, Link, hashHistory, Redirect } from 'react-router'
+import { HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 import IntroApplication from './components/IntroApplication';
 import Application from './components/Application';
@@ -9,7 +9,7 @@ import NetworkApplicationWrapper from './components/NetworkApplicationWrapper';
 import AdvancedDocumentView from './components/AdvancedDocumentView';
 import AdvancedPersonView from './components/AdvancedPersonView';
 
-console.log('Digitalt kulturarv running React.js version '+React.version);
+console.log(`Digitalt kulturarv  running React.js version ${React.version} and ReactDOM version ${ReactDOM.version}`);
 
 /*
 Object.assign polyfill
@@ -64,9 +64,19 @@ I början öppnas IntroApplication modulen
 */
 
 ReactDOM.render(
-	<Router history={hashHistory}>
-		<Route path="/" component={IntroApplication} />
-		<Route path="/search" component={Application}>
+	<HashRouter>
+		<Route exact path="/" component={IntroApplication} />
+		<Route path={[
+			"/search",
+			"/search/analyse",
+			"/search/analyse/document/:id",
+			"/search/analyse/person/:id",
+			"/search/network",
+			"/search/network/document/:id",
+			"/search/network/person/:id",	
+			]}
+				 component={Application}>
+			{/*
 			<Route path="/search/analyse" components={{main: AnalyticalApplicationWrapper}}>
 				<Route path="/search/analyse/document/:id" components={{popup: AdvancedDocumentView}} />
 				<Route path="/search/analyse/person/:id" components={{popup: AdvancedPersonView}} />
@@ -75,7 +85,8 @@ ReactDOM.render(
 				<Route path="/search/network/document/:id" components={{popup: AdvancedDocumentView}} />
 				<Route path="/search/network/person/:id" components={{popup: AdvancedPersonView}} />
 			</Route>
+			*/}
 		</Route>
-	</Router>,
+	</HashRouter>,
 	document.getElementById('app')
 );

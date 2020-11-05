@@ -1,5 +1,9 @@
 import React from 'react';
+import { Route, Switch } from 'react-router-dom'
 import { hashHistory } from 'react-router';
+
+import AnalyticalApplicationWrapper from './AnalyticalApplicationWrapper';
+import NetworkApplicationWrapper from './NetworkApplicationWrapper';
 
 import SearchForm from './SearchForm';
 
@@ -10,7 +14,7 @@ import EventBus from 'eventbusjs';
 /*
 Wrapper för hela applicationen. Innehåller SearchForm och lägger till component från router till 'main'
 */
-export default class AnalyticalApplicationWrapper extends React.Component {
+export default class Application extends React.Component {
 	constructor(props) {
 		console.log('Application.js constructor');
 		super(props);
@@ -96,13 +100,29 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 					*/
 					}
 
-					<SearchForm />
+				<SearchForm />
 
 				</div>
 
+				<Switch>
+					<Route path={[
+						"/search/analyse/document/:id",
+						"/search/analyse/person/:id",
+						"/search/analyse",
+					]}
+						>
+							<AnalyticalApplicationWrapper/>
+					</Route>
+					<Route 
+						path="/search/network">
+							<NetworkApplicationWrapper/>
+					</Route>
+				</Switch>
+				{/*
 				{main}
+				*/}
 
-				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
+{/*				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
 					<div>
 						<hr className="margin-bottom-35"/>
 						<div className="user-box">
@@ -113,7 +133,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
 					</div>
 				</OverlayWindow>
-				{ console.log('application.js render /OverlayWindow') }
+*/}				{ console.log('application.js render /OverlayWindow') }
 			</div>
 		);
 	}
