@@ -5,6 +5,10 @@ import { hashHistory } from 'react-router';
 import AnalyticalApplicationWrapper from './AnalyticalApplicationWrapper';
 import NetworkApplicationWrapper from './NetworkApplicationWrapper';
 
+//import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+//import AdvancedDocumentView from './AdvancedDocumentView';
+//import AdvancedPersonView from './AdvancedPersonView';
+
 import SearchForm from './SearchForm';
 
 import OverlayWindow from './../../ISOF-React-modules/components/controls/OverlayWindow';
@@ -24,7 +28,12 @@ export default class Application extends React.Component {
 		this.state = {
 			overlayVisible: true,
 			firsttime: true,
+			//popupVisible: false
 		};
+
+		//this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
+		//this.popupWindowHideHandler = this.popupWindowHideHandler.bind(this);
+		//this.popupCloseHandler = this.popupCloseHandler.bind(this);
 
 		// Bind all event handlers to this (the actual component) to make component variables available inside the functions
 		this.introOverlayCloseButtonClickHandler = this.introOverlayCloseButtonClickHandler.bind(this);
@@ -105,18 +114,47 @@ export default class Application extends React.Component {
 				</div>
 
 				<Switch>
+{/*					<Route path={[
+						"/search/analyse/document/:id",
+					]}
+						>
+								<AdvancedDocumentView match={this.props.match}/>
+					</Route>
 					<Route path={[
+						"/search/analyse/person/:id",
+					]}
+						>
+							<AdvancedPersonView/>
+					</Route>
+*/}					<Route path={[
 						"/search/analyse/document/:id",
 						"/search/analyse/person/:id",
 						"/search/analyse",
 					]}
+						render={(props) =>
+							<AnalyticalApplicationWrapper
+								{...props}
+							/>
+						}/>
+				{/*
 						>
 							<AnalyticalApplicationWrapper/>
 					</Route>
-					<Route 
-						path="/search/network">
+				*/}
+					<Route path={[
+						"/search/network/document/:id",
+						"/search/network/person/:id",
+						"/search/network",
+					]}
+						render={(props) =>
+							<NetworkApplicationWrapper
+								{...props}	
+							/>
+						}/>
+				{/*
 							<NetworkApplicationWrapper/>
 					</Route>
+				*/}
 				</Switch>
 				{/*
 				{main}

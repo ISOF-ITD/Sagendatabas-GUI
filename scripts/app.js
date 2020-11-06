@@ -67,16 +67,23 @@ ReactDOM.render(
 	<HashRouter>
 		<Route exact path="/" component={IntroApplication} />
 		<Route path={[
-			"/search",
-			"/search/analyse",
 			"/search/analyse/document/:id",
 			"/search/analyse/person/:id",
-			"/search/network",
 			"/search/network/document/:id",
 			"/search/network/person/:id",	
+			"/search/analyse",
+			"/search/network",
+			"/search",
 			]}
-				 component={Application}>
+			render={(props) =>
+				<Application
+					{...props}	
+				/>
+			}/>
+
 			{/*
+				 component={Application}>
+
 			<Route path="/search/analyse" components={{main: AnalyticalApplicationWrapper}}>
 				<Route path="/search/analyse/document/:id" components={{popup: AdvancedDocumentView}} />
 				<Route path="/search/analyse/person/:id" components={{popup: AdvancedPersonView}} />
@@ -86,7 +93,6 @@ ReactDOM.render(
 				<Route path="/search/network/person/:id" components={{popup: AdvancedPersonView}} />
 			</Route>
 			*/}
-		</Route>
 	</HashRouter>,
 	document.getElementById('app')
 );

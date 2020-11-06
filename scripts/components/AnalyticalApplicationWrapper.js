@@ -21,6 +21,8 @@ import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverl
 import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls/TabControl';
 
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+import AdvancedDocumentView from './AdvancedDocumentView';
+import AdvancedPersonView from './AdvancedPersonView';
 
 import config from './../config';
 
@@ -66,7 +68,12 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		} = this.props;
 
 		// Checkar om PopupWindow skulle synas
-		var popupVisible = Boolean(popup);
+		//var popupVisible = Boolean(popup);
+		var popupVisible = false;
+
+		// Check if popup should be true
+		if (this.props && this.props.match && this.props.match.url.indexOf('document') > -1) popupVisible = true;
+		if (this.props && this.props.match && this.props.match.url.indexOf('person') > -1) popupVisible = true;
 
 		return (
 			<div className={'app-container'}>
@@ -148,7 +155,28 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 				</div>
 
 				<PopupWindow windowOpen={popupVisible} onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
+					<Switch>
+					<Route path={[
+							"/search/analyse/document/:id",
+						]}
+						render={(props) =>
+							<AdvancedDocumentView
+								{...props}	
+							/>
+						}/>
+						<Route path={[
+							"/search/analyse/person/:id",
+						]}
+						render={(props) =>
+							<AdvancedPersonView
+								{...props}	
+							/>
+						}/>
+					</Switch>
+					{/*	
+					//TODO: Not needed anymore
 					{popup}
+					 */}
 				</PopupWindow>
 
 				<ImageOverlay />
