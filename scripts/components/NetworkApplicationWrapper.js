@@ -46,7 +46,8 @@ export default class NetworkApplicationWrapper extends React.Component {
 	}
 
 	popupCloseHandler() {
-		hashHistory.push('/search/network');
+		// Lägg till rätt route när användaren stänger popuprutan
+		this.props.history.push('/search/network');
 	}
 
 	popupWindowShowHandler() {
@@ -66,10 +67,11 @@ export default class NetworkApplicationWrapper extends React.Component {
 		//var popupVisible = Boolean(popup);
 		var popupVisible = false;
 
-		// Check if popup should be true
+		// Check if popup should be visible
+		// TODO: Use correct endpoint config.endpoints.document?
+		//if (this.props && this.props.match && this.props.match.url.indexOf(config.endpoints.documents) > -1) popupVisible = true;
 		if (this.props && this.props.match && this.props.match.url.indexOf('document') > -1) popupVisible = true;
 		if (this.props && this.props.match && this.props.match.url.indexOf('person') > -1) popupVisible = true;
-
 
 		return (
 			<div className={'app-container'}>

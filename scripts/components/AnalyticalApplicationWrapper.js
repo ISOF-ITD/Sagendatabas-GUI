@@ -50,7 +50,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	// Lägger till normal route när PopupWindow stängt
 	popupCloseHandler() {
-		hashHistory.push('/search/analyse');
+		// Lägg till rätt route när användaren stänger popuprutan
+		this.props.history.push('/search/analyse');
 	}
 
 	popupWindowShowHandler() {
@@ -63,15 +64,15 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	render() {
 		// Hämtar popup parameter från router som säger om vilket component skulle synas i PopupWindow
-		const {
-			popup
-		} = this.props;
+		//const {
+		//	popup
+		//} = this.props;
 
 		// Checkar om PopupWindow skulle synas
 		//var popupVisible = Boolean(popup);
 		var popupVisible = false;
 
-		// Check if popup should be true
+		// Check if popup should be visible
 		if (this.props && this.props.match && this.props.match.url.indexOf('document') > -1) popupVisible = true;
 		if (this.props && this.props.match && this.props.match.url.indexOf('person') > -1) popupVisible = true;
 
