@@ -1,12 +1,15 @@
 import React from 'react';
-import { hashHistory } from 'react-router';
+import { Route, Switch } from 'react-router-dom';
 
 import EventBus from 'eventbusjs';
 
 import DocumentList from './DocumentList';
 import NetworkGraph from './NetworkGraph';
 import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls/TabControl';
+
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+import AdvancedDocumentView from './AdvancedDocumentView';
+import AdvancedPersonView from './AdvancedPersonView';
 
 import config from './../config';
 
@@ -55,11 +58,18 @@ export default class NetworkApplicationWrapper extends React.Component {
 	}
 
 	render() {
-		const {
-			popup
-		} = this.props;
+		//const {
+		//	popup
+		//} = this.props;
 
-		var popupVisible = Boolean(popup);
+		// Checkar om PopupWindow skulle synas
+		//var popupVisible = Boolean(popup);
+		var popupVisible = false;
+
+		// Check if popup should be true
+		if (this.props && this.props.match && this.props.match.url.indexOf('document') > -1) popupVisible = true;
+		if (this.props && this.props.match && this.props.match.url.indexOf('person') > -1) popupVisible = true;
+
 
 		return (
 			<div className={'app-container'}>
@@ -71,7 +81,24 @@ export default class NetworkApplicationWrapper extends React.Component {
 				<NetworkGraph url={config.apiUrl+config.endpoints.terms_graph} />
 
 				<PopupWindow windowOpen={popupVisible} onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
-					{popup}
+					<Switch>
+					<Route path={[
+							"/search/network/document/:id",
+						]}
+						render={(props) =>
+							<AdvancedDocumentView
+								{...props}	
+							/>
+						}/>
+						<Route path={[
+							"/search/network/person/:id",
+						]}
+						render={(props) =>
+							<AdvancedPersonView
+								{...props}	
+							/>
+						}/>
+					</Switch>
 				</PopupWindow>
 
 			</div>
