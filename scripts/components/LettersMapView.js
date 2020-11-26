@@ -99,7 +99,7 @@ export default class LettersMapView extends React.Component {
 		console.log(data);
 
 		if (isFinite(data.min) && isFinite(data.max)) {
-			this.refs.timerangeSlider.slider.set([data.min, data.max]);
+			this.timerangeSliderRef.slider.set([data.min, data.max]);
 
 			this.setState({
 				sliderStartYear: data.min,
