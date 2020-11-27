@@ -13,7 +13,7 @@ export default class CollectionYearsGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.container = React.createRef();
+		//this.container = React.createRef();
 
 		this.graphMargins = {
 			left: this.props.simpleGraph ? 0 : 40,
@@ -55,7 +55,7 @@ export default class CollectionYearsGraph extends React.Component {
 
 	componentDidMount() {
 		this.setState({
-			graphContainerWidth: this.container.clientWidth
+			graphContainerWidth: this.refs.graphContainer.clientWidth
 		}, function() {
 			this.renderGraphBase();
 		}.bind(this));

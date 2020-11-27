@@ -12,7 +12,7 @@ export default class GenderGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.container = React.createRef();
+		//this.container = React.createRef();
 
 		this.graphMargins = {
 			left: 40,
@@ -52,7 +52,7 @@ export default class GenderGraph extends React.Component {
 
 	componentDidMount() {
 		this.setState({
-			graphContainerWidth: this.container.clientWidth
+			graphContainerWidth: this.refs.container.clientWidth
 		}, function() {
 			this.renderGraphBase();
 		}.bind(this));
