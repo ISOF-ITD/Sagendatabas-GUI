@@ -90,8 +90,8 @@ export default class CollectionYearsGraph extends React.Component {
 
 	windowResizeHandler() {
 		this.setState({
-			graphContainerWidth: this.container.clientWidth,
-			graphContainerHeight: this.state.fullScreen ? this.container.clientHeight / 2 : (this.props.graphHeight || 400),
+			graphContainerWidth: this.refs.graphContainer.clientWidth,
+			graphContainerHeight: this.state.fullScreen ? this.refs.graphContainer.clientHeight / 2 : (this.props.graphHeight || 400),
 		}, function() {
 			this.renderGraph(true);
 		}.bind(this));
