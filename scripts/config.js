@@ -1,15 +1,23 @@
 export default {
+	// Configuration for environment
+	///////////////////////////////////////
 	// Namn på localStorage som lagrar sparade sägner
 	localLibraryName: 'digitalt_kulturarv',
 
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
-//	apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
+	// For public application:
+	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	// For authorized users application:
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
+	// apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
-	//Is it ever used in this app?:
+	//Is is used in code but is it needed this app?:
 	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv',
 
+
+	// Base configuration for functionality
+	///////////////////////////////////////
 	geoserverUrl: 'https://oden-test.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
