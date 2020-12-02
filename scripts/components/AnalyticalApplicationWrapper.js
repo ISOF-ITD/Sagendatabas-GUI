@@ -13,7 +13,8 @@ import PersonList from './PersonList';
 import AdvancedMapView from './AdvancedMapView';
 import GenderGraphDisplay from './GenderGraphDisplay';
 import TypesGraph from './TypesGraph';
-import NetworkGraph from './NetworkGraph';
+// Extended app:
+// import NetworkGraph from './NetworkGraph';
 
 import TextHighlightList from './TextHighlightList';
 import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverlay';
@@ -23,6 +24,8 @@ import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
 import AdvancedDocumentView from './AdvancedDocumentView';
 import AdvancedPersonView from './AdvancedPersonView';
+
+import IntroApplication from './IntroApplication';
 
 import config from './../config';
 
@@ -81,7 +84,10 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 				<TabsContainer className="content-width">
 					<AdvancedMapView mapHeight="700" tabName="Karta" />
-					<NetworkGraph graphHeight="800" 
+{/*
+	extended app:
+*/}
+{/*					<NetworkGraph graphHeight="800" 
 						hideControls={true}
 						min_doc_count="1" 
 						vertices_size="800" 
@@ -91,6 +97,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						url={config.apiUrl+config.endpoints.persons_graph} 
 						hideLabels={true}
 						tabName="Person nätverk" />
+*/}				
+					<IntroApplication mapHeight="700" tabName="Om" />
 				</TabsContainer>
 
 				<div className="container">

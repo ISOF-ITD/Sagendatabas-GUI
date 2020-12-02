@@ -199,7 +199,9 @@ export default class Application extends React.Component {
 				{/*
 				{main}
 				*/}
-
+{/*
+	extended app:
+*/}
 {/*				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
 					<div>
 						<hr className="margin-bottom-35"/>
