@@ -5,6 +5,12 @@ import { hashHistory } from 'react-router';
 import AnalyticalApplicationWrapper from './AnalyticalApplicationWrapper';
 import NetworkApplicationWrapper from './NetworkApplicationWrapper';
 
+//Test use PlaceView for places:
+// TODO handle url-paths record/document: record/:record_id vs /search/analyse/document/:record_id
+import RoutePopupWindow from './../../ISOF-React-modules/components/controls/RoutePopupWindow';
+import PlaceView from './../../ISOF-React-modules/components/views/PlaceView';
+//import routeHelper from './../utils/routeHelper';
+
 //import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
 //import AdvancedDocumentView from './AdvancedDocumentView';
 //import AdvancedPersonView from './AdvancedPersonView';
@@ -31,9 +37,9 @@ export default class Application extends React.Component {
 			//popupVisible: false
 		};
 
-		//this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
-		//this.popupWindowHideHandler = this.popupWindowHideHandler.bind(this);
-		//this.popupCloseHandler = this.popupCloseHandler.bind(this);
+		this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
+		this.popupWindowHideHandler = this.popupWindowHideHandler.bind(this);
+		this.popupCloseHandler = this.popupCloseHandler.bind(this);
 
 		// Bind all event handlers to this (the actual component) to make component variables available inside the functions
 		this.introOverlayCloseButtonClickHandler = this.introOverlayCloseButtonClickHandler.bind(this);
@@ -82,6 +88,21 @@ export default class Application extends React.Component {
 		//if (this.state.neverShowIntro) {
 			//localStorage.setItem('neverShowIntro', true);
 		//}
+	}
+
+	// Test use PlaceView for places, uses PopupWindow:
+	// Lägger till normal route när PopupWindow stängt
+	popupCloseHandler() {
+		// Lägg till rätt route när användaren stänger popuprutan
+		this.props.history.push('/search/analyse');
+	}
+
+	popupWindowShowHandler() {
+		document.body.classList.add('has-overlay');
+	}
+
+	popupWindowHideHandler() {
+		document.body.classList.remove('has-overlay');
 	}
 
 	render() {
@@ -155,6 +176,25 @@ export default class Application extends React.Component {
 							<NetworkApplicationWrapper/>
 					</Route>
 				*/}
+				{/*
+					//Test use PlaceView for places, uses PopupWindow:
+				*/}
+					<Route 
+						path={[
+							"/place/:place_id([0-9]+)",
+						]}
+						render={(props) =>
+							<RoutePopupWindow
+								onShow={this.popupWindowShowHandler}
+								onHide={this.popupWindowHideHandler}
+								onClose={this.popupCloseHandler}
+								router={this.context.router}>
+									<PlaceView 
+										{...props}	
+										//match={this.props.match}
+									/>
+							</RoutePopupWindow>
+						}/>
 				</Switch>
 				{/*
 				{main}

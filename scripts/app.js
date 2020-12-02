@@ -4,10 +4,10 @@ import { HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 import IntroApplication from './components/IntroApplication';
 import Application from './components/Application';
-import AnalyticalApplicationWrapper from './components/AnalyticalApplicationWrapper';
-import NetworkApplicationWrapper from './components/NetworkApplicationWrapper';
-import AdvancedDocumentView from './components/AdvancedDocumentView';
-import AdvancedPersonView from './components/AdvancedPersonView';
+//import AnalyticalApplicationWrapper from './components/AnalyticalApplicationWrapper';
+//import NetworkApplicationWrapper from './components/NetworkApplicationWrapper';
+//import AdvancedDocumentView from './components/AdvancedDocumentView';
+//import AdvancedPersonView from './components/AdvancedPersonView';
 
 console.log(`Digitalt kulturarv  running React.js version ${React.version} and ReactDOM version ${ReactDOM.version}`);
 
@@ -52,6 +52,14 @@ if (!window.Promise) {
 	window.Promise = Promise;
 }
 
+// Needed to use ISOF-React-modules/components (as PlaceView):
+// Initalisera stöd för flerspråkighet
+import Lang from './../ISOF-React-modules/lang/Lang';
+// Språk: svenska
+Lang.setCurrentLang('sv');
+window.Lang = Lang;
+window.l = Lang.get;
+
 /*
 
 Här har vi bara två huvud routes, /search/analyse och /search/network
@@ -74,6 +82,7 @@ ReactDOM.render(
 			"/search/analyse",
 			"/search/network",
 			"/search",
+			"/place/:id",	
 			]}
 			render={(props) =>
 				<Application

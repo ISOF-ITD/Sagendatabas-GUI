@@ -12,8 +12,8 @@ export default {
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
-	//Is is used in code but is it needed this app?:
-	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv',
+	// For resources as /img:
+	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv-publik/',
 
 
 	// Base configuration for functionality
@@ -59,5 +59,28 @@ export default {
 	},
 
 	minYear: 1750,
-	maxYear: 2017
+	maxYear: 2017,
+
+	// Needed for ISOF-React-modules/components:
+	siteOptions: {
+		recordList: {
+			// Döljd materialtyp i RecordList, används för matkartan
+			//hideMaterialType: true,
+
+			/*
+			// Dölj kategorier kolumn i RecordList, används för folkmusiken
+			hideCategories: true
+
+			// Dölj TranscriptionStatus kolumn i RecordList, används bara för crowdsource?
+			hideTranscriptionStatus: true
+			*/
+
+			// Vilka kategorier vi vill visa i listan, här vill vi bara visa matkarta kategorier men dölja frågolista-kategorier
+			//visibleCategories: ['tradark']
+		},
+
+		// Inaktivera länker till personer, visa bara namnet
+		//disablePersonLinks: true
+	},
+
 };
