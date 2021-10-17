@@ -129,7 +129,7 @@ export default class CategoryTypesGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.metadata.total,
+					total: json.metadata.total.value.value,
 					data: json.data,
 					loading: false
 				}, function() {
@@ -240,7 +240,7 @@ export default class CategoryTypesGraph extends React.Component {
 
 		//var colorScale = d3.scaleOrdinal(d3.schemeCategory20)
 		var colorScale = d3.scaleOrdinal(d3ScaleChromatic.schemeDark2)
-		
+
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');
 

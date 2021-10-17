@@ -191,6 +191,7 @@ export default class AdvancedMapView extends React.Component {
 
 	timerangeChangeHandler(event, data) {
 		if (isFinite(data.min) && isFinite(data.max)) {
+			console.log(this.refs)
 			this.refs.timerangeSlider.slider.set([data.min, data.max]);
 
 			this.setState({
@@ -391,7 +392,7 @@ export default class AdvancedMapView extends React.Component {
 					return response.json()
 				}).then(function(json) {
 					this.setState({
-						total: json.metadata.total,
+						total: json.metadata.total.value,
 						data: json.data,
 					}, function() {
 						if (this.state.mapMode.type == 'vectorgrid') {
@@ -496,7 +497,6 @@ export default class AdvancedMapView extends React.Component {
 				});
 
 				marker.on('click', function(event) {
-					console.log(event);
 					window.eventBus.dispatch('graph.filter', this, {
 						filter: this.state.mapMode.filterField,
 						value: event.target.options.sockenObj.name

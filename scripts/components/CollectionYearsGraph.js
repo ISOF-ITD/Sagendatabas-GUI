@@ -197,7 +197,7 @@ export default class CollectionYearsGraph extends React.Component {
 					}
 
 					this.setState({
-						total: json.metadata.total,
+						total: json.metadata.total.value,
 						data: data,
 						loading: false
 					}, function() {
@@ -316,8 +316,6 @@ export default class CollectionYearsGraph extends React.Component {
 		this.xRange = this.createXRange();
 
 		this.yRange = this.createYRange();
-
-		var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');
@@ -516,7 +514,7 @@ export default class CollectionYearsGraph extends React.Component {
 				.attr('width', this.xRange(Number(values[1])-0.2)-this.xRange(Number(values[0])+0.2))
 				.transition()
 				.duration(100)
-				.style('opacity', 0.1);			
+				.style('opacity', 0.1);
 		}
 	}
 

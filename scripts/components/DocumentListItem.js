@@ -1,6 +1,7 @@
 import React from 'react';
 import EventBus from 'eventbusjs';
 import _ from 'underscore';
+import TimeslotsAudioPlayer from './../../ISOF-React-modules/components/controls/TimeslotsAudioPlayer';
 
 import config from './../config';
 
@@ -49,8 +50,8 @@ export default class DocumentListItem extends React.Component {
 							{this.state.data._source.year}
 							{
 								this.state.data._source.places && this.state.data._source.places.length > 0 &&
-								this.state.data._source.places.map(function(place) {
-									return <span className="prop">{place.name+', '+place.landskap}</span>
+								this.state.data._source.places.map(function(place, index) {
+									return <span className="prop" key={index}>{place.name+', '+place.landskap}</span>
 								})
 							}
 							<span className="prop">{this.state.data._source.materialtype}</span>
@@ -72,7 +73,20 @@ export default class DocumentListItem extends React.Component {
 
 					<div className="eight columns">
 						{
-							this.state.data &&
+							this.state.data._source.materialtype == 'inspelning' && this.state.data._source.media.length > 0 &&
+							<div>
+								{
+									_.where(this.state.data._source.media, {type: 'audio'}).map((item) => <TimeslotsAudioPlayer
+										document={this.state.data._source}
+										data={item}
+										preview={true}
+										inner_hits={this.state.data.inner_hits}
+									/>)
+								}
+							</div>
+						}
+						{
+							_.where(this.state.data._source.media, {type: 'audio'}).length > 0 && this.state.data._source.materialtype != 'inspelning' &&
 							<p className={'text-viewer'+(this.state.data._source.text && this.state.data._source.text.length > 1500 ? ' trimmed' : '')} dangerouslySetInnerHTML={{__html:
 									this.state.data.highlight ? (this.state.data.highlight['text.raw'] ? this.state.data.highlight['text.raw'][0] : this.state.data.highlight.text[0]) : this.state.data._source.text
 							}}></p>
@@ -88,7 +102,7 @@ export default class DocumentListItem extends React.Component {
 						}
 
 						{
-							this.state.data._source.archive.archive_id && 
+							this.state.data._source.archive.archive_id &&
 							<p><strong>Acc. nr.:</strong><br/>
 							{this.state.data._source.archive.archive_id}</p>
 						}

@@ -2,8 +2,8 @@ export default {
 	// Namn på localStorage som lagrar sparade sägner
 	localLibraryName: 'digitalt_kulturarv',
 
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
-//	apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
+	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced-tilltal/',
+	//apiUrl: 'http://localhost:8000/api/es/',
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
@@ -13,6 +13,8 @@ export default {
 	geoserverUrl: 'https://oden-test.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
+	audioUrlDialects: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/dialekter/',
+	audioUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/Tilltal/',
 
 	endpoints: {
 		terms: 'terms/',
@@ -43,7 +45,10 @@ export default {
 		terms_autocomplete: 'autocomplete/terms/',
 		title_terms_autocomplete: 'autocomplete/title_terms/',
 		persons_autocomplete: 'autocomplete/persons/',
-		socken_autocomplete: 'autocomplete/socken/'
+		socken_autocomplete: 'autocomplete/socken/',
+
+		check_authentication: 'check_authentication/',
+		authenticate: 'api-token-auth/'
 	},
 
 	requiredApiParams: {

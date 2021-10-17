@@ -8,6 +8,7 @@ import AnalyticalApplicationWrapper from './components/AnalyticalApplicationWrap
 import NetworkApplicationWrapper from './components/NetworkApplicationWrapper';
 import AdvancedDocumentView from './components/AdvancedDocumentView';
 import AdvancedPersonView from './components/AdvancedPersonView';
+import LoginWindow from './components/LoginWindow';
 
 console.log('Digitalt kulturarv running React.js version '+React.version);
 
@@ -47,16 +48,19 @@ if (typeof Object.assign != 'function') {
 
 // IE 11 backwards compatibility
 import 'whatwg-fetch';
-import Promise from 'promise-polyfill'; 
+import Promise from 'promise-polyfill';
 if (!window.Promise) {
 	window.Promise = Promise;
 }
+
+import EventBus from 'eventbusjs';
+window.eventBus = EventBus;
 
 /*
 
 Här har vi bara två huvud routes, /search/analyse och /search/network
 För varje har vi sen rotues for visning av documents och personer, routern lägger till component i
-'main' delen av Application componentet och 'popup' delen av AnalyticalApplicationWrapper 
+'main' delen av Application componentet och 'popup' delen av AnalyticalApplicationWrapper
 och NetworkApplicationWrapper componenten
 
 I början öppnas IntroApplication modulen
@@ -64,18 +68,24 @@ I början öppnas IntroApplication modulen
 */
 
 ReactDOM.render(
-	<Router history={hashHistory}>
-		<Route path="/" component={IntroApplication} />
-		<Route path="/search" component={Application}>
-			<Route path="/search/analyse" components={{main: AnalyticalApplicationWrapper}}>
-				<Route path="/search/analyse/document/:id" components={{popup: AdvancedDocumentView}} />
-				<Route path="/search/analyse/person/:id" components={{popup: AdvancedPersonView}} />
+	<div>
+
+		<LoginWindow />
+
+		<Router history={hashHistory}>
+			<Route path="/" component={IntroApplication} />
+			<Route path="/search" component={Application}>
+				<Route path="/search/analyse" components={{main: AnalyticalApplicationWrapper}}>
+					<Route path="/search/analyse/document/:id" components={{popup: AdvancedDocumentView}} />
+					<Route path="/search/analyse/person/:id" components={{popup: AdvancedPersonView}} />
+				</Route>
+				<Route path="/search/network" components={{main: NetworkApplicationWrapper}}>
+					<Route path="/search/network/document/:id" components={{popup: AdvancedDocumentView}} />
+					<Route path="/search/network/person/:id" components={{popup: AdvancedPersonView}} />
+				</Route>
 			</Route>
-			<Route path="/search/network" components={{main: NetworkApplicationWrapper}}>
-				<Route path="/search/network/document/:id" components={{popup: AdvancedDocumentView}} />
-				<Route path="/search/network/person/:id" components={{popup: AdvancedPersonView}} />
-			</Route>
-		</Route>
-	</Router>,
+		</Router>
+
+	</div>,
 	document.getElementById('app')
 );

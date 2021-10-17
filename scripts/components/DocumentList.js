@@ -9,6 +9,7 @@ import DropdownMenu from './../../ISOF-React-modules/components/controls/Dropdow
 import DocumentListItem from './DocumentListItem';
 
 import config from './../config';
+import auth from './../utils/auth';
 
 export default class DocumentList extends React.Component {
 	constructor(props) {
@@ -160,20 +161,22 @@ export default class DocumentList extends React.Component {
 
 		this.setState({
 			paramString: paramString,
-			loading: true
+			loading: true,
+			data: []
 		});
 
-		fetch(config.apiUrl+config.endpoints.documents+'?'+paramString)
+		fetch(config.apiUrl+config.endpoints.documents+'?'+paramString, auth.authHeaders)
 			.then(function(response) {
+				auth.checkAuthentication(response);
+
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.metadata.total,
+					total: json.metadata.total.value,
 					data: json.data,
 					loading: false
 				});
 			}.bind(this)).catch(function(ex) {
-				console.log('parsing failed', ex)
 			})
 		;
 	}

@@ -222,7 +222,7 @@ export default class LettersMapView extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.metadata.total,
+					total: json.metadata.total.value,
 					data: json.data,
 				}, function() {
 					this.updateMap();

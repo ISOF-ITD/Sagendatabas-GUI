@@ -108,7 +108,7 @@ export default class GenderGraphDisplay extends React.Component {
 					return response.json()
 				}).then(function(json) {
 					this.setState({
-						totalRecords: json.metadata.total,
+						totalRecords: json.metadata.total.value,
 						data: json.data,
 						loading: false
 					});

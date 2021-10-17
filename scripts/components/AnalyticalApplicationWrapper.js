@@ -17,6 +17,7 @@ import NetworkGraph from './NetworkGraph';
 
 import TextHighlightList from './TextHighlightList';
 import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverlay';
+import GlobalAudioPlayer from './../../ISOF-React-modules/components/views/GlobalAudioPlayer';
 
 import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls/TabControl';
 
@@ -44,6 +45,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		this.popupCloseHandler = this.popupCloseHandler.bind(this);
 
 		window.eventBus = EventBus;
+
+		window.eventBus.addEventListener('audio.playervisible', this.audioPlayerVisibleHandler.bind(this));
 	}
 
 	// Lägger till normal route när PopupWindow stängt
@@ -57,6 +60,12 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	popupWindowHideHandler() {
 		document.body.classList.remove('has-overlay');
+	}
+
+	audioPlayerVisibleHandler() {
+		// När GlobalAudioPlayer visas lägger vi till class till document.body för att
+		// få utrymme för ljudspelaren i gränssnittet
+		document.body.classList.add('has-docked-control');
 	}
 
 	render() {
@@ -73,14 +82,14 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 				<TabsContainer className="content-width">
 					<AdvancedMapView mapHeight="700" tabName="Karta" />
-					<NetworkGraph graphHeight="800" 
+					<NetworkGraph graphHeight="800"
 						hideControls={true}
-						min_doc_count="1" 
-						vertices_size="800" 
-						sample_size="50000" 
-						strength="-10" 
-						filterField="person" 
-						url={config.apiUrl+config.endpoints.persons_graph} 
+						min_doc_count="1"
+						vertices_size="800"
+						sample_size="50000"
+						strength="-10"
+						filterField="person"
+						url={config.apiUrl+config.endpoints.persons_graph}
 						hideLabels={true}
 						tabName="Person nätverk" />
 				</TabsContainer>
@@ -108,7 +117,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 									<TypesGraph graphHeight="300" />
 								</Tab>
 							</TabsContainer>
-					
+
 						</div>
 
 					</div>
@@ -118,10 +127,10 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="twelve columns">
 
 							<div className="graph-wrapper no-header">
-								<CollectionYearsGraph title="Uppteckningsår" 
+								<CollectionYearsGraph title="Uppteckningsår"
 									graphHeight="250"
 									dispatchTimerange={true} />
-								<BirthYearsGraph title="Födelseår" graphHeight="250" />	
+								<BirthYearsGraph title="Födelseår" graphHeight="250" />
 							</div>
 
 						</div>
@@ -150,6 +159,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 				<PopupWindow windowOpen={popupVisible} onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
 					{popup}
 				</PopupWindow>
+
+				<GlobalAudioPlayer useNativePlayer={true} signalDurationInterval={true} baseRecordsUrl={'/search/analyse/document/'} />
 
 				<ImageOverlay />
 

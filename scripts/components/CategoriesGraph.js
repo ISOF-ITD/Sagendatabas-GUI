@@ -143,7 +143,7 @@ export default class CategoriesGraph extends React.Component {
 
 				this.setState({
 					categoryTypes: categoryTypes,
-					total: json.metadata.total,
+					total: json.metadata.total.value,
 					originalData: json.data,
 					data: json.data,
 					loading: false

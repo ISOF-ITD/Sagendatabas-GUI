@@ -1,11 +1,14 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
+import _ from 'underscore';
 
 import DocumentList from './DocumentList';
 import SimpleMap from './../../ISOF-React-modules/components/views/SimpleMap';
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
+import TimeslotsAudioPlayer from './../../ISOF-React-modules/components/controls/TimeslotsAudioPlayer';
 
 import config from './../config';
+import auth from './../utils/auth.js';
 
 export default class AdvancedDocumentView extends React.Component {
 	constructor(props) {
@@ -18,6 +21,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 		this.state = {
 			doc: null,
+			inner_hits: null,
 			min_word_length:  5,
 			min_term_freq: 1,
 			max_query_terms: 25
@@ -37,7 +41,8 @@ export default class AdvancedDocumentView extends React.Component {
 	mediaImageClickHandler(event) {
 		if (window.eventBus) {
 			window.eventBus.dispatch('overlay.viewimage', {
-				imageUrl: event.target.dataset.image
+				imageUrl: event.target.dataset.image,
+				type: 'image'
 			});
 		}
 	}
@@ -51,13 +56,17 @@ export default class AdvancedDocumentView extends React.Component {
 	}
 
 	fetchData(id) {
-		fetch(config.apiUrl+config.endpoints.document+id+'/')
+		fetch(config.apiUrl+config.endpoints.document+id+'/', auth.authHeaders)
 			.then(function(response) {
+				auth.checkAuthentication(response);
+
 				return response.json()
 			}).then(function(json) {
+
 				this.setState({
 					id: json._id,
-					doc: json._source
+					doc: json._source,
+					inner_hits: json.inner_hits
 				})
 			}.bind(this)).catch(function(ex) {
 				console.log('parsing failed', ex)
@@ -76,7 +85,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 		var mediaItems = this.state.doc && this.state.doc.media ? this.state.doc.media.map(function(mediaItem, index) {
 			if (mediaItem.type == 'image') {
-				return <img className="archive-image" data-image={mediaItem.source} onClick={this.mediaImageClickHandler} src={config.imageUrl+mediaItem.source} key={index} />;
+				return <img className="archive-image" data-image={mediaItem.source.startsWith('https://') || mediaItem.source.startsWith('http://') ? mediaItem.source : config.imageUrl+mediaItem.source} onClick={this.mediaImageClickHandler} src={mediaItem.source.startsWith('https://') || mediaItem.source.startsWith('http://') ? mediaItem.source : config.imageUrl+mediaItem.source} key={index} />;
 			}
 		}.bind(this)) : [];
 
@@ -94,14 +103,29 @@ export default class AdvancedDocumentView extends React.Component {
 			</tr>;
 		}.bind(this)) : [];
 
-		return this.state.doc ? 
+		return this.state.doc ?
 			<div className="document-view">
 				<h2>{this.state.doc.title}</h2>
 
 				<div className="row">
-					
+
 					<div className="eight columns">
-						<p dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
+						{
+							this.state.doc && this.state.doc.materialtype == 'inspelning' && this.state.doc.media.length > 0 &&
+							<div>
+								{
+									_.where(this.state.doc.media, {type: 'audio'}).map((item) => <TimeslotsAudioPlayer documentTitle={this.state.doc.title}
+										document={this.state.doc}
+										inner_hits={this.state.inner_hits}
+										data={item}
+									/>)
+								}
+							</div>
+						}
+						{
+							_.where(this.state.doc.media, {type: 'audio'}).length > 0 && this.state.doc.materialtype != 'inspelning' &&
+							<p dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
+						}
 					</div>
 
 					<div className="four columns">
@@ -184,7 +208,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 					<div className="three columns">
 						{
-							this.state.doc.taxonomy && this.state.doc.taxonomy.category && 
+							this.state.doc.taxonomy && this.state.doc.taxonomy.category &&
 							<p><strong>Kategori:</strong><br/>
 							{this.state.doc.taxonomy.category+': '+this.state.doc.taxonomy.name}</p>
 						}
@@ -201,7 +225,7 @@ export default class AdvancedDocumentView extends React.Component {
 						}
 
 						{
-							this.state.doc.archive.archive_id && 
+							this.state.doc.archive.archive_id &&
 							<p><strong>Acc. nr.:</strong><br/>
 							{this.state.doc.archive.archive_id}</p>
 						}
@@ -245,56 +269,56 @@ export default class AdvancedDocumentView extends React.Component {
 					<div className="three columns">
 						<br/>
 						<label>min_word_length</label>
-						<Slider inputName="min_word_length" 
-							start={4} 
-							rangeMin={0} 
-							rangeMax={10} 
+						<Slider inputName="min_word_length"
+							start={4}
+							rangeMin={0}
+							rangeMax={10}
 							onChange={this.inputChangeHandler} />
 					</div>
 
 					<div className="three columns">
 						<br/>
 						<label>min_term_freq</label>
-						<Slider inputName="min_term_freq" 
-							start={1} 
-							rangeMin={0} 
-							rangeMax={10} 
+						<Slider inputName="min_term_freq"
+							start={1}
+							rangeMin={0}
+							rangeMax={10}
 							onChange={this.inputChangeHandler} />
 					</div>
 
 					<div className="three columns">
 						<br/>
 						<label>max_query_terms</label>
-						<Slider inputName="max_query_terms" 
-							start={25} 
-							rangeMin={0} 
-							rangeMax={50} 
+						<Slider inputName="max_query_terms"
+							start={25}
+							rangeMin={0}
+							rangeMax={50}
 							onChange={this.inputChangeHandler} />
 					</div>
 
 					<div className="three columns">
 						<br/>
 						<label>minimum_should_match</label>
-						<Slider inputName="minimum_should_match" 
-							start={30} 
-							rangeMin={0} 
-							rangeMax={100} 
+						<Slider inputName="minimum_should_match"
+							start={30}
+							rangeMin={0}
+							rangeMax={100}
 							onChange={this.inputChangeHandler} />
 					</div>
 
 				</div>
 
-				<DocumentList 
-					baseRoute={this.baseRoute} 
-					disableEventBus="true" 
-					disableSorting="true" 
-					similarDocs={this.state.id} 
-					min_word_length={this.state.min_word_length} 
-					min_term_freq={this.state.min_term_freq} 
-					max_query_terms={this.state.max_query_terms} 
-					minimum_should_match={this.state.minimum_should_match} 
+				<DocumentList
+					baseRoute={this.baseRoute}
+					disableEventBus="true"
+					disableSorting="true"
+					similarDocs={this.state.id}
+					min_word_length={this.state.min_word_length}
+					min_term_freq={this.state.min_term_freq}
+					max_query_terms={this.state.max_query_terms}
+					minimum_should_match={this.state.minimum_should_match}
 					displayScore="true" />
-			</div> : 
+			</div> :
 		null;
 	}
 }

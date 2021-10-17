@@ -199,7 +199,7 @@ export default class BirthYearsGraph extends React.Component {
 				delete data.all;
 
 				this.setState({
-					total: json.metadata.total,
+					total: json.metadata.total.value,
 					all: allData,
 					data: data,
 					loading: false
