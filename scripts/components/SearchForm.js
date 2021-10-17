@@ -54,7 +54,7 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
-			selectedTypes: ['arkiv', 'tryckt'], 
+			selectedTypes: ['arkiv', 'tryckt'],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
 			collectionYears: [this.sliderStartYear, this.sliderEndYear],
@@ -670,7 +670,7 @@ export default class SearchForm extends React.Component {
 								<label>Typ:</label>
 
 								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista', 'snd']}
+								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'tilltal', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista', 'snd']}
 									selectedItems={this.state.selectedTypes}
 									onSelectionChange={this.typeListChangeHandler} />
 							</div>
@@ -743,7 +743,7 @@ export default class SearchForm extends React.Component {
 
 									<div className="six columns">
 										<label>Landskap:</label>
-	
+
 										{/* Select input för landskap */}
 										<PopulatedSelect inputName="landskapInput"
 											dataUrl={config.apiUrl+config.endpoints.landskap}
