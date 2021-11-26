@@ -2,8 +2,8 @@ export default {
 	// Namn på localStorage som lagrar sparade sägner
 	localLibraryName: 'digitalt_kulturarv',
 
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced-tilltal/',
-	//apiUrl: 'http://localhost:8000/api/es/',
+	//apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced-tilltal/',
+	apiUrl: 'http://localhost:8000/api/es/',
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
