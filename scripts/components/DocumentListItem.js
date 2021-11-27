@@ -73,7 +73,7 @@ export default class DocumentListItem extends React.Component {
 
 					<div className="eight columns">
 						{
-							this.state.data._source.materialtype == 'inspelning' && this.state.data._source.media.length > 0 &&
+							(this.state.data._source.materialtype == 'inspelning' || this.state.data._source.materialtype == 'tilltal') && this.state.data._source.media.length > 0 &&
 							<div>
 								{
 									_.where(this.state.data._source.media, {type: 'audio'}).map((item) => <TimeslotsAudioPlayer

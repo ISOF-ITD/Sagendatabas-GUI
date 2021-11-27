@@ -111,7 +111,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 					<div className="eight columns">
 						{
-							this.state.doc && this.state.doc.materialtype == 'inspelning' && this.state.doc.media.length > 0 &&
+							this.state.doc && (this.state.doc.materialtype == 'inspelning' || this.state.doc.materialtype == 'tilltal') && this.state.doc.media.length > 0 &&
 							<div>
 								{
 									_.where(this.state.doc.media, {type: 'audio'}).map((item) => <TimeslotsAudioPlayer documentTitle={this.state.doc.title}
