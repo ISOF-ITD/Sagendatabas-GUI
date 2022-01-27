@@ -2,15 +2,19 @@ export default {
 	// Namn på localStorage som lagrar sparade sägner
 	localLibraryName: 'digitalt_kulturarv',
 
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
+	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/', // funkar inte. kolla vilka ändringar som gjorts i es-advanced-tilltal, dvs. branchen ES7-new i sagendatatbas-es-api-repot
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/', // index för forskare med mer data
 //	apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
+
+//TODO: varför görs anrop till oden.test
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
 	//Is it ever used in this app?:
 	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv',
 
-	geoserverUrl: 'https://oden-test.isof.se/geoserver',
+	geoserverUrl: '',//'https://oden-test.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
 

@@ -13,6 +13,9 @@ export default class CollectionYearsGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.container = React.createRef();
+		this.graphContainer = React.createRef();
+
 		this.graphMargins = {
 			left: this.props.simpleGraph ? 0 : 40,
 			right: this.props.simpleGraph ? 0 : 10,
@@ -53,7 +56,7 @@ export default class CollectionYearsGraph extends React.Component {
 
 	componentDidMount() {
 		this.setState({
-			graphContainerWidth: this.refs.container.clientWidth
+			graphContainerWidth: this.container.current.clientWidth
 		}, function() {
 			this.renderGraphBase();
 		}.bind(this));
@@ -88,8 +91,8 @@ export default class CollectionYearsGraph extends React.Component {
 
 	windowResizeHandler() {
 		this.setState({
-			graphContainerWidth: this.refs.container.clientWidth,
-			graphContainerHeight: this.state.fullScreen ? this.refs.container.clientHeight / 2 : (this.props.graphHeight || 400),
+			graphContainerWidth: this.container.current.clientWidth,
+			graphContainerHeight: this.state.fullScreen ? this.container.current.clientHeight / 2 : (this.props.graphHeight || 400),
 		}, function() {
 			this.renderGraph(true);
 		}.bind(this));
@@ -317,7 +320,7 @@ export default class CollectionYearsGraph extends React.Component {
 
 		this.yRange = this.createYRange();
 
-		var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+		// var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');
@@ -522,10 +525,10 @@ export default class CollectionYearsGraph extends React.Component {
 
 	render() {
 		return (
-			<div className={'graph-wrapper disable-component-frame'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} ref="container">
+			<div className={'graph-wrapper disable-component-frame'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} ref={this.container}>
 
 				<div className="graph-container">
-					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
+					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref={this.graphContainer}/>
 				</div>
 
 				{

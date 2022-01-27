@@ -140,10 +140,9 @@ export default class CategoriesGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				var categoryTypes = json.data.length > 0 ? ['Alla'].concat(_.compact(_.uniq(_.pluck(json.data, 'type')))) : [];
-
 				this.setState({
 					categoryTypes: categoryTypes,
-					total: json.metadata.total,
+					total: json.metadata.total.value,
 					originalData: json.data,
 					data: json.data,
 					loading: false

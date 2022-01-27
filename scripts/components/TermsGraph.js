@@ -94,7 +94,6 @@ export default class TermsGraph extends React.Component {
 		if (JSON.stringify(data.params) == JSON.stringify(this.state.params)) {
 			return;
 		}
-
 		this.setState({
 			params: data.params
 		}, function() {
@@ -120,7 +119,7 @@ export default class TermsGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.metadata.total,
+					total: json.metadata.total.value,
 					data: json.data,
 					loading: false
 				}, function() {

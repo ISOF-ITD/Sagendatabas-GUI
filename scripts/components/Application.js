@@ -102,7 +102,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 				{main}
 
-				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
+				{/* <OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
 					<div>
 						<hr className="margin-bottom-35"/>
 						<div className="user-box">
@@ -113,7 +113,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
 					</div>
 				</OverlayWindow>
-				{ console.log('application.js render /OverlayWindow') }
+				{ console.log('application.js render /OverlayWindow') } */}
 			</div>
 		);
 	}
