@@ -2,11 +2,7 @@
 
 Användargränssnitt för avancerade versionen av sägenkartan.
 
-node v12 not compatible with gulp v3.
-
-```bash
-nvm use 10.20.1 && gulp
-```
+---
 
 följande anrop verkar ha problem:
 
