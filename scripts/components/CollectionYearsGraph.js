@@ -199,7 +199,7 @@ export default class CollectionYearsGraph extends React.Component {
 					}
 
 					this.setState({
-						total: json.metadata.total,
+						total: json.metadata.total.value || json.metadata.total, // ES7 vs ES5
 						data: data,
 						loading: false
 					}, function() {

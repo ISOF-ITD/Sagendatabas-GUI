@@ -5,7 +5,8 @@ export default {
 	localLibraryName: 'digitalt_kulturarv',
 
 	// For public application:
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
 	// For authorized users application:
 	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
 	// apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',

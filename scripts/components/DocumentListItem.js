@@ -50,7 +50,7 @@ export default class DocumentListItem extends React.Component {
 							{
 								this.state.data._source.places && this.state.data._source.places.length > 0 &&
 								this.state.data._source.places.map(function(place) {
-									return <span className="prop">{place.name+', '+place.landskap}</span>
+									return <span className="prop" key={place.name+'-'+place.landskap}>{place.name+', '+place.landskap}</span>
 								})
 							}
 							<span className="prop">{this.state.data._source.materialtype}</span>
