@@ -13,8 +13,7 @@ export default class CollectionYearsGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.container = React.createRef();
-		this.graphContainer = React.createRef();
+		//this.container = React.createRef();
 
 		this.graphMargins = {
 			left: this.props.simpleGraph ? 0 : 40,
@@ -56,7 +55,7 @@ export default class CollectionYearsGraph extends React.Component {
 
 	componentDidMount() {
 		this.setState({
-			graphContainerWidth: this.container.current.clientWidth
+			graphContainerWidth: this.refs.graphContainer.clientWidth
 		}, function() {
 			this.renderGraphBase();
 		}.bind(this));
@@ -91,8 +90,8 @@ export default class CollectionYearsGraph extends React.Component {
 
 	windowResizeHandler() {
 		this.setState({
-			graphContainerWidth: this.container.current.clientWidth,
-			graphContainerHeight: this.state.fullScreen ? this.container.current.clientHeight / 2 : (this.props.graphHeight || 400),
+			graphContainerWidth: this.refs.graphContainer.clientWidth,
+			graphContainerHeight: this.state.fullScreen ? this.refs.graphContainer.clientHeight / 2 : (this.props.graphHeight || 400),
 		}, function() {
 			this.renderGraph(true);
 		}.bind(this));
@@ -200,7 +199,7 @@ export default class CollectionYearsGraph extends React.Component {
 					}
 
 					this.setState({
-						total: json.metadata.total,
+						total: json.metadata.total.value || json.metadata.total, // ES7 vs ES5
 						data: data,
 						loading: false
 					}, function() {
@@ -320,7 +319,8 @@ export default class CollectionYearsGraph extends React.Component {
 
 		this.yRange = this.createYRange();
 
-		// var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+		//TODO: Check if needed then fix it:
+		//var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
 		this.vis = this.svg.append('g')
 			.attr('transform', 'translate('+this.graphMargins.left + ','+this.graphMargins.top+')');

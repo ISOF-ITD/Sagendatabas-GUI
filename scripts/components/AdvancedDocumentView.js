@@ -14,7 +14,8 @@ export default class AdvancedDocumentView extends React.Component {
 		this.mediaImageClickHandler = this.mediaImageClickHandler.bind(this);
 		this.inputChangeHandler = this.inputChangeHandler.bind(this);
 
-		this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
+		//this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
+		this.baseRoute = props.match.url.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
 
 		this.state = {
 			doc: null,
@@ -43,11 +44,11 @@ export default class AdvancedDocumentView extends React.Component {
 	}
 
 	componentDidMount() {
-		this.fetchData(this.props.params.id);
+		this.fetchData(this.props.match.params.id);
 	}
 
 	componentWillReceiveProps(props) {
-		this.fetchData(props.params.id);
+		this.fetchData(props.match.params.id);
 	}
 
 	fetchData(id) {
@@ -88,7 +89,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 		var personItems = this.state.doc && this.state.doc.persons && this.state.doc.persons.length > 0 ? this.state.doc.persons.map(function(person, index) {
 			return <tr key={index}>
-				<td><a href={'#'+(this.props.baseRoute ? this.props.baseRoute : 'search/analyse/')+'person/'+person.id}>{person.name}</a></td>
+				<td><a href={'#'+(this.baseRoute ? this.baseRoute : 'search/analyse/')+'/person/'+person.id}>{person.name}</a></td>
 				<th>{person.birth_year ? person.birth_year : ''}</th>
 				<th>{person.relation == 'c' ? 'Upptecknare' : person.relation == 'i' ? 'Informant' : ''}</th>
 			</tr>;

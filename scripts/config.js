@@ -1,20 +1,38 @@
 export default {
+	// Configuration for environment
+	///////////////////////////////////////
 	// Namn på localStorage som lagrar sparade sägner
 	localLibraryName: 'digitalt_kulturarv',
 
+<<<<<<< HEAD
 	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
 	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/', // funkar inte. kolla vilka ändringar som gjorts i es-advanced-tilltal, dvs. branchen ES7-new i sagendatatbas-es-api-repot
 	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/', // index för forskare med mer data
 //	apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
+=======
+	// For public application:
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
+	// For authorized users application:
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
+	// apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
+>>>>>>> update-refs
 
 //TODO: varför görs anrop till oden.test
 
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
-	//Is it ever used in this app?:
-	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv',
+	// For resources as /img:
+	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv-publik/',
 
+<<<<<<< HEAD
 	geoserverUrl: '',//'https://oden-test.isof.se/geoserver',
+=======
+
+	// Base configuration for functionality
+	///////////////////////////////////////
+	geoserverUrl: 'https://oden-test.isof.se/geoserver',
+>>>>>>> update-refs
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
 
@@ -55,5 +73,28 @@ export default {
 	},
 
 	minYear: 1750,
-	maxYear: 2017
+	maxYear: 2017,
+
+	// Needed for ISOF-React-modules/components:
+	siteOptions: {
+		recordList: {
+			// Döljd materialtyp i RecordList, används för matkartan
+			//hideMaterialType: true,
+
+			/*
+			// Dölj kategorier kolumn i RecordList, används för folkmusiken
+			hideCategories: true
+
+			// Dölj TranscriptionStatus kolumn i RecordList, används bara för crowdsource?
+			hideTranscriptionStatus: true
+			*/
+
+			// Vilka kategorier vi vill visa i listan, här vill vi bara visa matkarta kategorier men dölja frågolista-kategorier
+			//visibleCategories: ['tradark']
+		},
+
+		// Inaktivera länker till personer, visa bara namnet
+		//disablePersonLinks: true
+	},
+
 };

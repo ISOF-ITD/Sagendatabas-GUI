@@ -1,5 +1,5 @@
 import React from 'react';
-import { hashHistory, Link } from 'react-router';
+import { hashHistory, Link } from 'react-router-dom';
 
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -573,7 +573,10 @@ export default class SearchForm extends React.Component {
 							<nav className="app-nav">
 								<Link to="/">Hem</Link>
 								<Link onClick={this.appMenuItemClickHandler} to="/search/analyse">Sök</Link>
+								{/*
+								//extended app:
 								<Link onClick={this.appMenuItemClickHandler} to="/search/network">Topic terms nätverk</Link>
+								*/}
 							</nav>
 						</DropdownMenu>
 					</div>

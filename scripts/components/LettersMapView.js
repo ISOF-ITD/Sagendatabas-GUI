@@ -22,6 +22,11 @@ export default class LettersMapView extends React.Component {
 
 		window.mapView = this;
 
+		this.collectionYearsGraphRef = React.createRef();
+		//TODO Maybe use a React way instead of ref for React-component MapBase instead of get this to work with MapBase and other components using MapBase:
+		//this.mapViewRef = React.createRef();
+		this.timerangeSliderRef = React.createRef();
+
 		this.baseLayerChangeHandler = this.baseLayerChangeHandler.bind(this);
 
 		this.searchHandler = this.searchHandler.bind(this);
@@ -57,6 +62,7 @@ export default class LettersMapView extends React.Component {
 
 		this.featureLayer = L.featureGroup();
 		this.featureLayer.addTo(this.refs.mapView.map);
+		//this.featureLayer.addTo(this.mapViewRef.map);
 
 		if (this.props.person) {
 			this.fetchData({
@@ -81,10 +87,10 @@ export default class LettersMapView extends React.Component {
 
 	sliderGraphChangeHandler(event) {
 		if (event == null) {
-			this.refs.timerangeSlider.slider.set([this.state.sliderStartYear, this.state.sliderEndYear]);
+			this.timerangeSliderRef.slider.set([this.state.sliderStartYear, this.state.sliderEndYear]);
 		}
 		else {
-			this.refs.timerangeSlider.slider.set(event);
+			this.timerangeSliderRef.slider.set(event);
 		}
 	}
 
@@ -93,14 +99,14 @@ export default class LettersMapView extends React.Component {
 		console.log(data);
 
 		if (isFinite(data.min) && isFinite(data.max)) {
-			this.refs.timerangeSlider.slider.set([data.min, data.max]);
+			this.timerangeSliderRef.slider.set([data.min, data.max]);
 
 			this.setState({
 				sliderStartYear: data.min,
 				sliderEndYear: data.max
 			});
 
-			this.refs.collectionYearsGraph.setTimeOverlay([data.min, data.max]);
+			this.collectionYearsGraphRef.setTimeOverlay([data.min, data.max]);
 		}
 	}
 
@@ -141,7 +147,7 @@ export default class LettersMapView extends React.Component {
 			this.waitingForSlider = false;
 		}.bind(this), 1000);
 
-		this.refs.collectionYearsGraph.setTimeOverlay(event.target.value);
+		this.collectionYearsGraphRef.setTimeOverlay(event.target.value);
 	}
 
 	baseLayerChangeHandler() {
@@ -222,7 +228,7 @@ export default class LettersMapView extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.metadata.total,
+					total: json.metadata.total.value || json.metadata.total, // ES7 vs ES5
 					data: json.data,
 				}, function() {
 					this.updateMap();
@@ -238,7 +244,7 @@ export default class LettersMapView extends React.Component {
 
 				<div className="map-timeline-container" style={{opacity: this.state.data == null ? 0.4 : 1}}>
 
-					<CollectionYearsGraph name="mapCollectionGraph" ref="collectionYearsGraph" 
+					<CollectionYearsGraph name="mapCollectionGraph" ref={this.collectionYearsGraphRef} 
 						graphHeight="100" 
 						simpleGraph={true} 
 						listenForTimerangeChange={true}
@@ -246,7 +252,7 @@ export default class LettersMapView extends React.Component {
 						onlyGeography={true}
 						onChange={this.sliderGraphChangeHandler} />
 
-					<Slider ref="timerangeSlider" 
+					<Slider ref={this.timerangeSliderRef}
 						inputName="collectionYears" 
 						enabled={this.state.data != null}
 						start={[this.state.sliderStartYear, this.state.sliderEndYear]} 

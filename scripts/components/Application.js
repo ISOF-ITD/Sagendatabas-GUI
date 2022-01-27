@@ -1,5 +1,19 @@
 import React from 'react';
+import { Route, Switch } from 'react-router-dom'
 import { hashHistory } from 'react-router';
+
+import AnalyticalApplicationWrapper from './AnalyticalApplicationWrapper';
+import NetworkApplicationWrapper from './NetworkApplicationWrapper';
+
+//Test use PlaceView for places:
+// TODO handle url-paths record/document: record/:record_id vs /search/analyse/document/:record_id
+import RoutePopupWindow from './../../ISOF-React-modules/components/controls/RoutePopupWindow';
+import PlaceView from './../../ISOF-React-modules/components/views/PlaceView';
+//import routeHelper from './../utils/routeHelper';
+
+//import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+//import AdvancedDocumentView from './AdvancedDocumentView';
+//import AdvancedPersonView from './AdvancedPersonView';
 
 import SearchForm from './SearchForm';
 
@@ -10,7 +24,7 @@ import EventBus from 'eventbusjs';
 /*
 Wrapper för hela applicationen. Innehåller SearchForm och lägger till component från router till 'main'
 */
-export default class AnalyticalApplicationWrapper extends React.Component {
+export default class Application extends React.Component {
 	constructor(props) {
 		console.log('Application.js constructor');
 		super(props);
@@ -20,7 +34,12 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		this.state = {
 			overlayVisible: true,
 			firsttime: true,
+			//popupVisible: false
 		};
+
+		this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
+		this.popupWindowHideHandler = this.popupWindowHideHandler.bind(this);
+		this.popupCloseHandler = this.popupCloseHandler.bind(this);
 
 		// Bind all event handlers to this (the actual component) to make component variables available inside the functions
 		this.introOverlayCloseButtonClickHandler = this.introOverlayCloseButtonClickHandler.bind(this);
@@ -71,6 +90,21 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		//}
 	}
 
+	// Test use PlaceView for places, uses PopupWindow:
+	// Lägger till normal route när PopupWindow stängt
+	popupCloseHandler() {
+		// Lägg till rätt route när användaren stänger popuprutan
+		this.props.history.push('/search/analyse');
+	}
+
+	popupWindowShowHandler() {
+		document.body.classList.add('has-overlay');
+	}
+
+	popupWindowHideHandler() {
+		document.body.classList.remove('has-overlay');
+	}
+
 	render() {
 		console.log('Application.js render');
 
@@ -96,13 +130,84 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 					*/
 					}
 
-					<SearchForm />
+				<SearchForm />
 
 				</div>
 
+				<Switch>
+{/*					<Route path={[
+						"/search/analyse/document/:id",
+					]}
+						>
+								<AdvancedDocumentView match={this.props.match}/>
+					</Route>
+					<Route path={[
+						"/search/analyse/person/:id",
+					]}
+						>
+							<AdvancedPersonView/>
+					</Route>
+*/}					<Route path={[
+						"/search/analyse/document/:id",
+						"/search/analyse/person/:id",
+						"/search/analyse",
+					]}
+						render={(props) =>
+							<AnalyticalApplicationWrapper
+								{...props}
+							/>
+						}/>
+				{/*
+						>
+							<AnalyticalApplicationWrapper/>
+					</Route>
+				*/}
+					<Route path={[
+						"/search/network/document/:id",
+						"/search/network/person/:id",
+						"/search/network",
+					]}
+						render={(props) =>
+							<NetworkApplicationWrapper
+								{...props}	
+							/>
+						}/>
+				{/*
+							<NetworkApplicationWrapper/>
+					</Route>
+				*/}
+				{/*
+					//Test use PlaceView for places, uses PopupWindow:
+				*/}
+					<Route 
+						path={[
+							"/place/:place_id([0-9]+)",
+						]}
+						render={(props) =>
+							<RoutePopupWindow
+								onShow={this.popupWindowShowHandler}
+								onHide={this.popupWindowHideHandler}
+								onClose={this.popupCloseHandler}
+								router={this.context.router}>
+									<PlaceView 
+										{...props}	
+										//match={this.props.match}
+									/>
+							</RoutePopupWindow>
+						}/>
+				</Switch>
+				{/*
 				{main}
+<<<<<<< HEAD
 
 				{/* <OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
+=======
+				*/}
+{/*
+	extended app:
+*/}
+{/*				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
+>>>>>>> update-refs
 					<div>
 						<hr className="margin-bottom-35"/>
 						<div className="user-box">
@@ -113,7 +218,11 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
 					</div>
 				</OverlayWindow>
+<<<<<<< HEAD
 				{ console.log('application.js render /OverlayWindow') } */}
+=======
+*/}				{ console.log('application.js render /OverlayWindow') }
+>>>>>>> update-refs
 			</div>
 		);
 	}

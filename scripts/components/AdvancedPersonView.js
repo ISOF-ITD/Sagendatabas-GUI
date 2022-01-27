@@ -11,7 +11,7 @@ export default class AdvancedPersonView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.baseRoute = this.props.route.path.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
+		this.baseRoute = props.match.url.indexOf('/network/') > -1 ? 'search/network' : 'search/analyse';
 
 		this.state = {
 			data: null
@@ -19,11 +19,11 @@ export default class AdvancedPersonView extends React.Component {
 	}
 
 	componentDidMount() {
-		this.fetchData(this.props.params.id);
+		this.fetchData(this.props.match.params.id);
 	}
 
 	componentWillReceiveProps(props) {
-		this.fetchData(props.params.id);
+		this.fetchData(this.props.match.params.id);
 	}
 
 	fetchData(id) {

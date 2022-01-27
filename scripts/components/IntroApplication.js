@@ -23,7 +23,10 @@ export default class IntroApplication extends React.Component {
 
 						<nav className="app-nav">
 							<a href="#/search/analyse">Sök</a>
+							{/*
+							// extended app:
 							<a href="#/search/network">Topic terms nätverk</a>
+							*/}
 						</nav>
 		
 					</div>

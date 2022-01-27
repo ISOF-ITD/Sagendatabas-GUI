@@ -1,5 +1,5 @@
 import React from 'react';
-import { hashHistory } from 'react-router';
+import { Route, Switch } from 'react-router-dom';
 
 import EventBus from 'eventbusjs';
 
@@ -13,7 +13,8 @@ import PersonList from './PersonList';
 import AdvancedMapView from './AdvancedMapView';
 import GenderGraphDisplay from './GenderGraphDisplay';
 import TypesGraph from './TypesGraph';
-import NetworkGraph from './NetworkGraph';
+// Extended app:
+// import NetworkGraph from './NetworkGraph';
 
 import TextHighlightList from './TextHighlightList';
 import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverlay';
@@ -21,6 +22,10 @@ import ImageOverlay from './../../ISOF-React-modules/components/views/ImageOverl
 import {TabsContainer, Tab} from './../../ISOF-React-modules/components/controls/TabControl';
 
 import PopupWindow from './../../ISOF-React-modules/components/controls/PopupWindow';
+import AdvancedDocumentView from './AdvancedDocumentView';
+import AdvancedPersonView from './AdvancedPersonView';
+
+import IntroApplication from './IntroApplication';
 
 import config from './../config';
 
@@ -48,7 +53,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	// Lägger till normal route när PopupWindow stängt
 	popupCloseHandler() {
-		hashHistory.push('/search/analyse');
+		// Lägg till rätt route när användaren stänger popuprutan
+		this.props.history.push('/search/analyse');
 	}
 
 	popupWindowShowHandler() {
@@ -61,19 +67,27 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	render() {
 		// Hämtar popup parameter från router som säger om vilket component skulle synas i PopupWindow
-		const {
-			popup
-		} = this.props;
+		//const {
+		//	popup
+		//} = this.props;
 
 		// Checkar om PopupWindow skulle synas
-		var popupVisible = Boolean(popup);
+		//var popupVisible = Boolean(popup);
+		var popupVisible = false;
+
+		// Check if popup should be visible
+		if (this.props && this.props.match && this.props.match.url.indexOf('document') > -1) popupVisible = true;
+		if (this.props && this.props.match && this.props.match.url.indexOf('person') > -1) popupVisible = true;
 
 		return (
 			<div className={'app-container'}>
 
 				<TabsContainer className="content-width">
 					<AdvancedMapView mapHeight="700" tabName="Karta" />
-					<NetworkGraph graphHeight="800" 
+{/*
+	extended app:
+*/}
+{/*					<NetworkGraph graphHeight="800" 
 						hideControls={true}
 						min_doc_count="1" 
 						vertices_size="800" 
@@ -83,6 +97,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						url={config.apiUrl+config.endpoints.persons_graph} 
 						hideLabels={true}
 						tabName="Person nätverk" />
+*/}				
+					<IntroApplication mapHeight="700" tabName="Om" />
 				</TabsContainer>
 
 				<div className="container">
@@ -148,7 +164,28 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 				</div>
 
 				<PopupWindow windowOpen={popupVisible} onShow={this.popupWindowShowHandler} onHide={this.popupWindowHideHandler} onClose={this.popupCloseHandler} closeButtonStyle="dark" disableAutoScrolling="true">
+					<Switch>
+					<Route path={[
+							"/search/analyse/document/:id",
+						]}
+						render={(props) =>
+							<AdvancedDocumentView
+								{...props}	
+							/>
+						}/>
+						<Route path={[
+							"/search/analyse/person/:id",
+						]}
+						render={(props) =>
+							<AdvancedPersonView
+								{...props}	
+							/>
+						}/>
+					</Switch>
+					{/*	
+					//TODO: Not needed anymore
 					{popup}
+					 */}
 				</PopupWindow>
 
 				<ImageOverlay />
