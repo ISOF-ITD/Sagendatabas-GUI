@@ -198,16 +198,11 @@ export default class Application extends React.Component {
 				</Switch>
 				{/*
 				{main}
-<<<<<<< HEAD
-
-				{/* <OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
-=======
 				*/}
 {/*
 	extended app:
 */}
 {/*				<OverlayWindow title="Välkommen till digitalt kulturarv" showClose={false}>
->>>>>>> update-refs
 					<div>
 						<hr className="margin-bottom-35"/>
 						<div className="user-box">
@@ -218,11 +213,7 @@ export default class Application extends React.Component {
 						<button className="button-primary margin-bottom-0" onClick={this.introOverlayCloseButtonClickHandler}>{'Logga in'}</button>
 					</div>
 				</OverlayWindow>
-<<<<<<< HEAD
 				{ console.log('application.js render /OverlayWindow') } */}
-=======
-*/}				{ console.log('application.js render /OverlayWindow') }
->>>>>>> update-refs
 			</div>
 		);
 	}
