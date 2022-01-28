@@ -129,7 +129,7 @@ export default class CategoryTypesGraph extends React.Component {
 				return response.json()
 			}).then(function(json) {
 				this.setState({
-					total: json.metadata.total.value || json.metadata.total, // ES7 vs ES5
+					total: json.metadata.total.value || (json.metadata.total.value === 0 ? 0 : json.metadata.total), // ES7 vs ES5
 					data: json.data,
 					loading: false
 				}, function() {

@@ -107,8 +107,9 @@ export default class GenderGraphDisplay extends React.Component {
 				.then(function(response) {
 					return response.json()
 				}).then(function(json) {
+					//TODO: why "totalRecords"?
 					this.setState({
-						totalRecords: json.metadata.total.value || json.metadata.total, // ES7 vs ES5
+						totalRecords: json.metadata.total.value || (json.metadata.total.value === 0 ? 0 : json.metadata.total), // ES7 vs ES5
 						data: json.data,
 						loading: false
 					});
