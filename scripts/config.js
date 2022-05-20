@@ -12,7 +12,8 @@ export default {
 
 	geoserverUrl: 'https://oden-test.isof.se/geoserver',
 
-	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
+	// imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
+	imageUrl: '',
 	audioUrlDialects: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/dialekter/',
 	audioUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/Tilltal/',
 
