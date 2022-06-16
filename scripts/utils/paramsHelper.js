@@ -123,6 +123,10 @@ export default {
 				searchTerms.push('Geografiskt område: '+formatParam('title="'+latLngs[0]+','+latLngs[1]+';'+latLngs[2]+','+latLngs[3]+'">[...]'))
 			}
 
+			if (params.recordType && params.recordType != '') {
+				searchTerms.push('Record Type: '+formatParam(params.recordType.split(',').join(', ')));
+			}
+
 			if (params.type && params.type != '') {
 				searchTerms.push('Typ: '+formatParam(params.type.split(',').join(', ')));
 			}

@@ -12,7 +12,8 @@ export default class GenderGraph extends React.Component {
 	constructor(props) {
 		super(props);
 
-		//this.container = React.createRef();
+		this.container = React.createRef();
+		this.graphContainer = React.createRef();
 
 		this.graphMargins = {
 			left: 40,
@@ -52,7 +53,7 @@ export default class GenderGraph extends React.Component {
 
 	componentDidMount() {
 		this.setState({
-			graphContainerWidth: this.refs.container.clientWidth
+			graphContainerWidth: this.container.current.clientWidth,
 		}, function() {
 			this.renderGraphBase();
 		}.bind(this));
@@ -94,7 +95,7 @@ export default class GenderGraph extends React.Component {
 
 	windowResizeHandler() {
 		this.setState({
-			graphContainerWidth: this.container.clientWidth
+			graphContainerWidth: this.container.current.clientWidth,
 		}, function() {
 			this.renderGraph(true);
 		}.bind(this));
@@ -277,12 +278,12 @@ export default class GenderGraph extends React.Component {
 
 	render() {
 		return (
-			<div className={'graph-wrapper disable-component-frame'+(this.state.loading ? ' loading' : '')} ref="container">
+			<div className={'graph-wrapper disable-component-frame'+(this.state.loading ? ' loading' : '')} ref={this.container}>
 
 				<div className="graph-header">{this.props.label}</div>
 
 				<div className="graph-container">
-					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref='graphContainer'/>
+					<svg id={this.state.graphId} width={this.state.graphContainerWidth} height={this.state.graphContainerHeight} ref={this.graphContainer}/>
 				</div>
 
 				<div className="loading-overlay"></div>

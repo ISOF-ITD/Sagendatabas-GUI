@@ -108,12 +108,6 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="twelve columns">
 
 							<TabsContainer>
-								<Tab tabName="Topic terms">
-									<TermsGraph count="15" graphHeight="300" />
-								</Tab>
-								<Tab tabName="Titel topic terms">
-									<TermsGraph count="15" type="titles" graphHeight="300" />
-								</Tab>
 								<Tab tabName="Huvudkategorier">
 									<CategoryTypesGraph graphHeight="300" />
 								</Tab>
@@ -122,6 +116,12 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 								</Tab>
 								<Tab tabName="Typ">
 									<TypesGraph graphHeight="300" />
+								</Tab>
+								<Tab tabName="Topic terms">
+									<TermsGraph count="15" graphHeight="300" />
+								</Tab>
+								<Tab tabName="Titel topic terms">
+									<TermsGraph count="15" type="titles" graphHeight="300" />
 								</Tab>
 							</TabsContainer>
 					
@@ -155,7 +155,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 					<TabsContainer>
 
-						<DocumentList tabName="Dokumenter" />
+						<DocumentList tabName="Dokument" />
 						<TextHighlightList tabName="Markerade meningar" />
 						<PersonList tabName="Personer" />
 

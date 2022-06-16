@@ -5,8 +5,8 @@ export default {
 	localLibraryName: 'digitalt_kulturarv',
 
 	// For public application:
-	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
+	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
 	// For authorized users application:
 	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
 	// apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
@@ -21,7 +21,8 @@ export default {
 
 	// Base configuration for functionality
 	///////////////////////////////////////
-	geoserverUrl: 'https://oden-test.isof.se/geoserver',
+	// Proxy:  https://frigg-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
+	geoserverUrl: 'https://frigg-test.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
 
@@ -58,8 +59,13 @@ export default {
 	},
 
 	requiredApiParams: {
-		country: 'sweden'
+		// country: 'sweden',
+		// recordtype: 'one_record',
 	},
+
+	// pre-selected (and immutable) category type in search form
+	// if undefined, list of all category_types will be shown
+	predefinedCategoryType: 'tradark',
 
 	minYear: 1750,
 	maxYear: 2017,

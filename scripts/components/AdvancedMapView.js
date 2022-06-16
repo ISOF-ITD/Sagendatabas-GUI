@@ -163,7 +163,8 @@ export default class AdvancedMapView extends React.Component {
 			this.drawLayer.clearLayers();
 		}.bind(this));
 
-		this.renderVectorGrid();
+		// do not render vector grid onMount, but later
+		// this.renderVectorGrid();
 	}
 
 	componentWillUnmount() {

@@ -19,7 +19,7 @@ export default class IntroApplication extends React.Component {
 
 					<div className="container">
 
-						<h1>Digitalt kulturarv</h1>
+						<h1>Folke <i>forska</i></h1>
 
 						<nav className="app-nav">
 							<a href="#/search/analyse">Sök</a>

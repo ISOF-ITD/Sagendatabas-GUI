@@ -26,6 +26,7 @@ export default class SearchForm extends React.Component {
 		window.searchForm = this;
 
 		this.inputChangeHandler = this.inputChangeHandler.bind(this);
+		this.recordTypeListChangeHandler = this.recordTypeListChangeHandler.bind(this);
 		this.typeListChangeHandler = this.typeListChangeHandler.bind(this);
 		this.categoryListChangeHandler = this.categoryListChangeHandler.bind(this);
 
@@ -54,6 +55,7 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
+			selectedRecordTypes: ['one_record'],
 			selectedTypes: ['arkiv', 'tryckt'], 
 			selectedCategories: [],
 			collectionYearsEnabled: false,
@@ -90,6 +92,7 @@ export default class SearchForm extends React.Component {
 			searchInput: this.state.searchInput || '',
 			termsInput: this.state.termsInput || '',
 			titleTermsInput: this.state.titleTermsInput || '',
+			selectedRecordTypes: this.state.selectedRecordTypes || ['one_record'],
 			selectedTypes: this.state.selectedTypes || ['arkiv', 'tryckt'],
 			selectedCategories: this.state.selectedCategories || [],
 			collectionYearsEnabled: this.state.collectionYearsEnabled,
@@ -134,6 +137,7 @@ export default class SearchForm extends React.Component {
 			searchInput: currentSearch.searchInput,
 			termsInput: currentSearch.termsInput,
 			titleTermsInput: currentSearch.titleTermsInput,
+			selectedRecordTypes: currentSearch.selectedRecordTypes,
 			selectedTypes: currentSearch.selectedTypes,
 			selectedCategories: currentSearch.selectedCategories,
 			collectionYearsEnabled: currentSearch.collectionYearsEnabled,
@@ -179,6 +183,7 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
+			selectedRecordTypes: ['one_record'],
 			selectedTypes: ['arkiv', 'tryckt'],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
@@ -203,6 +208,7 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
+			selectedRecordTypes: ['one_record'],
 			selectedTypes: ['arkiv', 'tryckt'],
 			selectedCategories: [],
 			collectionYearsEnabled: false,
@@ -385,14 +391,21 @@ export default class SearchForm extends React.Component {
 		När musen lämnar sökformuläret vänter vi i en sekund, om musen inte kommer tillbaka förminskar vi
 		sökformuläret (mouseIdleHandler)
 		*/
-		if (!this.state.hasFocus) {
-			this.mouseIdleTimer = setTimeout(this.mouseIdleHandler.bind(this), 1000);
-		}
+		// if (!this.state.hasFocus) {
+		// 	this.mouseIdleTimer = setTimeout(this.mouseIdleHandler.bind(this), 1000);
+		// }
 	}
 
 	mouseIdleHandler() {
 		this.setState({
 			expanded: false
+		});
+	}
+
+	recordTypeListChangeHandler(event) {
+		// Uppdaterar state objektet med ny recordtyp som man har valt i recordtyp fältet
+		this.setState({
+			selectedRecordTypes: event
 		});
 	}
 
@@ -481,6 +494,10 @@ export default class SearchForm extends React.Component {
 			params.socken = searchParams.sockenInput;
 		}
 
+		if (searchParams.selectedRecordTypes.length > 0) {
+			params.recordType = searchParams.selectedRecordTypes.join(',');
+		}
+
 		if (searchParams.selectedTypes.length > 0) {
 			params.type = searchParams.selectedTypes.join(',');
 		}
@@ -519,6 +536,9 @@ export default class SearchForm extends React.Component {
 		if (window.eventBus) {
 			// Förberedar parametrar som ska skickas
 			var params = this.buildParams();
+
+			console.log("params:")
+			console.log(params)
 
 			// Skickar parametrar via eventBus till visualiserings komponenter
 			window.eventBus.dispatch('searchForm.search', this, {
@@ -581,7 +601,7 @@ export default class SearchForm extends React.Component {
 						</DropdownMenu>
 					</div>
 
-					<h1>Digitalt kulturarv</h1>
+					<h1>Folke <i>forska</i></h1>
 
 					<div className="row">
 
@@ -644,7 +664,7 @@ export default class SearchForm extends React.Component {
 
 						<div className="row">
 
-							<div className="four columns">
+							<div className="three columns">
 								<label>Terms:</label>
 								{/* AutocompleteInput för sökning av topic terms */}
 								<AutocompleteInput inputName="termsInput"
@@ -669,16 +689,47 @@ export default class SearchForm extends React.Component {
 
 							</div>
 
-							<div className="four columns">
+							<div className="three columns">
+								<label>Record Type:</label>
+
+								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
+								<CheckBoxList values={[
+													'one_record',
+													'one_accession_row',
+													// 'register',
+													// 'matkarta',
+													// 'inspelning',
+													// 'frågelista',
+													// 'accessionsregister',
+													// 'brev',
+													// 'webbfrågelista',
+													// 'snd',
+												]}
+									selectedItems={this.state.selectedRecordTypes}
+									onSelectionChange={this.recordTypeListChangeHandler} />
+							</div>
+
+							<div className="three columns">
 								<label>Typ:</label>
 
 								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
-								<CheckBoxList values={['arkiv', 'tryckt', 'register', 'matkarta', 'inspelning', 'frågelista', 'accessionsregister', 'brev', 'webbfrågelista', 'snd']}
+								<CheckBoxList values={[
+													'arkiv',
+													'tryckt',
+													// 'register',
+													// 'matkarta',
+													// 'inspelning',
+													// 'frågelista',
+													// 'accessionsregister',
+													// 'brev',
+													// 'webbfrågelista',
+													// 'snd',
+												]}
 									selectedItems={this.state.selectedTypes}
 									onSelectionChange={this.typeListChangeHandler} />
 							</div>
 
-							<div className="four columns">
+							<div className="three columns">
 								<label>Kategorier:</label>
 
 								{/* Filtrerad PopuplatedCheckBoxList som innehåller alla kategorier */}
@@ -686,7 +737,8 @@ export default class SearchForm extends React.Component {
 									filteredBy="type"
 									valueField="key"
 									labelField="name"
-									labelFunction={function(item) {return item.key.toUpperCase()+': '+item.name+' ('+item.type+')'}}
+									// labelFunction={function(item) {return item.key.toUpperCase()+': '+item.name+' ('+item.type+')'}}
+									labelFunction={function(item) {return `${item.name} (${item.key.toLowerCase()})`} }
 									selectedItems={this.state.selectedCategories}
 									onSelectionChange={this.categoryListChangeHandler} onFetch={function(data) {
 										window.allCategories = data;

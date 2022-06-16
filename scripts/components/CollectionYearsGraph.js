@@ -275,7 +275,10 @@ export default class CollectionYearsGraph extends React.Component {
 	createXRange() {
 		var x = d3.scaleTime().range([0,this.graphWidth]);
 
-		x.domain(d3.extent([this.minYear, this.maxYear]));
+		let xmin = this.state.data[0].year;
+		let xmax = this.state.data[this.state.data.length-1].year;
+
+		x.domain(d3.extent([xmin, xmax]));
 /*
 		x.domain(d3.extent(_.filter(this.state.data, function(item) {
 			return (item.year >= this.minYear) && (item.year <= this.maxYear);
