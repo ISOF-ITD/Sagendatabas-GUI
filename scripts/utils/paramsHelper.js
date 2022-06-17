@@ -19,7 +19,7 @@ export default {
 		var params = JSON.parse(JSON.stringify(params));
 
 		var formatParam = function(s) {
-			return (disableHtml ? '' : '<strong>')+s+(disableHtml ? '' : '</strong>');
+			return (disableHtml ? '' : '<strong>')+l(s)+(disableHtml ? '' : '</strong>');
 		}
 
 		var getCategoryName = function(category) {
