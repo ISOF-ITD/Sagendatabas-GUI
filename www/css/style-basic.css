@@ -210,7 +210,7 @@ input[type="submit"].button-primary,
 input[type="reset"].button-primary,
 input[type="button"].button-primary {
   color: #FFF;
-  background-color: #a6192e;
+  background-color: #097C44;
   border: none;
 }
 .button.button-primary:hover,
@@ -224,7 +224,7 @@ input[type="submit"].button-primary:focus,
 input[type="reset"].button-primary:focus,
 input[type="button"].button-primary:focus {
   color: #FFF;
-  background-color: #7a1222;
+  background-color: #064c2a;
 }
 .button.button-gray,
 button.button-gray,
@@ -1700,7 +1700,7 @@ table th {
   border-bottom: none;
 }
 .table-wrapper table a {
-  color: #a6192e;
+  color: #097C44;
   text-decoration: none;
 }
 .table-wrapper table a:hover {
@@ -1822,7 +1822,7 @@ td .play-button {
   padding: 20px;
   margin-bottom: 0;
   text-decoration: none;
-  color: #a6192e;
+  color: #097C44;
   cursor: pointer;
   z-index: 1100;
   opacity: 0;
@@ -2062,7 +2062,7 @@ td .play-button {
   padding: 50px 50px 30px;
   color: #fff;
   background-image: url('../img/header-back.gif');
-  background-color: #a6192e;
+  background-color: #097C44;
   background-position: center;
 }
 @media print {
@@ -2331,7 +2331,7 @@ td .play-button {
   position: absolute;
   top: 0;
   bottom: 0;
-  background: #a6192e;
+  background: #097C44;
   -webkit-animation-duration: 1.5s;
   animation-duration: 1.5s;
   -webkit-animation-name: indicatorAnimate;
@@ -2579,7 +2579,7 @@ td .play-button {
 }
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item.selected {
   color: #fff;
-  background-color: #d4454c;
+  background-color: #3FD695;
 }
 .dropdown-wrapper .dropdown-container.dropdown-list .list-container .item input[type="checkbox"] {
   margin-bottom: 0;
@@ -3227,8 +3227,8 @@ jsx/html example:
 }
 .graph-controls a.selected {
   color: #fff;
-  background-color: #a6192e;
-  border-color: #a6192e;
+  background-color: #097C44;
+  border-color: #097C44;
 }
 .graph-controls input:hover,
 .graph-controls select:hover,
@@ -3532,7 +3532,7 @@ path.letter-path {
   border-bottom: #edeff1 1px solid;
 }
 .documents-list .item.open .header {
-  border-top: 2px solid #a6192e;
+  border-top: 2px solid #097C44;
 }
 .documents-list .item.open .content {
   max-height: 2000px;
