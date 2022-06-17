@@ -258,8 +258,6 @@ export default class CategoriesGraph extends React.Component {
 		this.graphWidth = (this.state.data.length * this.barWidth < this.state.graphContainerWidth ? this.state.graphContainerWidth : this.state.data.length * this.barWidth)-this.graphMargins.left-this.graphMargins.right;
 		this.graphHeight = this.state.graphContainerHeight-this.graphMargins.top-this.graphMargins.bottom;
 
-		console.log('graphWidth: '+this.graphWidth);
-
 		var x = d3.scaleBand()
 			.rangeRound([0, this.graphWidth])
 			.padding(0.1);
