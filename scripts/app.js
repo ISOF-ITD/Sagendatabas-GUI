@@ -73,7 +73,9 @@ I början öppnas IntroApplication modulen
 
 ReactDOM.render(
 	<HashRouter>
-		<Route exact path="/" component={IntroApplication} />
+		<Route exact path="/" component={IntroApplication} >
+			<Redirect to="/search/analyse" />
+		</Route>
 		<Route path={[
 			"/search/analyse/document/:id",
 			"/search/analyse/person/:id",
