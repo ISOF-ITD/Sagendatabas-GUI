@@ -15,7 +15,7 @@ export default class IntroApplication extends React.Component {
 		return (
 			<div className={'app-container'}>
 
-				<div className="advanced-search-form fixed">
+				<div className="advanced-search-form">
 
 					<div className="container">
 
