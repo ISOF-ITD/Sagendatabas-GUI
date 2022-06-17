@@ -29,6 +29,37 @@
 @color-gray: #edeff1;
 @color-gray-border: #d1d1d1;
 
+// Colors defined in color intensity perspective
+//isof profile colors from june 2021:
+//Used?:
+//@color-black: #000000;
+
+//Ljusare färg för knapp för icke-aktiv
+//Mörkare färg för knapp för aktiv + hover
+
+//Icke aktiv knapp: (om fungerar alternativt Text alternativfärg)
+@color-lightest-isof: #3FD695;
+//Icke aktiv knapp: (HELST om fungerar)
+//Text alternativfärg (ej standard dvs vanligtvis svart):
+@color-text-contrast-isof: #097C44;
+//Profilfärg
+@color-lighter-isof: #005462;
+//Aktiv knapp + knapp-hover-over: 
+@color-darker-isof: #1c3f49;
+
+// Colors defined in color function perspective
+//Step 1: Defined less values for usage directly in rules from function perspective in adjusted rules (new from june 2021):
+//@color-background-lighter-isof: @color-lighter-isof;
+//@color-hover-active-button-isof: @color-lightest-isof;
+@color-hover-active-button-isof: @color-text-contrast-isof;
+
+//Step 2: Handle less for rules using color-values directly not adjusted (yet?)
+//Map to new isof-profile colors:
+@color-red: @color-text-contrast-isof;
+@color-red-lighter: @color-lightest-isof;
+@color-red-divider: @color-darker-isof;
+@notification-background: @color-darker-isof;
+
 body {
 	padding: 0;
 	margin: 0;
