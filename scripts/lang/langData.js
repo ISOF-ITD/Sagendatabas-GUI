@@ -8,7 +8,9 @@ export default {
 		'transcribed':'Granskas', 
 		'reviewing':'Granskas', 
 		'approved':'Granskas',
-		'published':'Ja'
+		'published':'Ja',
+		'one_record': 'Uppteckning',
+		'one_accession_row': 'Accession',
 	},
 	'no': {
 		'Karta': 'Kart',
