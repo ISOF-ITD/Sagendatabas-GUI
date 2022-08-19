@@ -48,7 +48,7 @@ export default {
 			}
 
 			if (params.title_terms && params.title_terms != '') {
-				searchTerms.push('Titel terms: '+formatParam(params.title_terms.split(',').join(', ')));
+				searchTerms.push('Rubrik på källa: '+formatParam(params.title_terms.split(',').join(', ')));
 			}
 
 			if (params.collection_years && (params.collection_years != '' || typeof params.collection_years.join)) {

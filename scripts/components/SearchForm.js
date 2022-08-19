@@ -55,8 +55,9 @@ export default class SearchForm extends React.Component {
 			searchInput: '',
 			termsInput: '',
 			titleTermsInput: '',
+			availableRecordTypes: ['one_record', 'one_accession_row'],
 			selectedRecordTypes: ['one_record'],
-			selectedTypes: ['arkiv', 'tryckt'], 
+			selectedTypes: ['arkiv'], 
 			selectedCategories: [],
 			collectionYearsEnabled: false,
 			collectionYears: [this.sliderStartYear, this.sliderEndYear],
@@ -93,6 +94,7 @@ export default class SearchForm extends React.Component {
 			termsInput: this.state.termsInput || '',
 			titleTermsInput: this.state.titleTermsInput || '',
 			selectedRecordTypes: this.state.selectedRecordTypes || ['one_record'],
+			availableTypes: this.state.availableTypes || (this.state.selectedTypes && this.state.selectedTypes.includes('arkiv') && ['one_record']) || [],
 			selectedTypes: this.state.selectedTypes || ['arkiv', 'tryckt'],
 			selectedCategories: this.state.selectedCategories || [],
 			collectionYearsEnabled: this.state.collectionYearsEnabled,
@@ -411,8 +413,15 @@ export default class SearchForm extends React.Component {
 
 	typeListChangeHandler(event) {
 		// Uppdaterar state objektet med ny materialtyp som man har valt i materialtyp fältet
+		// och: trycker man 'arkiv' får man välja mellan uppteckning och/eller accession
+		let selectedTypes = event;
+		let availableRecordTypes =[];
+		if (selectedTypes.includes('arkiv')) {
+			availableRecordTypes = ['one_record', 'one_accession_row'];
+		}
 		this.setState({
-			selectedTypes: event
+			availableRecordTypes: availableRecordTypes,
+			selectedTypes: event,
 		});
 	}
 
@@ -646,7 +655,7 @@ export default class SearchForm extends React.Component {
 							<label><input type="checkbox"
 								name="rawTextSearch"
 								checked={this.state.rawTextSearch}
-								onChange={this.inputChangeHandler} /> Raw text sökning</label>
+								onChange={this.inputChangeHandler} /> Exakt sökning</label>
 						</div>
 
 						{/* Inställningar för fras-sökning */}
@@ -661,10 +670,10 @@ export default class SearchForm extends React.Component {
 
 						<div className="row">
 
-							<div className="three columns">
-								<label>Terms:</label>
+							{/* <div className="three columns">
+								<label>Terms:</label> */}
 								{/* AutocompleteInput för sökning av topic terms */}
-								<AutocompleteInput inputName="termsInput"
+								{/* <AutocompleteInput inputName="termsInput"
 									searchUrl={config.apiUrl+config.endpoints.terms_autocomplete+'?search=$s'}
 									valueField="term"
 									inputClassName="u-full-width"
@@ -673,9 +682,9 @@ export default class SearchForm extends React.Component {
 									onEnter={this.triggerSearch}
 									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
-								<label>Titel terms:</label>
+								<label>Rubrik på källa:</label> */}
 								{/* AutocompleteInput för sökning av titel topic terms */}
-								<AutocompleteInput inputName="titleTermsInput"
+								{/* <AutocompleteInput inputName="titleTermsInput"
 									searchUrl={config.apiUrl+config.endpoints.title_terms_autocomplete+'?search=$s'}
 									valueField="term"
 									inputClassName="u-full-width"
@@ -684,29 +693,9 @@ export default class SearchForm extends React.Component {
 									onEnter={this.triggerSearch}
 									listLabelFormatFunc={this.termsAutocompleteFormatListLabel} />
 
-							</div>
+							</div> */}
 
-							<div className="three columns">
-								<label>Record Type:</label>
-
-								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
-								<CheckBoxList values={[
-													'one_record',
-													'one_accession_row',
-													// 'register',
-													// 'matkarta',
-													// 'inspelning',
-													// 'frågelista',
-													// 'accessionsregister',
-													// 'brev',
-													// 'webbfrågelista',
-													// 'snd',
-												]}
-									selectedItems={this.state.selectedRecordTypes}
-									onSelectionChange={this.recordTypeListChangeHandler} />
-							</div>
-
-							<div className="three columns">
+							<div className="four columns">
 								<label>Typ:</label>
 
 								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
@@ -726,7 +715,28 @@ export default class SearchForm extends React.Component {
 									onSelectionChange={this.typeListChangeHandler} />
 							</div>
 
-							<div className="three columns">
+							<div className="four columns">
+								<label>Dokumenttyp:</label>
+
+								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
+								<CheckBoxList values={this.state.availableRecordTypes}
+												// {[
+												// 	'one_record',
+												// 	'one_accession_row',
+												// 	// 'register',
+												// 	// 'matkarta',
+												// 	// 'inspelning',
+												// 	// 'frågelista',
+												// 	// 'accessionsregister',
+												// 	// 'brev',
+												// 	// 'webbfrågelista',
+												// 	// 'snd',
+												// ]}
+									selectedItems={this.state.selectedRecordTypes}
+									onSelectionChange={this.recordTypeListChangeHandler} />
+							</div>
+
+							<div className="four columns">
 								<label>Kategorier:</label>
 
 								{/* Filtrerad PopuplatedCheckBoxList som innehåller alla kategorier */}
