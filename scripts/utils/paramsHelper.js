@@ -123,12 +123,18 @@ export default {
 				searchTerms.push('Geografiskt område: '+formatParam('title="'+latLngs[0]+','+latLngs[1]+';'+latLngs[2]+','+latLngs[3]+'">[...]'))
 			}
 
-			if (params.recordType && params.recordType != '') {
-				searchTerms.push('Record Type: '+formatParam(params.recordType.split(',').join(', ')));
-			}
-
-			if (params.type && params.type != '') {
-				searchTerms.push('Typ: '+formatParam(params.type.split(',').join(', ')));
+			if ((params.recordtype && params.recordtype != '') || (params.type && params.type != '')) {
+				let s = 'Materialtyp: ';
+				s = s + (formatParam(params.recordtype.split(',').map(function(n){
+					return l(n);
+				}).join(', ')));
+				if(params.recordtype && params.type && params.type.split(',').filter(n => {return n != 'arkiv'} ).length > 0) {
+					s = s + ', '
+				}
+				s= s + (formatParam(params.type.split(',').filter(function(n) {
+					return n != 'arkiv'; 
+				}).join(', ')));
+				searchTerms.push(s);
 			}
 
 			return params ? searchTerms.join(', ') : '';

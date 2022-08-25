@@ -117,12 +117,12 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 								<Tab tabName="Typ">
 									<TypesGraph graphHeight="300" />
 								</Tab>
-								<Tab tabName="Topic terms">
+								{/* <Tab tabName="Topic terms">
 									<TermsGraph count="15" graphHeight="300" />
 								</Tab>
 								<Tab tabName="Rubrik på källa (Titel topic terms)">
 									<TermsGraph count="15" type="titles" graphHeight="300" />
-								</Tab>
+								</Tab> */}
 							</TabsContainer>
 					
 						</div>

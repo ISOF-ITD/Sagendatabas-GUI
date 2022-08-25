@@ -61,6 +61,7 @@ export default {
 	requiredApiParams: {
 		// country: 'sweden',
 		// recordtype: 'one_record',
+		publishstatus: 'published',
 	},
 
 	// pre-selected (and immutable) category type in search form

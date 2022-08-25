@@ -712,31 +712,51 @@ export default class AdvancedMapView extends React.Component {
 		})
 
 		return (
-			<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
+			<div>
+				<div className={'map-wrapper'+(this.state.loading ? ' loading' : '')+(this.state.fullScreen ? ' full-screen' : '')} style={this.props.mapHeight ? {height: Number(this.props.mapHeight)+50} : {}} ref="container">
 
-				<MapBase ref="mapView" className="map-container" disableLocateControl={true} disableSwedenMap={true} scrollWheelZoom={false} onBaseLayerChange={this.baseLayerChangeHandler} />
+					<MapBase
+						ref="mapView"
+						className="map-container"
+						disableLocateControl={true}
+						disableSwedenMap={true}
+						scrollWheelZoom={false}
+						onBaseLayerChange={this.baseLayerChangeHandler}
+						center={[63.0, 16.7211]}
+						/>
 
-				{
-					this.state.mapMode.type == 'vectorgrid' &&
-					<ColorLegendsGraph colorScale={this.state.colorScale} />
-				}
+					{
+						this.state.mapMode.type == 'vectorgrid' &&
+						<ColorLegendsGraph colorScale={this.state.colorScale} />
+					}
 
-				<div className="map-controls graph-controls">
+					<div className="map-controls graph-controls">
 
-					<a onClick={this.fullScreenButtonClickHandler} className={this.state.fullScreen ? 'selected' : ''}>Fullskärm</a>
+						<a onClick={this.fullScreenButtonClickHandler} className={this.state.fullScreen ? 'selected' : ''}>Fullskärm</a>
 
-					<select value={this.state.mapMode.name} onChange={this.mapModeSelectChangeHandler}>
-						{mapModeSelectElements}
-					</select>
+						<select value={this.state.mapMode.name} onChange={this.mapModeSelectChangeHandler}>
+							{mapModeSelectElements}
+						</select>
 
-					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
-						<option value="absolute">Antal dokument</option>
-						<option value="relative">Antal dokument relativt det totala antalet</option>
-						<option value="page_count">Antal sidor</option>
-					</select>
+						<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
+							<option value="absolute">Antal dokument</option>
+							<option value="relative">Antal dokument relativt det totala antalet</option>
+							<option value="page_count">Antal sidor</option>
+						</select>
+
+					</div>
+
+
+					<div className="loading-overlay"></div>
+
+					<div style={{top: this.state.tooltip.y+20, left: this.state.tooltip.x+20}} className={'graph-tooltip position-fixed'+(this.state.tooltip.title != '' && this.state.tooltip.text ? ' visible' : '')}>
+
+						<strong>{this.state.tooltip.title}</strong><br/>
+						<span dangerouslySetInnerHTML={{__html: this.state.tooltip.text}}></span>
+
+					</div>
 
 				</div>
-
 				<div className={'map-timeline-container'+(!this.state.limitMapToPeriod ? ' minimized' : '')+(this.state.data == null ? ' disabled' : '')}>
 
 					<div style={{position: 'relative', float: 'right', marginTop: 10, marginRight: 10, zIndex: 10}}>
@@ -760,16 +780,6 @@ export default class AdvancedMapView extends React.Component {
 						onChange={this.timerangeSliderSlideHandler}
 						onSlide={this.timerangeSliderSlideHandler} />
 				</div>
-
-				<div className="loading-overlay"></div>
-
-				<div style={{top: this.state.tooltip.y+20, left: this.state.tooltip.x+20}} className={'graph-tooltip position-fixed'+(this.state.tooltip.title != '' && this.state.tooltip.text ? ' visible' : '')}>
-
-					<strong>{this.state.tooltip.title}</strong><br/>
-					<span dangerouslySetInnerHTML={{__html: this.state.tooltip.text}}></span>
-
-				</div>
-
 			</div>
 		);
 	}

@@ -9,8 +9,9 @@ export default {
 		'reviewing':'Granskas', 
 		'approved':'Granskas',
 		'published':'Ja',
-		'one_record': 'Uppteckning',
-		'one_accession_row': 'Accession',
+		'one_record': 'Uppteckning (Arkiv)',
+		'one_accession_row': 'Accession (Arkiv)',
+		'tryckt': 'Tryckt',
 	},
 	'no': {
 		'Karta': 'Kart',

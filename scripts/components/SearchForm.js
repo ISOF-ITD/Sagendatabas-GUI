@@ -18,6 +18,7 @@ import sagenkartaCategories from './../../ISOF-React-modules/utils/sagenkartaCat
 import paramsHelper from './../utils/paramsHelper';
 
 import config from './../config.js';
+import { tickStep } from 'd3';
 
 export default class SearchForm extends React.Component {
 	constructor(props) {
@@ -49,6 +50,7 @@ export default class SearchForm extends React.Component {
 
 		this.sliderStartYear = config.minYear;
 		this.sliderEndYear = config.maxYear;
+		this.sliderClickHandler = this.sliderClickHandler.bind(this);
 
 		// Förberedar state objectet som innehåller alla sökparams
 		this.state = {
@@ -277,6 +279,13 @@ export default class SearchForm extends React.Component {
 		this.refs.appMenu.closeMenu();
 	}
 
+	sliderClickHandler(event) {
+		// activate year range
+		this.setState({
+			collectionYearsEnabled: true
+		});
+	}
+
 	componentDidMount() {
 		// Förberedar gränsnittet när komponentet är redo i DOM
 
@@ -409,19 +418,38 @@ export default class SearchForm extends React.Component {
 		this.setState({
 			selectedRecordTypes: event
 		});
+		if(this.state.selectedRecordTypes.includes('one_record') || this.state.selectedRecordTypes.includes('one_accession_row')){
+			this.setState({
+				// add 'arkiv' to selectedTypes if it is not already in list
+				selectedTypes: this.state.selectedTypes.includes('arkiv') ? this.state.selectedTypes : this.state.selectedTypes.concat('arkiv')
+				
+			});
+		}
+		else {
+			this.setState({
+				// remove 'arkiv' from selectedTypes if it is in list
+				selectedTypes: this.state.selectedTypes.includes('arkiv') ? this.state.selectedTypes.filter(x => x !== 'arkiv') : this.state.selectedTypes
+			});
+		}
+		// if 'one_record' is not in list 'record_type_list', set state for selectedCategories to []		
+		if (!this.state.selectedRecordTypes.includes('one_record')) {
+			this.setState({
+				selectedCategories: []
+			});
+		}
 	}
 
 	typeListChangeHandler(event) {
 		// Uppdaterar state objektet med ny materialtyp som man har valt i materialtyp fältet
 		// och: trycker man 'arkiv' får man välja mellan uppteckning och/eller accession
 		let selectedTypes = event;
-		let availableRecordTypes =[];
-		if (selectedTypes.includes('arkiv')) {
-			availableRecordTypes = ['one_record', 'one_accession_row'];
-		}
+		// let availableRecordTypes =[];
+		// if (selectedTypes.includes('arkiv')) {
+			// availableRecordTypes = ['one_record', 'one_accession_row'];
+		// }
 		this.setState({
-			availableRecordTypes: availableRecordTypes,
-			selectedTypes: event,
+			// availableRecordTypes: availableRecordTypes,
+			selectedTypes: selectedTypes,
 		});
 	}
 
@@ -504,7 +532,7 @@ export default class SearchForm extends React.Component {
 		}
 
 		if (searchParams.selectedRecordTypes.length > 0) {
-			params.recordType = searchParams.selectedRecordTypes.join(',');
+			params.recordtype = searchParams.selectedRecordTypes.join(',');
 		}
 
 		if (searchParams.selectedTypes.length > 0) {
@@ -575,6 +603,34 @@ export default class SearchForm extends React.Component {
 		return item.name;
 	}
 
+	categoriesList() {
+		// if state.selectedRecordTypes has element 'one_record'
+		if (this.state.selectedRecordTypes.indexOf('one_record') > -1) {
+			return(
+				<div className="four columns">
+					<label>Kategorier för uppteckningar:</label>
+
+					{/* Filtrerad PopuplatedCheckBoxList som innehåller alla kategorier */}
+					<div className="checkbox-list">
+						<PopulatedCheckBoxList ref="categoryList" dataUrl={config.apiUrl+config.endpoints.categories}
+							filteredBy="type"
+							valueField="key"
+							labelField="name"
+							// labelFunction={function(item) {return item.key.toUpperCase()+': '+item.name+' ('+item.type+')'}}
+							labelFunction={function(item) {return `${item.name} (${item.key.toLowerCase()})`} }
+							selectedItems={this.state.selectedCategories}
+							onSelectionChange={this.categoryListChangeHandler} onFetch={function(data) {
+								window.allCategories = data;
+							}.bind(this)} />
+					</div>
+
+				</div>
+			)
+		} else {
+			return null;
+		}
+	}
+
 	render() {
 		// Bygger upp lista över html elements för söknings tabbarna
 		var searchTabs = this.state.savedSearches.length > 0 ? this.state.savedSearches.map(function(searchItem, index) {
@@ -594,18 +650,18 @@ export default class SearchForm extends React.Component {
 				<div className="container">
 
 					{/* Meny för applicationen */}
-					<div className="main-menu">
+					{/* <div className="main-menu">
 						<DropdownMenu ref="appMenu">
 							<nav className="app-nav">
 								<Link to="/">Hem</Link>
 								<Link onClick={this.appMenuItemClickHandler} to="/search/analyse">Sök</Link>
-								{/*
+								
 								//extended app:
-								<Link onClick={this.appMenuItemClickHandler} to="/search/network">Topic terms nätverk</Link>
-								*/}
+								//<Link onClick={this.appMenuItemClickHandler} to="/search/network">Topic terms nätverk</Link>
+								
 							</nav>
 						</DropdownMenu>
-					</div>
+					</div> */}
 
 					<h1>Folke <i>forska</i></h1>
 
@@ -695,11 +751,11 @@ export default class SearchForm extends React.Component {
 
 							</div> */}
 
-							<div className="four columns">
-								<label>Typ:</label>
+							{/* <div className="four columns">
+								<label>Typ:</label> */}
 
 								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
-								<CheckBoxList values={[
+								{/* <CheckBoxList values={[
 													'arkiv',
 													'tryckt',
 													// 'register',
@@ -712,46 +768,46 @@ export default class SearchForm extends React.Component {
 													// 'snd',
 												]}
 									selectedItems={this.state.selectedTypes}
-									onSelectionChange={this.typeListChangeHandler} />
-							</div>
+									onSelectionChange={this.typeListChangeHandler} /> */}
+							{/* </div> */}
 
 							<div className="four columns">
 								<label>Dokumenttyp:</label>
 
 								{/* CheckBoxList som innehåller alla typer av material. Todo: byta till PopulatetCheckBoxList */}
-								<CheckBoxList values={this.state.availableRecordTypes}
-												// {[
-												// 	'one_record',
-												// 	'one_accession_row',
-												// 	// 'register',
-												// 	// 'matkarta',
-												// 	// 'inspelning',
-												// 	// 'frågelista',
-												// 	// 'accessionsregister',
-												// 	// 'brev',
-												// 	// 'webbfrågelista',
-												// 	// 'snd',
-												// ]}
-									selectedItems={this.state.selectedRecordTypes}
-									onSelectionChange={this.recordTypeListChangeHandler} />
+								<div className="checkbox-list">
+									<CheckBoxList values={this.state.availableRecordTypes}
+													// {[
+													// 	'one_record',
+													// 	'one_accession_row',
+													// 	// 'register',
+													// 	// 'matkarta',
+													// 	// 'inspelning',
+													// 	// 'frågelista',
+													// 	// 'accessionsregister',
+													// 	// 'brev',
+													// 	// 'webbfrågelista',
+													// 	// 'snd',
+													// ]}
+										selectedItems={this.state.selectedRecordTypes}
+										onSelectionChange={this.recordTypeListChangeHandler} />
+										<CheckBoxList values={[
+														// 'arkiv',
+														'tryckt',
+														// 'register',
+														// 'matkarta',
+														// 'inspelning',
+														// 'frågelista',
+														// 'accessionsregister',
+														// 'brev',
+														// 'webbfrågelista',
+														// 'snd',
+													]}
+										selectedItems={this.state.selectedTypes}
+										onSelectionChange={this.typeListChangeHandler} />
+									</div>
 							</div>
-
-							<div className="four columns">
-								<label>Kategorier:</label>
-
-								{/* Filtrerad PopuplatedCheckBoxList som innehåller alla kategorier */}
-								<PopulatedCheckBoxList ref="categoryList" dataUrl={config.apiUrl+config.endpoints.categories}
-									filteredBy="type"
-									valueField="key"
-									labelField="name"
-									// labelFunction={function(item) {return item.key.toUpperCase()+': '+item.name+' ('+item.type+')'}}
-									labelFunction={function(item) {return `${item.name} (${item.key.toLowerCase()})`} }
-									selectedItems={this.state.selectedCategories}
-									onSelectionChange={this.categoryListChangeHandler} onFetch={function(data) {
-										window.allCategories = data;
-									}.bind(this)} />
-
-							</div>
+							{this.categoriesList()}
 
 						</div>
 
@@ -759,7 +815,7 @@ export default class SearchForm extends React.Component {
 
 						<div className="row">
 
-							<div className="six columns">
+							<div className="six columns" onClick={this.sliderClickHandler}>
 								<label><input name="collectionYearsEnabled"
 									onChange={this.inputChangeHandler}
 									className="bottom-margin-0"
