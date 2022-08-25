@@ -3333,7 +3333,7 @@ path.letter-path {
   line-height: 0;
 }
 .map-timeline-container {
-  position: absolute;
+  position: relative;
   left: 50%;
   bottom: 20px;
   width: 90%;
