@@ -729,7 +729,9 @@ export default class AdvancedMapView extends React.Component {
 						this.state.mapMode.type == 'vectorgrid' &&
 						<ColorLegendsGraph colorScale={this.state.colorScale} />
 					}
-
+					{
+						this.state.data && <span className="total-documents">{this.state.total} Dokument</span>
+					}
 					<div className="map-controls graph-controls">
 
 						<a onClick={this.fullScreenButtonClickHandler} className={this.state.fullScreen ? 'selected' : ''}>Fullskärm</a>
