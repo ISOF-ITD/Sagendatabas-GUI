@@ -1,9 +1,5 @@
 import React from 'react';
-import EventBus from 'eventbusjs';
 import _ from 'underscore';
-import { hashHistory } from 'react-router';
-
-import config from './../config';
 
 export default class TextHighlightListItem extends React.Component {
 	constructor(props) {
@@ -33,7 +29,8 @@ export default class TextHighlightListItem extends React.Component {
 	}
 
 	itemClickHandler() {
-		hashHistory.push((this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/document/'+this.state.data._id)
+		this.props.history.push('/' + (this.props.baseRoute ? this.props.baseRoute : 'search/analyse')+'/document/'+this.state.data._id)
+
 	}
 
 	formatHtml(html) {

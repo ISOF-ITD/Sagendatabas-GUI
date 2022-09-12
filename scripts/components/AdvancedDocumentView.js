@@ -1,5 +1,4 @@
 import React from 'react';
-import { hashHistory } from 'react-router';
 
 import DocumentList from './DocumentList';
 import SimpleMap from './../../ISOF-React-modules/components/views/SimpleMap';

@@ -156,7 +156,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 					<TabsContainer>
 
 						<DocumentList tabName="Dokument" />
-						<TextHighlightList tabName="Markerade meningar" />
+						<TextHighlightList history={this.props.history} tabName="Markerade meningar" />
 						<PersonList tabName="Personer" />
 
 					</TabsContainer>

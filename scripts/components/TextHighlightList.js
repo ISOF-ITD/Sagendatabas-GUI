@@ -177,7 +177,7 @@ export default class TextHighlightList extends React.Component {
 
 	render() {
 		var documentItems = this.state.data.map(function(item, index) {
-			return <TextHighlightListItem baseRoute={this.props.baseRoute} hideAttributes={this.props.hideAttributes} key={item._id+'-'+index} data={item} displayScore={this.props.displayScore} />
+			return <TextHighlightListItem baseRoute={this.props.baseRoute} hideAttributes={this.props.hideAttributes} key={item._id+'-'+index} data={item} displayScore={this.props.displayScore} history={this.props.history} />
 		}.bind(this));
 
 		return (
