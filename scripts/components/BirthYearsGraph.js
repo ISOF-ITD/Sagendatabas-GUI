@@ -547,8 +547,8 @@ export default class BirthYearsGraph extends React.Component {
 					<a onClick={this.fullScreenButtonClickHandler} className={this.state.fullScreen ? 'selected' : ''}>Fullskärm</a>
 
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
-						<option value="absolute">absolute</option>
-						<option value="relative">relative</option>
+						<option value="absolute">absoluta tal</option>
+						<option value="relative">relativa tal</option>
 					</select>
 				</div>
 

@@ -373,8 +373,8 @@ export default class CategoryTypesGraph extends React.Component {
 
 				<div className="graph-controls">
 					<select value={this.state.viewMode} onChange={this.viewModeSelectChangeHandler}>
-						<option value="absolute">absolute</option>
-						<option value="relative">relative</option>
+						<option value="absolute">absoluta tal</option>
+						<option value="relative">relativa tal</option>
 					</select>
 				</div>
 
