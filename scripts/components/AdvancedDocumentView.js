@@ -37,7 +37,8 @@ export default class AdvancedDocumentView extends React.Component {
 	mediaImageClickHandler(event) {
 		if (window.eventBus) {
 			window.eventBus.dispatch('overlay.viewimage', {
-				imageUrl: event.target.dataset.image
+				imageUrl: event.target.dataset.image,
+				type: 'image', // TODO: send 'pdf' when .pdf
 			});
 		}
 	}
