@@ -6,6 +6,7 @@ export default {
 
 	// For public application:
 	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	// apiUrl: 'http://localhost:5000/api/es/',
 	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
 	// For authorized users application:
 	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
@@ -16,7 +17,9 @@ export default {
 	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
 
 	// For resources as /img:
-	appUrl: 'https://frigg-test.isof.se/static/js-apps/digitalt_kulturarv-publik/',
+	appUrl: 'https://forska.folke-test.isof.se/',
+	// appUrl: 'http://localhost:5500/',
+	
 
 
 	// Base configuration for functionality
