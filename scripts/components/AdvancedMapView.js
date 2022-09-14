@@ -91,7 +91,8 @@ export default class AdvancedMapView extends React.Component {
 			data: null,
 			loading: false,
 			viewMode: 'absolute',
-			mapMode: this.mapModes[0],
+			// default: circles
+			mapMode: this.mapModes[2],
 			colorScale: null,
 			sliderStartYear: config.minYear,
 			sliderEndYear: config.maxYear,
