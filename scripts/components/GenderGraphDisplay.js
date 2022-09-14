@@ -123,7 +123,8 @@ export default class GenderGraphDisplay extends React.Component {
 	render() {
 		var graphElements = [];
 
-		for (var item in this.state.data) {
+		// omit 'all', only show informants and collectors
+		for (var item in _.omit(this.state.data, 'all')) {
 			graphElements.push(<div key={item} className="four columns">
 				<GenderGraph label={this.roleLabels[item]} total={this.state.total[item]} viewMode={this.state.viewMode} graphHeight="200" data={this.state.data[item] || []} />
 			</div>);
