@@ -64,15 +64,16 @@ export default {
 	requiredApiParams: {
 		// country: 'sweden',
 		// recordtype: 'one_record',
-		publishstatus: 'published',
+		// publishstatus: 'published',
+		// categorytypes: 'tradark,sagner',
 	},
 
 	// pre-selected (and immutable) category type in search form
 	// if undefined, list of all category_types will be shown
 	predefinedCategoryType: 'tradark',
 
-	minYear: 1750,
-	maxYear: 2017,
+	minYear: 1880,
+	maxYear: 2022,
 
 	// Needed for ISOF-React-modules/components:
 	siteOptions: {
