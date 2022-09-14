@@ -108,9 +108,9 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						<div className="twelve columns">
 
 							<TabsContainer>
-								<Tab tabName="Huvudkategorier">
+								{/* <Tab tabName="Huvudkategorier">
 									<CategoryTypesGraph graphHeight="300" />
-								</Tab>
+								</Tab> */}
 								<Tab tabName="Kategorier">
 									<CategoriesGraph graphHeight="300" />
 								</Tab>
