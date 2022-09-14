@@ -125,10 +125,12 @@ export default {
 
 			if ((params.recordtype && params.recordtype != '') || (params.type && params.type != '')) {
 				let s = 'Materialtyp: ';
-				s = s + (formatParam(params.recordtype.split(',').map(function(n){
-					return l(n);
-				}).join(', ')));
-				if(params.recordtype && params.type && params.type.split(',').filter(n => {return n != 'arkiv'} ).length > 0) {
+				if(params.recordtype) {
+					s = s + (formatParam(params.recordtype.split(',').map(function(n){
+						return l(n);
+					}).join(', ')));
+				}
+				if(s !== 'Materialtyp: ' && params.type && params.type.split(',').filter(n => {return n != 'arkiv'} ).length > 0) {
 					s = s + ', '
 				}
 				s= s + (formatParam(params.type.split(',').filter(function(n) {
