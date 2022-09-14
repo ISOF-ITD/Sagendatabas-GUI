@@ -395,7 +395,7 @@ export default class AdvancedMapView extends React.Component {
 		}
 
 		this.fetchTotal(totalParams, function() {
-			fetch(config.apiUrl+this.state.mapMode.endpoint+'/?'+paramString)
+			fetch(config.apiUrl+this.state.mapMode.endpoint+'?'+paramString)
 				.then(function(response) {
 					return response.json()
 				}).then(function(json) {
