@@ -111,11 +111,6 @@ export default class AdvancedMapView extends React.Component {
 	componentDidMount() {
 		L.drawLocal.draw.toolbar.buttons.rectangle = 'Rita rektangel';
 
-		if (window.eventBus) {
-			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
-			window.eventBus.addEventListener('collectionYears.timerangeChanged', this.timerangeChangeHandler);
-		}
-
 		L.Control.RemoveAll = L.Control.extend({
 			options: {
 				position: 'topleft',
@@ -165,6 +160,15 @@ export default class AdvancedMapView extends React.Component {
 
 		// do not render vector grid onMount, but later
 		// this.renderVectorGrid();
+
+		// if params are defined in the props, fetch data to map directly
+		if(this.props.params){
+			this.fetchData();
+		// otherwise wait for search form to send params
+		} else if (window.eventBus) {
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
+			window.eventBus.addEventListener('collectionYears.timerangeChanged', this.timerangeChangeHandler);
+		}
 	}
 
 	componentWillUnmount() {
@@ -356,11 +360,15 @@ export default class AdvancedMapView extends React.Component {
 	}
 
 	fetchData(forceFetch, callBack) {
-		if (!this.state.params) {
+		if (!this.state.params && !this.props.params) {
 			return;
 		}
-
-		var params = JSON.parse(JSON.stringify(this.state.params));
+		let params;
+		if(this.props.params) {
+			 params = this.props.params;
+		} else {
+			params = JSON.parse(JSON.stringify(this.state.params));
+		}
 
 		if (!this.state.limitMapToPeriod && params.collection_years) {
 			delete params.collection_years;
@@ -759,7 +767,7 @@ export default class AdvancedMapView extends React.Component {
 					</div>
 
 				</div>
-				<div className={'map-timeline-container'+(!this.state.limitMapToPeriod ? ' minimized' : '')+(this.state.data == null ? ' disabled' : '')}>
+				<div style={{display: this.props.disableSlider !== true ? 'inherit' : 'none'}} className={'map-timeline-container'+(!this.state.limitMapToPeriod ? ' minimized' : '')+(this.state.data == null ? ' disabled' : '')}>
 
 					<div style={{position: 'relative', float: 'right', marginTop: 10, marginRight: 10, zIndex: 10}}>
 						<label><input type="checkbox" name="limitMapToPeriod" checked={this.state.limitMapToPeriod} onChange={this.inputChangeHandler} /> Begränsa kartvy till en period</label>

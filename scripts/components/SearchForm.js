@@ -575,6 +575,7 @@ export default class SearchForm extends React.Component {
 			var params = this.buildParams();
 
 			// Skickar parametrar via eventBus till visualiserings komponenter
+			// OBS! Inte optimalt, kringgår den egentliga React-logiken (top-down data-flöde)
 			window.eventBus.dispatch('searchForm.search', this, {
 				params: params
 			});
