@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet-draw';
 
 import EventBus from 'eventbusjs';
+import _ from 'underscore';
 
 import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBoxList';
 import PopulatedCheckBoxList from './../../ISOF-React-modules/components/controls/PopulatedCheckBoxList';
@@ -893,7 +894,8 @@ export default class SearchForm extends React.Component {
 
 										{/* AutocompleteInput för sökning efter upptecknares namn */}
 										<AutocompleteInput inputName="collectorNameInput"
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c&idprefix=acc,crwd'}
+											// narrow down persons to having idprefix=acc,crwd when "Tryckt" is not selected
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c'+ (_.contains(this.state.selectedTypes,'tryckt') ? '' : '&idprefix=acc,crwd') }
 											valueField="name"
 											inputClassName="u-full-width"
 											onChange={this.inputChangeHandler}
