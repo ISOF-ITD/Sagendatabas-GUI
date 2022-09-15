@@ -893,7 +893,7 @@ export default class SearchForm extends React.Component {
 
 										{/* AutocompleteInput för sökning efter upptecknares namn */}
 										<AutocompleteInput inputName="collectorNameInput"
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c'}
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=c&idprefix=acc,crwd'}
 											valueField="name"
 											inputClassName="u-full-width"
 											onChange={this.inputChangeHandler}
@@ -944,7 +944,7 @@ export default class SearchForm extends React.Component {
 
 										{/* AutocompleteInput för sökning efter upptecknares namn */}
 										<AutocompleteInput inputName="informantNameInput"
-											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=i'}
+											searchUrl={config.apiUrl+config.endpoints.persons_autocomplete+'?search=$s&relation=i&idprefix=acc,crwd'}
 											valueField="name"
 											inputClassName="u-full-width"
 											onChange={this.inputChangeHandler}
