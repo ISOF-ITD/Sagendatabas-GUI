@@ -8,7 +8,8 @@ import EventBus from 'eventbusjs';
 import _ from 'underscore';
 
 import CheckBoxList from './../../ISOF-React-modules/components/controls/CheckBoxList';
-import PopulatedCheckBoxList from './../../ISOF-React-modules/components/controls/PopulatedCheckBoxList';
+// import PopulatedCheckBoxList from './../../ISOF-React-modules/components/controls/PopulatedCheckBoxList';
+import PopulatedCheckBoxList from './PopulatedCheckBoxList';
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
 import AutocompleteInput from './../../ISOF-React-modules/components/controls/AutocompleteInput';
 import PopulatedSelect from './../../ISOF-React-modules/components/controls/PopulatedSelect';
@@ -422,14 +423,19 @@ export default class SearchForm extends React.Component {
 		if(this.state.selectedRecordTypes.includes('one_record') || this.state.selectedRecordTypes.includes('one_accession_row')){
 			this.setState({
 				// add 'arkiv' to selectedTypes if it is not already in list
-				selectedTypes: this.state.selectedTypes.includes('arkiv') ? this.state.selectedTypes : this.state.selectedTypes.concat('arkiv')
-				
+				selectedTypes: this.state.selectedTypes.includes('arkiv') ? this.state.selectedTypes : this.state.selectedTypes.concat('arkiv'),				
 			});
+			// if(!this.state.selectedCategories.includes('trad16')) {
+			// 	this.setState({
+			// 		selectedCategories: this.state.selectedCategories.concat(['trad16']),
+			// 	});
+			// }
 		}
 		else {
 			this.setState({
 				// remove 'arkiv' from selectedTypes if it is in list
-				selectedTypes: this.state.selectedTypes.includes('arkiv') ? this.state.selectedTypes.filter(x => x !== 'arkiv') : this.state.selectedTypes
+				selectedTypes: this.state.selectedTypes.includes('arkiv') ? this.state.selectedTypes.filter(x => x !== 'arkiv') : this.state.selectedTypes,
+				// selectedCategories: this.state.selectedCategories.filter(x => x !== 'trad16'),
 			});
 		}
 		// if 'one_record' is not in list 'record_type_list', set state for selectedCategories to []		
@@ -613,14 +619,16 @@ export default class SearchForm extends React.Component {
 					<label>Kategorier för uppteckningar:</label>
 
 					{/* Filtrerad PopuplatedCheckBoxList som innehåller alla kategorier */}
-					<div className="checkbox-list">
+					<div >
 						<PopulatedCheckBoxList ref="categoryList" dataUrl={config.apiUrl+config.endpoints.categories}
 							filteredBy="type"
 							valueField="key"
 							labelField="name"
+							selectedRecordTypes={this.state.selectedRecordTypes}
+							selectedTypes={this.state.selectedTypes}
 							// labelFunction={function(item) {return item.key.toUpperCase()+': '+item.name+' ('+item.type+')'}}
 							labelFunction={function(item) {return `${item.name} (${item.key.toLowerCase()})`} }
-							selectedItems={this.state.selectedCategories}
+							// selectedItems={this.state.selectedCategories}
 							onSelectionChange={this.categoryListChangeHandler} onFetch={function(data) {
 								window.allCategories = data;
 							}.bind(this)} />
