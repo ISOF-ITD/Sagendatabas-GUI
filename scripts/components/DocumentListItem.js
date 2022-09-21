@@ -41,7 +41,7 @@ export default class DocumentListItem extends React.Component {
 		return this.state.data ? (
 			<div className={'item'+(this.state.open ? ' open' : '')}>
 				<div className="header" onClick={this.headerClickHandler}>
-					<span className="title">{this.state.data._source.title}</span>
+					<span className="title">{this.state.data._source.title || `${[this.state.data._source.contents]}`}</span>
 
 					{
 						!this.props.hideAttributes &&
