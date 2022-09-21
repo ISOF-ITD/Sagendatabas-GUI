@@ -18,9 +18,15 @@ const rest_api_url = {
 }
 
 const app_url = {
-	'dev': 'http://127.0.0.1:5502',
+	'dev': window.location.origin,
 	'test': 'https://forska.folke-test.isof.se/',
 	'prod': 'https://forska.folke.isof.se/',
+}
+
+const pdf_url = {
+	'dev': 'https://sok.folke.isof.se/arkivfiler/publik/',
+	'test': 'https://sok.folke-test.isof.se/arkivfiler/publik/',
+	'prod': 'https://sok.folke.isof.se/arkivfiler/publik/',
 }
 
 export default {
@@ -43,6 +49,8 @@ export default {
 	geoserverUrl: 'https://frigg-test.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
+
+	pdfUrl: pdf_url[ENV],
 
 	endpoints: {
 		terms: 'terms/',
