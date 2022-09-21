@@ -3,6 +3,9 @@ import React from 'react';
 import DocumentList from './DocumentList';
 import SimpleMap from './../../ISOF-React-modules/components/views/SimpleMap';
 import Slider from './../../ISOF-React-modules/components/controls/Slider';
+import PdfViewer from './../../ISOF-React-modules/components/controls/PdfViewer'
+
+import _ from 'underscore';
 
 import config from './../config';
 
@@ -95,14 +98,30 @@ export default class AdvancedDocumentView extends React.Component {
 			</tr>;
 		}.bind(this)) : [];
 
+		let pdfObject = undefined;
+			if (this.state.doc && _.filter(this.state.doc.media, function(item) {
+				return item.type == 'pdf';
+			}).length == 1 && _.filter(this.state.doc.media, function(item) {
+				return item.type == 'image';
+			}).length == 0 && _.filter(this.state.doc.media, function(item) {
+				return item.type == 'audio';
+			}).length == 0) {
+				pdfObject = _.find(this.state.doc.media, function(item) {
+					return item.type == 'pdf';
+				});
+			}
+		let pdfElement = pdfObject ? <PdfViewer height="800" url={config.pdfUrl+pdfObject.source}/> : <div/>;
+
 		return this.state.doc ? 
 			<div className="document-view">
-				<h2>{this.state.doc.title}</h2>
+				<h2>{this.state.doc.title || `[${this.state.doc.contents}]`}</h2>
 
 				<div className="row">
 					
 					<div className="eight columns">
 						<p dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
+						{pdfElement}
+						
 					</div>
 
 					<div className="four columns">
