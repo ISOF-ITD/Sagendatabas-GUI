@@ -1,3 +1,28 @@
+const hostname = window.location.hostname
+const is_dev = ['127.0.0.1', 'localhost', '0.0.0.0'].some(element => hostname.includes(element))
+const is_test = ['-test.'].some(element => hostname.includes(element))
+const ENV =  is_dev ? 'dev' : (is_test ? 'test' : 'prod')
+
+console.log(`ENV=${ENV}`)
+
+const api_url = {
+	'dev': 'http://localhost:5000/api/es/',
+	'test': 'https://frigg-test.isof.se/sagendatabas/api/es/',
+	'prod': 'https://frigg.isof.se/sagendatabas/api/es/',
+}
+
+const rest_api_url = {
+	'dev': 'http://localhost:5000/api/',
+	'test': 'https://frigg-test.isof.se/sagendatabas/api/',
+	'prod': 'https://frigg.isof.se/sagendatabas/api/',
+}
+
+const app_url = {
+	'dev': 'http://127.0.0.1:5502',
+	'test': 'https://forska.folke-test.isof.se/',
+	'prod': 'https://forska.folke.isof.se/',
+}
+
 export default {
 	// Configuration for environment
 	///////////////////////////////////////
@@ -5,23 +30,13 @@ export default {
 	localLibraryName: 'digitalt_kulturarv',
 
 	// For public application:
-	apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es/',
-	// apiUrl: 'http://localhost:5000/api/es/',
-	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-dk/',
-	// For authorized users application:
-	// apiUrl: 'https://frigg-test.isof.se/sagendatabas/api/es-advanced/',
-	// apiUrl: 'https://127.0.0.1:8000/sagenkarta/es/',
+	apiUrl: api_url[ENV],
 
-//TODO: varför görs anrop till oden.test
-
-	restApiUrl: 'https://frigg-test.isof.se/sagendatabas/api/',
+	restApiUrl: rest_api_url[ENV],
 
 	// For resources as /img:
-	appUrl: 'https://forska.folke-test.isof.se/',
-	// appUrl: 'http://localhost:5500/',
+	appUrl: app_url[ENV],
 	
-
-
 	// Base configuration for functionality
 	///////////////////////////////////////
 	// Proxy:  https://frigg-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
@@ -64,16 +79,17 @@ export default {
 	requiredApiParams: {
 		// country: 'sweden',
 		// recordtype: 'one_record',
-		// publishstatus: 'published',
-		// categorytypes: 'tradark,sagner',
+		publishstatus: 'published',
+		categorytypes: 'tradark',
+		transcriptionstatus: 'published,accession'
 	},
 
 	// pre-selected (and immutable) category type in search form
 	// if undefined, list of all category_types will be shown
 	predefinedCategoryType: 'tradark',
 
-	minYear: 1880,
-	maxYear: 2022,
+	minYear: 1800,
+	maxYear: new Date().getFullYear(),
 
 	// Needed for ISOF-React-modules/components:
 	siteOptions: {
