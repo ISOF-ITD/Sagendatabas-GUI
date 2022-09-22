@@ -335,6 +335,11 @@ export default class AdvancedMapView extends React.Component {
 			}
 		}.bind(this));
 
+		if(mapMode === 'socken') {
+			Array.from(document.getElementsByClassName('leaflet-overlay-pane')).forEach(x => x.style="display:none;")
+		} else {
+			Array.from(document.getElementsByClassName('leaflet-overlay-pane')).forEach(x => x.style="display:block;")
+		}
 	}
 
 	getTotal(dataType, id) {
