@@ -503,10 +503,9 @@ export default class AdvancedMapView extends React.Component {
 					color: '#000',
 					weight: 0.8,
 					sockenObj: mapItem
-				});
+				}).bindTooltip(`${mapItem.name} (${mapItem.doc_count} dokument)`).openTooltip();
 
 				marker.on('click', function(event) {
-					console.log(event);
 					window.eventBus.dispatch('graph.filter', this, {
 						filter: this.state.mapMode.filterField,
 						value: event.target.options.sockenObj.name
