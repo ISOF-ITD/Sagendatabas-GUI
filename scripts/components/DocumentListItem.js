@@ -53,7 +53,8 @@ export default class DocumentListItem extends React.Component {
 									return <span className="prop" key={place.name+'-'+place.landskap}>{place.name+', '+place.landskap}</span>
 								})
 							}
-							<span className="prop">{this.state.data._source.materialtype}</span>
+							<span className="prop">{l(this.state.data._source.recordtype)}</span>
+							<span className="prop">{l(this.state.data._source.materialtype)}</span>
 							{
 								this.state.data._source.taxonomy && this.state.data._source.taxonomy.category &&
 								<span className="prop">{this.state.data._source.taxonomy.category+': '+this.state.data._source.taxonomy.name}</span>
