@@ -498,7 +498,7 @@ export default class AdvancedMapView extends React.Component {
 
 				var marker = L.circleMarker(mapItem.location, {
 					radius: ((sizeValue/maxValue)*20)+2,
-					fillColor: "#047bff",
+					fillColor: "#a6192e", //"#047bff",
 					fillOpacity: 0.4,
 					color: '#000',
 					weight: 0.8,
