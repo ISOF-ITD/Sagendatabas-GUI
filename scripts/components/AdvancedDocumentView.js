@@ -119,7 +119,7 @@ export default class AdvancedDocumentView extends React.Component {
 				<div className="row">
 					
 					<div className="eight columns">
-						<p dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
+						<p style={{wordWrap: 'break-word', whiteSpace: 'pre-wrap'}} dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
 						{pdfElement}
 						
 					</div>
