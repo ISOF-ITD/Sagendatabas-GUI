@@ -82,7 +82,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 		return (
 			<div className={'app-container'}>
 
-				<TabsContainer className="content-width">
+				{/* <TabsContainer className="content-width"> */}
 					<AdvancedMapView mapHeight="700" tabName="Karta" />
 {/*
 	extended app:
@@ -98,8 +98,8 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 						hideLabels={true}
 						tabName="Person nätverk" />
 */}				
-					<IntroApplication mapHeight="700" tabName="Om" />
-				</TabsContainer>
+					{/* <IntroApplication mapHeight="700" tabName="Om" /> */}
+				{/* </TabsContainer> */}
 
 				<div className="container">
 
