@@ -2476,6 +2476,7 @@ td .play-button {
 }
 .slider-container .noUi-horizontal .noUi-handle {
   left: 50px;
+  left: 9px;
   width: 15px;
 }
 .slider-container .noUi-horizontal .noUi-handle:before {
