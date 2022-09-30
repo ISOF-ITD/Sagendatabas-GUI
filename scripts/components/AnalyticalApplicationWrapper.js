@@ -37,16 +37,17 @@ Wrapper component för hela applicationen
 
 export default class AnalyticalApplicationWrapper extends React.Component {
 	constructor(props) {
-		console.log('AnalyticalApplicationWrapper.js constructor');
 		super(props);
 
 		this.state = {
-			popupVisible: false
+			popupVisible: false,
+			params: null,
 		};
 
 		this.popupWindowShowHandler = this.popupWindowShowHandler.bind(this);
 		this.popupWindowHideHandler = this.popupWindowHideHandler.bind(this);
 		this.popupCloseHandler = this.popupCloseHandler.bind(this);
+		this.searchHandler = this.searchHandler.bind(this);
 
 		window.eventBus = EventBus;
 	}
@@ -63,6 +64,26 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 
 	popupWindowHideHandler() {
 		document.body.classList.remove('has-overlay');
+	}
+
+	componentDidMount() {
+		if (window.eventBus && !this.props.disableEventBus) {
+			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
+		}
+	}
+
+	componentWillUnmount() {
+		if (window.eventBus) {
+			window.eventBus.removeEventListener('searchForm.search', this.searchHandler);
+		}
+	}
+
+	searchHandler(event, data) {
+		this.filters = {};
+
+		this.setState({
+			params: data.params,
+		})
 	}
 
 	render() {
@@ -156,7 +177,7 @@ export default class AnalyticalApplicationWrapper extends React.Component {
 					<TabsContainer>
 
 						<DocumentList tabName="Dokument" />
-						<TextHighlightList history={this.props.history} tabName="Markerade meningar" />
+						<TextHighlightList visible={this.state.params && this.state.params['recordtype'] && this.state.params['recordtype'].includes('one_record') ? true : false} history={this.props.history} tabName="Markerade meningar" />
 						<PersonList tabName="Personer" />
 
 					</TabsContainer>

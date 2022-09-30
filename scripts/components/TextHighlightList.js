@@ -149,6 +149,12 @@ export default class TextHighlightList extends React.Component {
 		params.sort = this.state.sort;
 		params.order = this.state.sortOrder;
 
+		if (params['recordtype'].includes('one_record')){
+			params['recordtype'] = 'one_record'
+		} else {
+			// abort if one_record is not in params.
+			return;
+		}
 		var paramString = paramsHelper.buildParamString(params);
 
 		if (paramString == this.state.paramString) {
