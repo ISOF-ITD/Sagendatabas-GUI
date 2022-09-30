@@ -21,8 +21,8 @@ export default class AdvancedDocumentView extends React.Component {
 
 		this.state = {
 			doc: null,
-			min_word_length:  5,
-			min_term_freq: 1,
+			min_word_length:  4,
+			min_term_freq: 2,
 			max_query_terms: 25
 		};
 	}
@@ -262,9 +262,10 @@ export default class AdvancedDocumentView extends React.Component {
 
 				<div className="row table-wrapper">
 
-					<div className="three columns">
+					{/* Sliders för anpassning av "similar"-sök */}
+					{/* <div className="three columns">
 						<br/>
-						<label>min_word_length</label>
+						<label>Minsta ordlängd <small title="Minsta ordlängd under vilken termerna ignoreras. Standardvärdet är 0. ">(?)</small></label>
 						<Slider inputName="min_word_length" 
 							start={4} 
 							rangeMin={0} 
@@ -274,9 +275,9 @@ export default class AdvancedDocumentView extends React.Component {
 
 					<div className="three columns">
 						<br/>
-						<label>min_term_freq</label>
+						<label>Minsta termfrekvens <small title="Minsta termfrekvens under vilken termerna ignoreras från dokumentet. Standardvärdet är 2.">(?)</small></label>
 						<Slider inputName="min_term_freq" 
-							start={1} 
+							start={2} 
 							rangeMin={0} 
 							rangeMax={10} 
 							onChange={this.inputChangeHandler} />
@@ -284,7 +285,7 @@ export default class AdvancedDocumentView extends React.Component {
 
 					<div className="three columns">
 						<br/>
-						<label>max_query_terms</label>
+						<label>Maximala antal söktermer <small title="Det maximala antalet söktermer som väljs ut. Om du ökar det här värdet får du större noggrannhet på bekostnad av hastigheten på sökningen. Standardvärdet är 25. ">(?)</small></label>
 						<Slider inputName="max_query_terms" 
 							start={25} 
 							rangeMin={0} 
@@ -294,13 +295,13 @@ export default class AdvancedDocumentView extends React.Component {
 
 					<div className="three columns">
 						<br/>
-						<label>minimum_should_match</label>
+						<label>Minsta antal termer som ska matcha</label>
 						<Slider inputName="minimum_should_match" 
 							start={30} 
 							rangeMin={0} 
 							rangeMax={100} 
 							onChange={this.inputChangeHandler} />
-					</div>
+					</div> */}
 
 				</div>
 

@@ -61,7 +61,7 @@ export default class DocumentListItem extends React.Component {
 							}
 							{
 								this.props.displayScore &&
-								<span className="prop"><div className="score-view">&nbsp;<span className="score" style={{width: this.state.data._score+'%'}}></span></div></span>
+								<span className="prop"><div className="score-view"  title={`${this.state.data._score}%`}>&nbsp;<span className="score" style={{width: this.state.data._score+'%'}}></span></div></span>
 							}
 						</span>
 					}
