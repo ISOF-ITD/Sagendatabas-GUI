@@ -12,6 +12,9 @@ export default {
 		'one_record': 'Uppteckning (Arkiv)',
 		'one_accession_row': 'Accession (Arkiv)',
 		'tryckt': 'Tryckt',
+		'asc': 'Lägst',
+		'desc': 'Högst',
+		'_score': 'Score',
 	},
 	'no': {
 		'Karta': 'Kart',
