@@ -30,7 +30,8 @@ export default class DocumentList extends React.Component {
 			params: null,
 			sort: '_score',
 			sortOrder: 'desc',
-			currentPage: 1
+			currentPage: 1,
+			size: 100,
 		};
 
 		if (window.eventBus) {
@@ -39,6 +40,11 @@ export default class DocumentList extends React.Component {
 	}
 
 	componentDidMount() {
+		if(this.props.params && this.props.params.size) {
+			this.setState({
+				size: this.props.params.size
+			})
+		}
 		if (window.eventBus && !this.props.disableEventBus) {
 			window.eventBus.addEventListener('searchForm.search', this.searchHandler);
 		}
@@ -55,6 +61,9 @@ export default class DocumentList extends React.Component {
 				person_id: this.props.person
 			});
 		}
+		if (this.props.params && this.props.open === true) {
+			this.fetchData(this.props.params)
+		}
 	}
 
 	componentWillUnmount() {
@@ -64,7 +73,12 @@ export default class DocumentList extends React.Component {
 		}
 	}
 
-	componentWillReceiveProps(props) {
+	UNSAFE_componentWillReceiveProps(props) {
+		if(props.params && props.params.size) {
+			this.setState({
+				size: props.params.size
+			})
+		}
 		if (props.similarDocs) {
 			this.fetchData({
 				similar: props.similarDocs,
@@ -73,6 +87,9 @@ export default class DocumentList extends React.Component {
 				max_query_terms: props.max_query_terms ? props.max_query_terms : 12,
 				minimum_should_match: props.max_query_terms ? props.minimum_should_match : '30%'
 			});
+		}
+		if (props.params && props.open === true) {
+			this.fetchData(props.params);
 		}
 	}
 
@@ -151,8 +168,8 @@ export default class DocumentList extends React.Component {
 			params.order = this.state.sortOrder;
 		}
 
-		params.from = (this.state.currentPage-1)*this.pageSize;
-		params.size = this.pageSize;
+		params.from = (this.state.currentPage-1)*this.state.size;
+		params.size = this.state.size;
 
 		var paramString = paramsHelper.buildParamString(params);
 
@@ -211,7 +228,7 @@ export default class DocumentList extends React.Component {
 					{
 						this.state.total && this.state.total > 0 &&
 						<div className="list-footer">
-							<div className="page-info u-pull-right">{'Visar '+((this.state.currentPage*this.pageSize)-(this.pageSize-1))+'-'+(this.state.currentPage*this.pageSize > this.state.total ? this.state.total : this.state.currentPage*this.pageSize)+' av '+this.state.total}</div>
+							<div className="page-info u-pull-right">{'Visar '+((this.state.currentPage*this.state.size)-(this.state.size-1))+'-'+(this.state.currentPage*this.state.size > this.state.total ? this.state.total : this.state.currentPage*this.state.size)+' av '+this.state.total}</div>
 							<button className="button prev-button" disabled={this.state.currentPage == 1} onClick={this.prevPage}>Föregående</button>
 							<span> </span>
 							<button className="button next-button" disabled={this.state.total <= this.state.currentPage*50} onClick={this.nextPage}>Nästa</button>

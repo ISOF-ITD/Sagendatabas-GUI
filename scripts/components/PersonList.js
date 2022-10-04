@@ -119,7 +119,7 @@ export default class PersonList extends React.Component {
 
 	render() {
 		var personItems = this.state.data.map(function(item) {
-			return <PersonListItem key={item.id} data={item} />
+			return <PersonListItem key={item.id} data={item} paramString={this.state.paramString} />
 		}.bind(this));
 
 		return (

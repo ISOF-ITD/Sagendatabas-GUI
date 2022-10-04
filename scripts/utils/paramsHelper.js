@@ -15,6 +15,12 @@ export default {
 		return paramStrings.join('&');
 	},
 
+	getJsonFromParamString(s) {
+		const h = {};
+		s.split("&").forEach(param => h[param.split("=")[0]]=param.split("=")[1]);
+		return h;
+	},
+
 	describeParams(params, disableHtml, allCategories) {
 		var params = JSON.parse(JSON.stringify(params));
 
