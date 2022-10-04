@@ -84,7 +84,9 @@ export default class DocumentList extends React.Component {
 		if (sort != this.state.sort || sortOrder != this.state.sortOrder) {
 			this.setState({
 				sort: sort,
-				sortOrder: sortOrder
+				sortOrder: sortOrder,
+				// start over from page 1
+				currentPage: 1,
 			}, function() {
 				this.fetchData();
 			}.bind(this));
