@@ -216,6 +216,7 @@ export default class DocumentList extends React.Component {
 							<span> </span>
 							<button className="button next-button" disabled={this.state.total <= this.state.currentPage*50} onClick={this.nextPage}>Nästa</button>
 						</div>
+						|| "Inga liknande uppteckningar"
 					}
 
 					<div className="loading-overlay"></div>

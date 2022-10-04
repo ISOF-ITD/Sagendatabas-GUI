@@ -213,7 +213,10 @@ export default class AdvancedDocumentView extends React.Component {
 						}
 
 						<p><strong>Materialtyp:</strong><br/>
-						{this.state.doc.materialtype}</p>
+						{l(this.state.doc.materialtype)}</p>
+
+						<p><strong>Dokumenttyp:</strong><br/>
+						{l(this.state.doc.recordtype)}</p>
 					</div>
 
 					<div className="three columns">
@@ -258,66 +261,71 @@ export default class AdvancedDocumentView extends React.Component {
 						}
 					</div>
 				}
+				{
+					// Only show Liknande uppteckningar if document is an uppteckning
+					this.state.doc.recordtype === 'one_record' &&
+					<div>
+						<hr/>
 
-				<hr/>
+						<h3>Liknande uppteckningar</h3>
 
-				<h3>Liknande upptekningar</h3>
+						<div className="row table-wrapper">
 
-				<div className="row table-wrapper">
+							{/* Sliders för anpassning av "similar"-sök */}
+							{/* <div className="three columns">
+								<br/>
+								<label>Minsta ordlängd <small title="Minsta ordlängd under vilken termerna ignoreras. Standardvärdet är 0. ">(?)</small></label>
+								<Slider inputName="min_word_length" 
+									start={4} 
+									rangeMin={0} 
+									rangeMax={10} 
+									onChange={this.inputChangeHandler} />
+							</div>
 
-					{/* Sliders för anpassning av "similar"-sök */}
-					{/* <div className="three columns">
-						<br/>
-						<label>Minsta ordlängd <small title="Minsta ordlängd under vilken termerna ignoreras. Standardvärdet är 0. ">(?)</small></label>
-						<Slider inputName="min_word_length" 
-							start={4} 
-							rangeMin={0} 
-							rangeMax={10} 
-							onChange={this.inputChangeHandler} />
+							<div className="three columns">
+								<br/>
+								<label>Minsta termfrekvens <small title="Minsta termfrekvens under vilken termerna ignoreras från dokumentet. Standardvärdet är 2.">(?)</small></label>
+								<Slider inputName="min_term_freq" 
+									start={2} 
+									rangeMin={0} 
+									rangeMax={10} 
+									onChange={this.inputChangeHandler} />
+							</div>
+
+							<div className="three columns">
+								<br/>
+								<label>Maximala antal söktermer <small title="Det maximala antalet söktermer som väljs ut. Om du ökar det här värdet får du större noggrannhet på bekostnad av hastigheten på sökningen. Standardvärdet är 25. ">(?)</small></label>
+								<Slider inputName="max_query_terms" 
+									start={25} 
+									rangeMin={0} 
+									rangeMax={50} 
+									onChange={this.inputChangeHandler} />
+							</div>
+
+							<div className="three columns">
+								<br/>
+								<label>Minsta antal termer som ska matcha</label>
+								<Slider inputName="minimum_should_match" 
+									start={30} 
+									rangeMin={0} 
+									rangeMax={100} 
+									onChange={this.inputChangeHandler} />
+							</div> */}
+
+						</div>
+
+						<DocumentList 
+							baseRoute={this.baseRoute} 
+							disableEventBus="true" 
+							disableSorting="true" 
+							similarDocs={this.state.id} 
+							min_word_length={this.state.min_word_length} 
+							min_term_freq={this.state.min_term_freq} 
+							max_query_terms={this.state.max_query_terms} 
+							minimum_should_match={this.state.minimum_should_match} 
+							displayScore="true" />
 					</div>
-
-					<div className="three columns">
-						<br/>
-						<label>Minsta termfrekvens <small title="Minsta termfrekvens under vilken termerna ignoreras från dokumentet. Standardvärdet är 2.">(?)</small></label>
-						<Slider inputName="min_term_freq" 
-							start={2} 
-							rangeMin={0} 
-							rangeMax={10} 
-							onChange={this.inputChangeHandler} />
-					</div>
-
-					<div className="three columns">
-						<br/>
-						<label>Maximala antal söktermer <small title="Det maximala antalet söktermer som väljs ut. Om du ökar det här värdet får du större noggrannhet på bekostnad av hastigheten på sökningen. Standardvärdet är 25. ">(?)</small></label>
-						<Slider inputName="max_query_terms" 
-							start={25} 
-							rangeMin={0} 
-							rangeMax={50} 
-							onChange={this.inputChangeHandler} />
-					</div>
-
-					<div className="three columns">
-						<br/>
-						<label>Minsta antal termer som ska matcha</label>
-						<Slider inputName="minimum_should_match" 
-							start={30} 
-							rangeMin={0} 
-							rangeMax={100} 
-							onChange={this.inputChangeHandler} />
-					</div> */}
-
-				</div>
-
-				<DocumentList 
-					baseRoute={this.baseRoute} 
-					disableEventBus="true" 
-					disableSorting="true" 
-					similarDocs={this.state.id} 
-					min_word_length={this.state.min_word_length} 
-					min_term_freq={this.state.min_term_freq} 
-					max_query_terms={this.state.max_query_terms} 
-					minimum_should_match={this.state.minimum_should_match} 
-					displayScore="true" />
+				}
 			</div> : 
 		null;
 	}
