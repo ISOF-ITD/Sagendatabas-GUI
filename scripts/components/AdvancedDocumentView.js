@@ -117,19 +117,22 @@ export default class AdvancedDocumentView extends React.Component {
 				<h2>{this.state.doc.title || `[${this.state.doc.contents}]`}</h2>
 
 				<div className="row">
-					
-					<div className="eight columns">
+						{/* mediaItems can be [ undefined ], that is why we need this long boolean
+						clause: */}
+					<div className={`${this.state.doc.media && mediaItems && mediaItems.length > 0 && mediaItems[0] ? 'eight' : 'twelve'} columns`}>
 						<p style={{wordWrap: 'break-word', whiteSpace: 'pre-wrap'}} dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
 						{pdfElement}
 						
 					</div>
 
-					<div className="four columns">
-						{
-							this.state.doc.media &&
-							mediaItems
-						}
-					</div>
+					{
+						// mediaItems can be [ undefined ], that is why we need this long boolean
+						// clause:
+						this.state.doc.media && mediaItems && mediaItems.length > 0 && mediaItems[0] &&
+						<div className="four columns">
+							{mediaItems}
+						</div>
+					}
 
 				</div>
 
