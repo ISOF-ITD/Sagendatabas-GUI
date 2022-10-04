@@ -3537,10 +3537,10 @@ path.letter-path {
 .documents-list .item.open {
   border-bottom: #edeff1 1px solid;
 }
-.documents-list .item.open .header {
+.documents-list .item.open > .header {
   border-top: 2px solid #097C44;
 }
-.documents-list .item.open .content {
+.documents-list .item.open > .content {
   max-height: 2000px;
   padding-top: 20px;
   padding-bottom: 20px;
