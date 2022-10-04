@@ -2430,6 +2430,7 @@ td .play-button {
 }
 .tabs-control .tab-container.hidden {
   position: absolute;
+  display: none !important;
   top: 0;
   opacity: 0;
   pointer-events: none;
