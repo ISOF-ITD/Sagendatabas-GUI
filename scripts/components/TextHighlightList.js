@@ -30,7 +30,7 @@ export default class TextHighlightList extends React.Component {
 			params: null,
 
 			sort: '_score',
-			sortOrder: 'asc',
+			sortOrder: 'desc',
 			currentPage: 1
 		};
 
@@ -194,10 +194,10 @@ export default class TextHighlightList extends React.Component {
 					{
 						!this.props.disableSorting &&
 						<div className="list-heading">
-							<DropdownMenu label={'Sortering: '+this.state.sort+', '+this.state.sortOrder}>
-								<div className="sort-item"><strong>Score</strong>: <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="asc">asc</a> <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="desc">desc</a></div>
-								<div className="sort-item"><strong>Uppteckningsår</strong>: <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="desc">desc</a></div>
-								<div className="sort-item"><strong>Category</strong>: <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="asc">asc</a>, <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="desc">desc</a></div>
+							<DropdownMenu label={'Sortering: '+l(this.state.sort)+', '+l(this.state.sortOrder)}>
+								<div className="sort-item"><strong>Score</strong>: <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="asc">{l('asc')}</a> <a onClick={this.orderLinkClickHandler} data-sort="_score" data-order="desc">{l('desc')}</a></div>
+								<div className="sort-item"><strong>Uppteckningsår</strong>: <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="asc">{l('asc')}</a>, <a onClick={this.orderLinkClickHandler} data-sort="year" data-order="desc">{l('desc')}</a></div>
+								<div className="sort-item"><strong>Category</strong>: <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="asc">{l('asc')}</a>, <a onClick={this.orderLinkClickHandler} data-sort="taxonomy.category" data-order="desc">{l('desc')}</a></div>
 							</DropdownMenu>
 
 							{
