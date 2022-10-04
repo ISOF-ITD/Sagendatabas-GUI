@@ -14,7 +14,9 @@ export default {
 		'tryckt': 'Tryckt',
 		'asc': 'Lägst',
 		'desc': 'Högst',
-		'_score': 'Score',
+		'_score': 'Relevans',
+		'Score': 'Relevans',
+		'Category': 'Kategori',
 	},
 	'no': {
 		'Karta': 'Kart',

@@ -208,7 +208,7 @@ export default class AdvancedDocumentView extends React.Component {
 					<div className="three columns">
 						{
 							this.state.doc.taxonomy && this.state.doc.taxonomy.category && 
-							<p><strong>Kategori:</strong><br/>
+							<p><strong>{l('Kategori')}:</strong><br/>
 							{this.state.doc.taxonomy.category+': '+this.state.doc.taxonomy.name}</p>
 						}
 
