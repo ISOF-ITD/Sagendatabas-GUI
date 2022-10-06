@@ -140,7 +140,7 @@ export default class DocumentList extends React.Component {
 		this.setState({
 			currentPage: this.state.currentPage+1
 		}, function() {
-			this.fetchData();
+			this.fetchData(this.props.params);
 		}.bind(this));
 	}
 
@@ -151,7 +151,7 @@ export default class DocumentList extends React.Component {
 		this.setState({
 			currentPage: this.state.currentPage-1
 		}, function() {
-			this.fetchData();
+			this.fetchData(this.props.params);
 		}.bind(this));
 	}
 
