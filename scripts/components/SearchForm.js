@@ -725,14 +725,15 @@ export default class SearchForm extends React.Component {
 						</div>
 
 						{/* Inställningar för fras-sökning */}
-						<div className="radio-list-inline">
+						{/* Deaktiverat, fungerar inte just nu */}
+						{/* <div className="radio-list-inline">
 							<div className="list-heading">Fras-sökning inställningar: </div>
 							<label><input type="radio" checked={this.state.phraseSearchOptions == ''} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="" /> Exakt</label>
 							<label><input type="radio" checked={this.state.phraseSearchOptions == 'nearer'} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="nearer" /> Närmare</label>
 							<label><input type="radio" checked={this.state.phraseSearchOptions == 'near'} name="phraseSearchOptions" onChange={this.inputChangeHandler} value="near" /> Nära</label>
-						</div>
+						</div> */}
 
-						<hr />
+						{/* <hr /> */}
 
 						<div className="row">
 
