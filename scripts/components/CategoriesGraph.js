@@ -192,7 +192,7 @@ export default class CategoriesGraph extends React.Component {
 						return d;
 					}
 					else if (this.state.viewMode == 'relative') {
-						return d*100 < 1 ? d*100 : Math.round(d*100);
+						return `${d*100 < 1 ? d*100 : Math.round(d*100)}%`;
 					}
 				}.bind(this))
 				.tickSizeInner([-this.graphWidth])
@@ -318,7 +318,6 @@ export default class CategoriesGraph extends React.Component {
 				return this.selectedBar && this.selectedBar != d.key ? 0.2 : 1;
 			}.bind(this))
 			.on('mousemove', function(d) {
-				console.log(d.key);
 
 				var total = this.getTotalByCategory(d.key);
 
@@ -326,7 +325,17 @@ export default class CategoriesGraph extends React.Component {
 					.style('left', d3.event.pageX + 20 + 'px')
 					.style('top', d3.event.pageY + 'px')
 					.style('display', 'inline-block')
-					.html('<strong>'+this.getCategoryName(d.key)+'</strong>'+(d.key != ' ' ? ' ('+d.key+')' : '')+'<br/>'+d.doc_count+' (total '+total+')');
+					.html(
+						this.state.viewMode === 'absolute' ?
+						(
+							'<strong>'+this.getCategoryName(d.key)+'</strong>'+(d.key != ' ' ? ' ('+d.key+')' : '')+'<br/>'+d.doc_count+' (total '+total+')'
+						)
+						:
+						(
+							`<strong>${this.getCategoryName(d.key)}</strong>${(d.key != ' ' ? ' ('+d.key+')' : '')}<br/>${Math.round(d.doc_count/total*100*10)/10}% (${d.doc_count}/${total})`
+						)
+						);//+
+						// this.state.viewMode === 'relative' ? (' ' + Math.round(d.doc_count/total*10000)/100 + '%') : '');
 			}.bind(this))
 			.on('mouseout', function(d) {
 				this.tooltip.style('display', 'none');

@@ -162,7 +162,7 @@ export default class CategoryTypesGraph extends React.Component {
 						return d;
 					}
 					else if (this.state.viewMode == 'relative') {
-						return d*100 < 1 ? d*100 : Math.round(d*100);
+						return `${d*100 < 1 ? d*100 : Math.round(d*100)}%`;
 					}
 				}.bind(this))
 				.tickSizeInner([-this.graphWidth])
