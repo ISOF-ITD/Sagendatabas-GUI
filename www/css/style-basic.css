@@ -2475,20 +2475,6 @@ td .play-button {
   background: transparent;
   font-size: 0.8rem;
 }
-.slider-container .noUi-horizontal .noUi-handle {
-  left: 50px;
-  left: 9px;
-  width: 15px;
-}
-.slider-container .noUi-horizontal .noUi-handle:before {
-  left: 3px;
-}
-.slider-container .noUi-horizontal .noUi-handle:after {
-  left: 8px;
-}
-.map-timeline-container .noUi-horizontal .noUi-handle {
-  left: 100px;
-}
 .dropdown-wrapper {
   position: relative;
 }
