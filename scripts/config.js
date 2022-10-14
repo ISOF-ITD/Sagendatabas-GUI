@@ -24,9 +24,9 @@ const app_url = {
 }
 
 const pdf_url = {
-	'dev': 'https://sok.folke.isof.se/arkivfiler/publik/',
-	'test': 'https://sok.folke-test.isof.se/arkivfiler/publik/',
-	'prod': 'https://sok.folke.isof.se/arkivfiler/publik/',
+	'dev': '',
+	'test': 'https://forska.folke-test.isof.se/arkivfiler/publik/',
+	'prod': 'https://forska.folke.isof.se/arkivfiler/publik/',
 }
 
 export default {
