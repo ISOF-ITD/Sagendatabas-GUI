@@ -20,7 +20,7 @@ export default class TextHighlightListItem extends React.Component {
 	}
 
 	componentWillReceiveProps(props) {
-		if (this.state.data._id != props.data._id) {
+		if (this.state.data._id != props.data._id || this.state.data.highlight != props.data.highlight) {
 			this.setState({
 				open: false,
 				data: props.data
