@@ -253,7 +253,7 @@ export default class AdvancedDocumentView extends React.Component {
 				}
 
 				{
-					this.state.doc.metadata && this.state.doc.metadata.length > 0 &&
+					!"do not show metadata" && this.state.doc.metadata && this.state.doc.metadata.length > 0 &&
 					<div className="row">
 						<h3>Metadata</h3>
 
