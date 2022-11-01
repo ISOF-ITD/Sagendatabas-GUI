@@ -122,6 +122,11 @@ export default class AdvancedDocumentView extends React.Component {
 					<div className={`${this.state.doc.media && mediaItems && mediaItems.length > 0 && mediaItems[0] ? 'eight' : 'twelve'} columns`}>
 						<p style={{wordWrap: 'break-word', whiteSpace: 'pre-wrap'}} dangerouslySetInnerHTML={{__html: this.state.doc.text}}></p>
 						{pdfElement}
+
+						{
+							this.state.doc.transcribedby && this.state.doc.transcribedby != '' &&
+							<p className="text-small"><strong>{l('Transkriberad av')+': '}</strong><span dangerouslySetInnerHTML={{__html: this.state.doc.transcribedby}} /></p>
+						}
 						
 					</div>
 
