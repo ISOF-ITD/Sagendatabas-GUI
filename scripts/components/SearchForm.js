@@ -58,6 +58,7 @@ export default class SearchForm extends React.Component {
 		this.state = {
 			searchInput: '',
 			termsInput: '',
+			searchTypeInput: 'all',
 			titleTermsInput: '',
 			availableRecordTypes: ['one_record', 'one_accession_row'],
 			selectedRecordTypes: ['one_record'],
@@ -96,6 +97,7 @@ export default class SearchForm extends React.Component {
 		return JSON.parse(JSON.stringify({
 			searchInput: this.state.searchInput || '',
 			termsInput: this.state.termsInput || '',
+			searchTypeInput: this.state.searchTypeInput || 'all',
 			titleTermsInput: this.state.titleTermsInput || '',
 			selectedRecordTypes: this.state.selectedRecordTypes || ['one_record'],
 			availableTypes: this.state.availableTypes || (this.state.selectedTypes && this.state.selectedTypes.includes('arkiv') && ['one_record']) || [],
@@ -142,6 +144,7 @@ export default class SearchForm extends React.Component {
 		this.setState({
 			searchInput: currentSearch.searchInput,
 			termsInput: currentSearch.termsInput,
+			searchTypeInput: currentSearch.searchTypeInput,
 			titleTermsInput: currentSearch.titleTermsInput,
 			selectedRecordTypes: currentSearch.selectedRecordTypes,
 			selectedTypes: currentSearch.selectedTypes,
@@ -188,6 +191,7 @@ export default class SearchForm extends React.Component {
 		savedSearches.push({
 			searchInput: '',
 			termsInput: '',
+			searchTypeInput: 'all',
 			titleTermsInput: '',
 			selectedRecordTypes: ['one_record'],
 			selectedTypes: ['arkiv', 'tryckt'],
@@ -213,6 +217,7 @@ export default class SearchForm extends React.Component {
 		this.setState({
 			searchInput: '',
 			termsInput: '',
+			searchTypeInput: 'all',
 			titleTermsInput: '',
 			selectedRecordTypes: ['one_record'],
 			selectedTypes: ['arkiv', 'tryckt'],
@@ -493,6 +498,15 @@ export default class SearchForm extends React.Component {
 		if (searchParams.termsInput != '') {
 			params.terms = searchParams.termsInput;
 		}
+		if (searchParams.searchTypeInput != '') {
+			switch (searchParams.searchTypeInput) {
+				case 'title':
+					params.search_title = 'true';
+					break;
+				case 'content':
+					params.search_content = 'true';
+			}
+		}
 
 		if (searchParams.titleTermsInput != '') {
 			params.title_terms = searchParams.titleTermsInput;
@@ -722,6 +736,25 @@ export default class SearchForm extends React.Component {
 								name="rawTextSearch"
 								checked={this.state.rawTextSearch}
 								onChange={this.inputChangeHandler} /> Exakt sökning</label>
+						</div>
+
+						{/* Choose search all, search only title or only content */}
+						<div className="radio-list-inline" style={{float: 'left'}}>
+							<label><input type="radio"
+								name="searchTypeInput"
+								value="all"
+								checked={this.state.searchTypeInput == 'all'}
+								onChange={this.inputChangeHandler} /> Allt</label>
+							<label><input type="radio"
+								name="searchTypeInput"
+								value="title"
+								checked={this.state.searchTypeInput == 'title'}
+								onChange={this.inputChangeHandler} /> Titel</label>
+							<label><input type="radio"
+								name="searchTypeInput"
+								value="content"
+								checked={this.state.searchTypeInput == 'content'}
+								onChange={this.inputChangeHandler} /> Innehåll</label>
 						</div>
 
 						{/* Inställningar för fras-sökning */}
