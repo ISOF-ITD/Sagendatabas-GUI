@@ -754,7 +754,7 @@ export default class SearchForm extends React.Component {
 								name="searchTypeInput"
 								value="content"
 								checked={this.state.searchTypeInput == 'content'}
-								onChange={this.inputChangeHandler} /> Innehåll</label>
+								onChange={this.inputChangeHandler} /> Avskriven text</label>
 						</div>
 
 						{/* Inställningar för fras-sökning */}
