@@ -600,6 +600,10 @@ export default class SearchForm extends React.Component {
 			window.eventBus.dispatch('searchForm.search', this, {
 				params: params
 			});
+			// send search query to matomo
+			window.eventBus.dispatch('searchForm.matomo', this, {
+				search: params.search
+			});
 
 			// Sparar parametrarna till 'lastSearchParams' som används för att beskriva parametrara i gränsnittet som text
 			this.setState({
