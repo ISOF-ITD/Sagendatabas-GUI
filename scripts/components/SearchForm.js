@@ -691,7 +691,18 @@ export default class SearchForm extends React.Component {
 						</DropdownMenu>
 					</div> */}
 
-					<h1>Folke <i>forska</i></h1>
+					<div class="logo">
+
+						<div id="Logo" className="isof-app-header">
+
+							<a href="https://www.isof.se/arkiv-och-insamling/digitala-arkivtjanster/folke"><img alt="Folke på Institutet för språk och folkminnen" className="sv-noborder" style={{maxWidth:326,maxHeight:50}} src="img/folkelogga.svg" /></a>
+							<div id="about">
+
+							</div>
+							
+						</div>
+
+					</div>
 
 					<div className="row">
 
