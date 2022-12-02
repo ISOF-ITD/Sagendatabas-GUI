@@ -3862,3 +3862,8 @@ hr {
   top: 20px;
   left: 10px;
 }
+.logo {
+  height: 50px;
+  position: relative;
+  z-index: 1000;
+}
