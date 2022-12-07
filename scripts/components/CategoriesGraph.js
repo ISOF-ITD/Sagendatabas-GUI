@@ -139,6 +139,12 @@ export default class CategoriesGraph extends React.Component {
 			.then(function(response) {
 				return response.json()
 			}).then(function(json) {
+				// quick fix
+				//remove objects from json where type is 'sägner'
+				json.data = _.reject(json.data, function(item) {
+					return item.type == 'sägner';
+				});
+
 				var categoryTypes = json.data.length > 0 ? ['Alla'].concat(_.compact(_.uniq(_.pluck(json.data, 'type')))) : [];
 				this.setState({
 					categoryTypes: categoryTypes,
