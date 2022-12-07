@@ -23,7 +23,7 @@
 <script>
 	const hostname = window.location.hostname;
 	const is_dev = ["127.0.0.1", "localhost", "0.0.0.0"].some((element) =>
-	hostname.includes(element)
+	hostnae.includes(element)
 	);
 	const is_test = ["-test."].some((element) => hostname.includes(element));
 	const ENV = is_dev ? "dev" : is_test ? "test" : "prod";
