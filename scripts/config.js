@@ -6,15 +6,17 @@ const ENV =  is_dev ? 'dev' : (is_test ? 'test' : 'prod')
 console.log(`ENV=${ENV}`)
 
 const api_url = {
-	'dev': 'http://localhost:5000/api/es/',
-	'test': 'https://frigg-test.isof.se/sagendatabas/api/es/',
-	'prod': 'https://frigg.isof.se/sagendatabas/api/es/',
+	// 'dev': 'http://localhost:5000/api/es/', // feel free to change according to your local environment
+	'dev': 'https://garm-test.isof.se/folkeservice/api/es/', // feel free to change according to your local environment
+	'test': 'https://garm-test.isof.se/sagendatabas/api/es/',
+	'prod': 'https://garm.isof.se/sagendatabas/api/es/',
 }
 
 const rest_api_url = {
-	'dev': 'http://localhost:5000/api/',
-	'test': 'https://frigg-test.isof.se/sagendatabas/api/',
-	'prod': 'https://frigg.isof.se/sagendatabas/api/',
+	// 'dev': 'http://localhost:5000/api/', // feel free to change according to your local environment
+	'dev': 'https://garm-test.isof.se/folkeservice/api/', // feel free to change according to your local environment
+	'test': 'https://garm-test.isof.se/sagendatabas/api/',
+	'prod': 'https://garm.isof.se/sagendatabas/api/',
 }
 
 const app_url = {
@@ -45,8 +47,9 @@ export default {
 	
 	// Base configuration for functionality
 	///////////////////////////////////////
-	// Proxy:  https://frigg-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
-	geoserverUrl: 'https://frigg-test.isof.se/geoserver',
+	// Proxy:  https://garm-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
+	// Proxy does not work yet!
+	geoserverUrl: 'https://oden-test.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
 

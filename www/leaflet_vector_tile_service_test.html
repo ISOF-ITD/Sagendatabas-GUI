@@ -30,14 +30,15 @@
 
         var layer = 'SockenStad_ExtGranskning-clipped:SockenStad_ExtGranskn_v1.0_clipped'
 
-        var isfotilesUrl = 'https://oden-test.sprakochfolkminnen.se/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=' + layer + '&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}'
+        // var isoftilesUrl = 'https://oden-test.sprakochfolkminnen.se/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=' + layer + '&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}'
+        var isoftilesUrl = 'https://oden-test.isof.se/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=' + layer + '&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/x-protobuf;type=mapbox-vector&TILECOL={x}&TILEROW={y}'
 
         var isofVectorTileOptions = {
             rendererFactory: L.canvas.tile,
             maxZoom: 14
         };
 
-		var isofPbfLayer = L.vectorGrid.protobuf(isfotilesUrl, isofVectorTileOptions).addTo(map);
+		var isofPbfLayer = L.vectorGrid.protobuf(isoftilesUrl, isofVectorTileOptions).addTo(map);
 		
         map.setView({ lat: 62.000000000000000, lng: 14.000000000000000 }, 5);
 
