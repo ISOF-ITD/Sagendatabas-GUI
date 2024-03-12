@@ -8,15 +8,15 @@ console.log(`ENV=${ENV}`)
 const api_url = {
 	// 'dev': 'http://localhost:5000/api/es/', // feel free to change according to your local environment
 	'dev': 'https://garm-test.isof.se/folkeservice/api/es/', // feel free to change according to your local environment
-	'test': 'https://garm-test.isof.se/sagendatabas/api/es/',
-	'prod': 'https://garm.isof.se/sagendatabas/api/es/',
+	'test': 'https://garm-test.isof.se/folkeservice/api/es/',
+	'prod': 'https://garm.isof.se/folkeservice/api/es/',
 }
 
 const rest_api_url = {
 	// 'dev': 'http://localhost:5000/api/', // feel free to change according to your local environment
 	'dev': 'https://garm-test.isof.se/folkeservice/api/', // feel free to change according to your local environment
-	'test': 'https://garm-test.isof.se/sagendatabas/api/',
-	'prod': 'https://garm.isof.se/sagendatabas/api/',
+	'test': 'https://garm-test.isof.se/folkeservice/api/',
+	'prod': 'https://garm.isof.se/folkeservice/api/',
 }
 
 const app_url = {
