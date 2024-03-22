@@ -60,7 +60,10 @@ export default class AdvancedMapView extends React.Component {
 				idField: 'SnSt_Id',
 				endpoint: config.endpoints.socken,
 				type: 'vectorgrid',
-				layer: 'SockenStad_ExtGranskning-clipped:SockenStad_ExtGranskn_v1.0_clipped'
+				// oden
+				layer: 'Sockenstad:SockenStad_ExtGranskn_v1.0_clipped'
+				// oden-test
+				//layer: 'SockenStad_ExtGranskning-clipped:SockenStad_ExtGranskn_v1.0_clipped'
 			},
 			/*
 			{

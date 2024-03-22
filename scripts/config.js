@@ -49,7 +49,8 @@ export default {
 	///////////////////////////////////////
 	// Proxy:  https://garm-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
 	// Proxy does not work yet!
-	geoserverUrl: 'https://oden-test.isof.se/geoserver',
+	// geoserverUrl: 'https://oden-test.isof.se/geoserver',
+	geoserverUrl: 'https://oden.isof.se/geoserver',
 
 	imageUrl: 'https://www4.isof.se/Folkminnen/Svenska_sagor_filer/',
 
