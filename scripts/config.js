@@ -7,16 +7,16 @@ console.log(`ENV=${ENV}`)
 
 const api_url = {
 	// 'dev': 'http://localhost:5000/api/es/', // feel free to change according to your local environment
-	'dev': 'https://garm-test.isof.se/folkeservice/api/es/', // feel free to change according to your local environment
-	'test': 'https://garm-test.isof.se/folkeservice/api/es/',
-	'prod': 'https://garm.isof.se/folkeservice/api/es/',
+	'dev': 'https://ull-test.isof.se/folkeservice/api/es/', // feel free to change according to your local environment
+	'test': 'https://ull-test.isof.se/folkeservice/api/es/',
+	'prod': 'https://ull.isof.se/folkeservice/api/es/',
 }
 
 const rest_api_url = {
 	// 'dev': 'http://localhost:5000/api/', // feel free to change according to your local environment
-	'dev': 'https://garm-test.isof.se/folkeservice/api/', // feel free to change according to your local environment
-	'test': 'https://garm-test.isof.se/folkeservice/api/',
-	'prod': 'https://garm.isof.se/folkeservice/api/',
+	'dev': 'https://ull-test.isof.se/folkeservice/api/', // feel free to change according to your local environment
+	'test': 'https://ull-test.isof.se/folkeservice/api/',
+	'prod': 'https://ull.isof.se/folkeservice/api/',
 }
 
 const app_url = {
@@ -47,7 +47,7 @@ export default {
 	
 	// Base configuration for functionality
 	///////////////////////////////////////
-	// Proxy:  https://garm-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
+	// Proxy:  https://ull-test.isof.se/geoserver' -> https://oden-test.isof.se/geoserver
 	// Proxy does not work yet!
 	// geoserverUrl: 'https://oden-test.isof.se/geoserver',
 	geoserverUrl: 'https://oden.isof.se/geoserver',
@@ -93,7 +93,8 @@ export default {
 		// recordtype: 'one_record',
 		publishstatus: 'published',
 		categorytypes: 'tradark',
-		transcriptionstatus: 'published,accession'
+		// Only transcribed records?:
+		// transcriptionstatus: 'published,accession'
 	},
 
 	// pre-selected (and immutable) category type in search form
